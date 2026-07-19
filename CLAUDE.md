@@ -15,8 +15,9 @@ social network — no feed, following, or sharing between users.
 Status: **Phase 01 — Verification.** The reviewed design prototype is vendored under
 `Lincoln's Reel Records - Claude Design/`; the PRD / design system / user stories are written, and all
 9 open PRD questions are resolved (see `context/decisions.md`). The SwiftUI scaffold, minimum
-SwiftData/outbox flow, hosted Supabase schema/RLS, and automated tests exist. Next up: Apple signing,
-internal TestFlight upload, and the physical-device acceptance script in
+SwiftData/outbox flow, hosted Supabase schema/RLS, and automated tests exist. Signed TestFlight build
+`0.1.0 (3)` is available internally; the external friends-and-family build is in TestFlight App Review.
+Next up: finish the physical-device reconnect/recovery checks in
 `context/implementation-phases/01-tracer-bullet.md`.
 
 ## Working agreement (read before writing any code)

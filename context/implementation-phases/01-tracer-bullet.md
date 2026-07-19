@@ -80,13 +80,15 @@ Box; profile editing; production-ready generalized conflict resolution; visual c
 
 ## Closeout record
 
-- TestFlight build: _Pending._ Signed archive is blocked because Xcode has no Apple account configured:
-  `No Accounts: Add a new account in Accounts settings.` Build number remains `1` (`0.1.0`).
+- TestFlight build: `0.1.0 (3)` is signed and uploaded. It is available to the internal group
+  `Reel Records Internal`; `ed.p.may@gmail.com` installed the beta on the named test phone. The external
+  group `Reel Records Friends & Family` contains `fisher.lincoln@gmail.com`; build `3` is awaiting
+  TestFlight App Review, so the external tester currently shows `No Builds Available`.
 - Test phone / iOS: iPhone 16 Pro / iOS 18.6
 - Supabase migration: `supabase/migrations/20260719184719_create_phase_01_schema.sql`; hosted migration
   ledger version `20260719191234` (`create_phase_01_schema`) on project `ptoqkqisgyzypfpjvmvx`.
   Hosted email confirmation is disabled; Security Advisor reports no findings.
-- Automated checks: 9 XCTest/UI tests pass; 9 local pgTAP RLS assertions pass; equivalent hosted
+- Automated checks: 9 unit tests and 1 UI test pass; 9 local pgTAP RLS assertions pass; equivalent hosted
   transactional two-user RLS assertions pass. `swiftformat --lint` and `swiftlint --strict` pass.
 - Manual acceptance evidence:
   - Normally signed iPhone 17 Pro Simulator / iOS 26.5: real hosted signup entered the app immediately;
@@ -96,12 +98,19 @@ Box; profile editing; production-ready generalized conflict resolution; visual c
   - Sign-out returned to Welcome. The temporary hosted test user was deleted afterward; cascades left
     `auth.users`, `public.profiles`, and `public.catches` at zero rows.
   - A clean install with no session now opens Welcome without an `Auth session missing` alert.
+  - Physical TestFlight build `2`: `ed.p.may@gmail.com` remained signed in in airplane mode, saved a
+    Northern Pike Catch locally, force-quit/relaunched, and saw both that pending Catch and the earlier
+    synchronized Largemouth Bass. The app remained responsive, but automatic synchronization kept the
+    upper-right activity indicator spinning while offline.
+  - Build `3` prevents automatic remote synchronization for an account restored offline while retaining
+    explicit retry. The regression is covered by the automated suite; physical-device confirmation is
+    still required.
 
 ## Remaining acceptance work
 
-- Sign Edwin May's Apple account into Xcode Settings > Accounts, then create/download automatic signing
-  assets and archive/upload build `1` to the email-invite-only TestFlight group.
-- Connect the named iPhone; it was not visible to `devicectl` during this run.
-- On that physical device, complete the airplane-mode save, force-quit/relaunch, reconnect/upload, and
-  clean-install recovery script. Record the installed TestFlight build and results above before marking
-  this phase Complete.
+- Install/confirm TestFlight build `3` on the named phone and verify that airplane-mode relaunch no longer
+  leaves the global activity indicator spinning continuously.
+- Reconnect and verify the pending Northern Pike uploads exactly once and changes to `Synced`; then
+  clean-install/sign-in and verify both Catches recover from Supabase without duplication.
+- Record those physical results above before marking this phase Complete. External TestFlight approval is
+  tracked for the friends-and-family rollout but is not a substitute for the Phase 01 recovery gate.

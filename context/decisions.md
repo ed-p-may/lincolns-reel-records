@@ -27,7 +27,9 @@ made; keep the "Open" list current. Newest entries at the top.
     immediately. First signup/login requires a network connection.
   - After a successful login, a cached authenticated session may reopen its account-scoped SwiftData
     logbook offline. A failed refresh caused only by unavailable connectivity does not hide or discard
-    cached data; a definitively invalid session returns to authentication.
+    cached data; a definitively invalid session returns to authentication. Startup must expose the
+    cached account and local logbook before awaiting network-backed profile/session validation, and an
+    account restored as offline must not start automatic remote synchronization.
   - Phase 01 blocks sign-out while that account has pending or failed Catch creations, shows the pending
     count, and offers retry. Phase 02 will revisit the broader policy when edit/delete outbox operations
     exist.
