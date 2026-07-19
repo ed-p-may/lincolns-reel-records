@@ -1,0 +1,110 @@
+name: LincolnReelRecords
+
+options:
+  bundleIdPrefix: com.bldgtyp
+  createIntermediateGroups: true
+  deploymentTarget:
+    iOS: "18.0"
+
+configs:
+  Debug: debug
+  Beta: release
+  Release: release
+
+configFiles:
+  Debug: Config/Debug.xcconfig
+  Beta: Config/Beta.xcconfig
+  Release: Config/Beta.xcconfig
+
+packages:
+  Supabase:
+    url: https://github.com/supabase/supabase-swift.git
+    exactVersion: 2.52.0
+
+settings:
+  base:
+    DEVELOPMENT_TEAM: JPJ3AJ5U8A
+    SWIFT_VERSION: 6.0
+    SWIFT_STRICT_CONCURRENCY: complete
+    IPHONEOS_DEPLOYMENT_TARGET: 18.0
+    MARKETING_VERSION: 0.1.0
+    CURRENT_PROJECT_VERSION: 1
+
+targets:
+  LincolnReelRecords:
+    type: application
+    platform: iOS
+    sources:
+      - ReelRecords
+    dependencies:
+      - package: Supabase
+        product: Supabase
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.bldgtyp.LincolnsReelRecords
+        PRODUCT_NAME: LincolnReelRecords
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGN_STYLE: Automatic
+        TARGETED_DEVICE_FAMILY: 1
+    info:
+      path: ReelRecords/Resources/Info.plist
+      properties:
+        CFBundleDisplayName: Lincoln's Reel Records
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        LSRequiresIPhoneOS: true
+        SUPABASE_PROJECT_HOST: $(SUPABASE_PROJECT_HOST)
+        SUPABASE_PUBLISHABLE_KEY: $(SUPABASE_PUBLISHABLE_KEY)
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+        UILaunchScreen:
+          UIColorName: LaunchBackground
+        UIRequiresFullScreen: true
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+
+  LincolnReelRecordsTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - ReelRecordsTests
+    dependencies:
+      - target: LincolnReelRecords
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.bldgtyp.LincolnsReelRecordsTests
+        GENERATE_INFOPLIST_FILE: true
+
+  LincolnReelRecordsUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - ReelRecordsUITests
+    dependencies:
+      - target: LincolnReelRecords
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.bldgtyp.LincolnsReelRecordsUITests
+        GENERATE_INFOPLIST_FILE: true
+        TEST_TARGET_NAME: LincolnReelRecords
+
+schemes:
+  LincolnReelRecords:
+    build:
+      targets:
+        LincolnReelRecords: all
+        LincolnReelRecordsTests: [test]
+        LincolnReelRecordsUITests: [test]
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - LincolnReelRecordsTests
+        - LincolnReelRecordsUITests
+    profile:
+      config: Beta
+    analyze:
+      config: Debug
+    archive:
+      config: Beta

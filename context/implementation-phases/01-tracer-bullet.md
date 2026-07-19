@@ -1,6 +1,6 @@
 # Phase 01 — Tracer Bullet
 
-**Status:** Planned  
+**Status:** Verification
 **Depends on:** Pre-scaffold confirmation gate in `../implementation-plan.md`  
 **Primary stories:** A1, B1, E1, E2, E5
 
@@ -80,8 +80,28 @@ Box; profile editing; production-ready generalized conflict resolution; visual c
 
 ## Closeout record
 
-- TestFlight build: _TBD_
-- Test phone / iOS: _TBD_
-- Supabase migration: _TBD_
-- Automated checks: _TBD_
-- Manual acceptance evidence: _TBD_
+- TestFlight build: _Pending._ Signed archive is blocked because Xcode has no Apple account configured:
+  `No Accounts: Add a new account in Accounts settings.` Build number remains `1` (`0.1.0`).
+- Test phone / iOS: iPhone 16 Pro / iOS 18.6
+- Supabase migration: `supabase/migrations/20260719184719_create_phase_01_schema.sql`; hosted migration
+  ledger version `20260719191234` (`create_phase_01_schema`) on project `ptoqkqisgyzypfpjvmvx`.
+  Hosted email confirmation is disabled; Security Advisor reports no findings.
+- Automated checks: 9 XCTest/UI tests pass; 9 local pgTAP RLS assertions pass; equivalent hosted
+  transactional two-user RLS assertions pass. `swiftformat --lint` and `swiftlint --strict` pass.
+- Manual acceptance evidence:
+  - Normally signed iPhone 17 Pro Simulator / iOS 26.5: real hosted signup entered the app immediately;
+    local Catch creation rendered before network completion; retry uploaded it and displayed `Synced`.
+  - Force-quit/relaunch restored the authenticated session and Catch. Removing and reinstalling the app
+    erased SwiftData, then the retained session downloaded the Catch from Supabase.
+  - Sign-out returned to Welcome. The temporary hosted test user was deleted afterward; cascades left
+    `auth.users`, `public.profiles`, and `public.catches` at zero rows.
+  - A clean install with no session now opens Welcome without an `Auth session missing` alert.
+
+## Remaining acceptance work
+
+- Sign Edwin May's Apple account into Xcode Settings > Accounts, then create/download automatic signing
+  assets and archive/upload build `1` to the email-invite-only TestFlight group.
+- Connect the named iPhone; it was not visible to `devicectl` during this run.
+- On that physical device, complete the airplane-mode save, force-quit/relaunch, reconnect/upload, and
+  clean-install recovery script. Record the installed TestFlight build and results above before marking
+  this phase Complete.

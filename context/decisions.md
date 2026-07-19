@@ -6,14 +6,37 @@ made; keep the "Open" list current. Newest entries at the top.
 ## Open decisions
 
 - **Detailed sync semantics** — local-first SwiftData + an explicit outbox is decided. Before Phase 02,
-  fix conflict detection/resolution and remote tombstone retention. Before Phase 01, fix the minimum
-  sign-out behavior when an unsynced creation exists. Phase 01 may use the smallest creation-only form
-  of the remaining sync contract.
-- **Signup email confirmation + offline session behavior** — “signup → straight in” must match the
-  Supabase Auth configuration. Before Phase 01, decide whether email confirmation is disabled for the
-  invite-only beta and define what an already-authenticated user can do after an offline relaunch.
+  fix conflict detection/resolution, remote tombstone retention, and the long-term pending-data sign-out
+  UX. Phase 01 uses the smallest creation-only form of this contract.
 
 ## Decisions made
+
+## 2026-07-19 — Phase 01 identity, environment, session, and device contract
+- **Context:** The tracer bullet cannot be scaffolded until its Apple identity, Supabase environment,
+  beta auth behavior, minimum offline session rules, and first physical-device test target are fixed.
+- **Decision:**
+  - App display name: **Lincoln's Reel Records**. Bundle identifier:
+    **`com.bldgtyp.LincolnsReelRecords`**.
+  - Signing and App Store Connect ownership use Edwin May's existing individual Apple Developer team,
+    Team ID **`JPJ3AJ5U8A`**. The internal TestFlight tester is **`ed.p.may@gmail.com`**.
+  - Create a new hosted Supabase beta project in the `bldgtyp` organization: project
+    **`lincolns-reel-records`**, reference **`ptoqkqisgyzypfpjvmvx`**, in **`us-east-1`**. Debug and
+    TestFlight configurations use separate build-setting keys; Phase 01 may point both at this hosted
+    project while local Supabase remains optional. No service-role or secret key is stored in the app.
+  - Disable Supabase signup email confirmation for the email-invite-only beta so signup enters the app
+    immediately. First signup/login requires a network connection.
+  - After a successful login, a cached authenticated session may reopen its account-scoped SwiftData
+    logbook offline. A failed refresh caused only by unavailable connectivity does not hide or discard
+    cached data; a definitively invalid session returns to authentication.
+  - Phase 01 blocks sign-out while that account has pending or failed Catch creations, shows the pending
+    count, and offers retry. Phase 02 will revisit the broader policy when edit/delete outbox operations
+    exist.
+  - Initial device acceptance uses an **iPhone 16 Pro on iOS 18.6**.
+- **Consequences:** Phase 01 may begin. Its closeout still requires migration evidence, an App Store
+  Connect record, a signed TestFlight build, and physical-device recovery results.
+  Simulator integration runs that exercise Supabase Auth must use normal Simulator ad-hoc signing;
+  `CODE_SIGNING_ALLOWED=NO` prevents Keychain-backed session persistence and makes PostgREST requests
+  fall back to the anonymous role.
 
 ## 2026-07-19 — Notifications behavior deferred; v1 row is disabled
 - **Context:** The Profile mockup includes Notifications, but no notification event, cadence, permission

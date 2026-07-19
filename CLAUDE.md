@@ -12,10 +12,12 @@ fishing catches; each keeps a **private logbook**. The feel is a **premium fishi
 with a **modern tracking app** (clean, tactile, image-forward). Multi-user backend, but **not** a public
 social network — no feed, following, or sharing between users.
 
-Status: **pre-code / planning done.** The Claude Design prototype has been reviewed (vendored under
-`Lincoln's Reel Records - Claude Design/`), the PRD / design system / user stories are written, and all
-9 open PRD questions are resolved (see `context/decisions.md`). Next up: project scaffolding and the
-Supabase schema. No application source exists yet.
+Status: **Phase 01 — Verification.** The reviewed design prototype is vendored under
+`Lincoln's Reel Records - Claude Design/`; the PRD / design system / user stories are written, and all
+9 open PRD questions are resolved (see `context/decisions.md`). The SwiftUI scaffold, minimum
+SwiftData/outbox flow, hosted Supabase schema/RLS, and automated tests exist. Next up: Apple signing,
+internal TestFlight upload, and the physical-device acceptance script in
+`context/implementation-phases/01-tracer-bullet.md`.
 
 ## Working agreement (read before writing any code)
 

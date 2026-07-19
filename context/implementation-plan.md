@@ -148,6 +148,9 @@ assigned and completed before Phase 11 begins rather than introduced during hard
 
 ## 6. Pre-scaffold confirmation gate
 
+**Gate status:** Satisfied on 2026-07-19; see the Phase 01 identity/environment/session decision in
+`decisions.md`.
+
 Before Phase 1 scaffolding begins, confirm and record:
 
 - bundle identifier, app display name, Apple team, and TestFlight app record ownership;
