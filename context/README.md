@@ -7,7 +7,8 @@ Read the relevant doc before building a feature; keep docs current as decisions 
 |------|---------|
 | `PRD.md` | Product requirements — what the app does and why. |
 | `user-stories.md` | User stories + acceptance criteria driving each feature. |
-| `design-guidelines.md` | Visual + interaction language (the "premium journal" feel). |
+| `design-system.md` | Design tokens + component specs (color, type, motion) from the prototype. |
 | `decisions.md` | ADR-style log of tech/product decisions; tracks the open database choice. |
 
-All four are currently **skeletons** pending the Claude Design wireframe and a PRD review.
+`PRD.md`, `user-stories.md`, and `design-system.md` are populated from the Claude Design prototype.
+`decisions.md` tracks the open infrastructure choices (database, auth, map, sync) still to be made.

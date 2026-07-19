@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<script src="./image-slot.js"></script>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#060706;-webkit-font-smoothing:antialiased;font-family:'Manrope',system-ui,sans-serif}
+a{color:#37E27B;text-decoration:none}a:hover{color:#5FF29B}
+input,textarea,button{font-family:inherit}
+input::placeholder,textarea::placeholder{color:#5C645D}
+input,textarea{-webkit-appearance:none}
+::-webkit-scrollbar{width:0;height:0}
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+@keyframes sheetUp{from{transform:translateY(101%)}to{transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulseRing{0%{transform:translate(-50%,-50%) scale(.7);opacity:.6}80%{transform:translate(-50%,-50%) scale(2.3);opacity:0}100%{opacity:0}}
+</style>
+</helmet>
+<div style="--bg:#0A0C0B;--s1:#121512;--s2:#181C18;--s3:#20251F;--bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.13);--grn:#37E27B;--grn2:#5FF29B;--grnk:#04220F;--grnt:rgba(55,226,123,.12);--tx:#F1F4F0;--tx2:#9AA39C;--tx3:#5C645D;--dsp:'Archivo',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:28px;background:radial-gradient(120% 90% at 50% -10%, #161c18 0%, #0a0c0b 55%, #060706 100%)">
+<x-import component-from-global-scope="IOSDevice" from="./ios-frame.jsx" dark="{{ dark }}" hint-size="402px,874px">
+
+<div style="position:relative;height:100%;overflow:hidden;background:var(--bg);color:var(--tx);font-family:'Manrope',sans-serif">
+
+<!-- ============ WELCOME ============ -->
+<sc-if value="{{ screenWelcome }}" hint-placeholder-val="{{ true }}">
+<div style="position:absolute;inset:0;overflow:hidden;background:#0B0D0C">
+<div style="position:absolute;inset:0;background:radial-gradient(130% 82% at 50% 4%, #4d3c22 0%, #2a2418 34%, #10120d 74%)"></div>
+<div style="position:absolute;inset:0"><image-slot id="hero-photo" shape="rect" fit="cover" placeholder="Drop a sunrise-on-the-lake photo"></image-slot></div>
+<div style="position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg, rgba(6,8,6,.52) 0%, rgba(6,8,6,.1) 24%, rgba(6,8,6,.5) 58%, rgba(6,8,6,.97) 100%)"></div>
+<div style="position:absolute;left:-24%;top:-12%;width:82%;height:46%;pointer-events:none;background:radial-gradient(circle, rgba(55,226,123,.15), transparent 68%)"></div>
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:60px 26px 40px;pointer-events:none">
+<div style="display:flex;align-items:center;gap:11px;pointer-events:auto">
+<div style="width:34px;height:34px;border-radius:11px;background:rgba(55,226,123,.16);border:1px solid rgba(55,226,123,.4);display:flex;align-items:center;justify-content:center;color:#5FF29B"><i class="fa-solid fa-fish" style="font-size:15px"></i></div>
+<div style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.74);font-weight:600">Reel&nbsp;Records</div>
+<div style="margin-left:auto;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:6px"><i class="fa-solid fa-location-dot"></i>EST. THE LAKE</div>
+</div>
+<div style="pointer-events:auto">
+<div style="display:inline-flex;align-items:center;gap:7px;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,.08);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.14);font-size:11px;font-weight:600;color:rgba(255,255,255,.82);margin-bottom:18px"><span style="width:6px;height:6px;border-radius:50%;background:#37E27B;box-shadow:0 0 10px #37E27B"></span>Your personal fishing journal</div>
+<h1 style="margin:0;font-family:'Archivo',sans-serif;font-weight:900;font-size:52px;line-height:.92;letter-spacing:-.02em;color:#fff;text-shadow:0 2px 34px rgba(0,0,0,.55)">Lincoln's<br>Reel<br><span style="color:#37E27B">Records</span></h1>
+<p style="margin:16px 0 26px;font-size:16px;line-height:1.45;color:rgba(255,255,255,.82);max-width:290px;font-weight:500">Track every catch. Remember every adventure.</p>
+<button onClick="{{ goSignup }}" style="width:100%;height:58px;border:none;border-radius:17px;background:#37E27B;color:#04220F;font-family:'Archivo',sans-serif;font-weight:800;font-size:17px;cursor:pointer;box-shadow:0 10px 34px rgba(55,226,123,.34);display:flex;align-items:center;justify-content:center;gap:10px;transition:transform .15s" style-active="transform:scale(.98)">Get Started&nbsp;&nbsp;<i class="fa-solid fa-arrow-right"></i></button>
+<div style="display:flex;gap:12px;margin-top:12px">
+<button onClick="{{ goLogin }}" style="flex:1;height:52px;border-radius:15px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);backdrop-filter:blur(8px);color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:background .15s" style-hover="background:rgba(255,255,255,.12)">Log In</button>
+<button onClick="{{ goSignup }}" style="flex:1;height:52px;border-radius:15px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);backdrop-filter:blur(8px);color:#fff;font-weight:700;font-size:15px;cursor:pointer;transition:background .15s" style-hover="background:rgba(255,255,255,.12)">Create Account</button>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+
+<!-- ============ LOGIN ============ -->
+<sc-if value="{{ screenLogin }}">
+<div style="position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;animation:fadeIn .3s ease">
+<div style="position:relative;padding:66px 26px 8px">
+<div style="position:absolute;inset:0;background:radial-gradient(120% 74% at 15% 0%, rgba(55,226,123,.1), transparent 58%);pointer-events:none"></div>
+<button onClick="{{ goWelcome }}" style="position:relative;width:40px;height:40px;border-radius:12px;background:var(--s2);border:1px solid var(--bd);color:var(--tx2);cursor:pointer"><i class="fa-solid fa-arrow-left"></i></button>
+</div>
+<div style="flex:1;overflow:auto;padding:22px 26px 26px">
+<div style="width:52px;height:52px;border-radius:16px;background:var(--grnt);border:1px solid rgba(55,226,123,.4);display:flex;align-items:center;justify-content:center;color:var(--grn2);margin-bottom:22px"><i class="fa-solid fa-fish" style="font-size:22px"></i></div>
+<h2 style="margin:0 0 6px;font-family:var(--dsp);font-weight:800;font-size:30px;color:var(--tx)">Welcome back</h2>
+<p style="margin:0 0 30px;color:var(--tx2);font-size:15px">Log in to your tackle box.</p>
+<label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Email</label>
+<div style="position:relative;margin-bottom:18px"><i class="fa-regular fa-envelope" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:15px"></i><input type="email" placeholder="lincoln@thelake.com" style="width:100%;height:54px;border-radius:15px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 16px 0 44px;font-size:15px;outline:none;transition:border-color .15s" style-focus="border-color:var(--grn)"></div>
+<label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Password</label>
+<div style="position:relative;margin-bottom:26px"><i class="fa-solid fa-lock" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:15px"></i><input type="password" placeholder="••••••••" style="width:100%;height:54px;border-radius:15px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 16px 0 44px;font-size:15px;outline:none;transition:border-color .15s" style-focus="border-color:var(--grn)"></div>
+<button onClick="{{ enter }}" style="width:100%;height:56px;border:none;border-radius:16px;background:var(--grn);color:var(--grnk);font-family:var(--dsp);font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 8px 26px rgba(55,226,123,.28)" style-active="transform:scale(.98)">Log In</button>
+<p style="text-align:center;margin:22px 0 0;color:var(--tx2);font-size:14px">New to the lake? <a onClick="{{ goSignup }}" style="cursor:pointer;font-weight:700">Create an account</a></p>
+</div>
+</div>
+</sc-if>
+
+<!-- ============ SIGNUP ============ -->
+<sc-if value="{{ screenSignup }}">
+<div style="position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;animation:fadeIn .3s ease">
+<div style="position:relative;padding:66px 26px 8px">
+<div style="position:absolute;inset:0;background:radial-gradient(120% 74% at 15% 0%, rgba(55,226,123,.1), transparent 58%);pointer-events:none"></div>
+<button onClick="{{ goWelcome }}" style="position:relative;width:40px;height:40px;border-radius:12px;background:var(--s2);border:1px solid var(--bd);color:var(--tx2);cursor:pointer"><i class="fa-solid fa-arrow-left"></i></button>
+</div>
+<div style="flex:1;overflow:auto;padding:22px 26px 26px">
+<div style="width:52px;height:52px;border-radius:16px;background:var(--grnt);border:1px solid rgba(55,226,123,.4);display:flex;align-items:center;justify-content:center;color:var(--grn2);margin-bottom:22px"><i class="fa-solid fa-fish" style="font-size:22px"></i></div>
+<h2 style="margin:0 0 6px;font-family:var(--dsp);font-weight:800;font-size:30px;color:var(--tx)">Start your logbook</h2>
+<p style="margin:0 0 30px;color:var(--tx2);font-size:15px">Every catch, kept forever.</p>
+<label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Username</label>
+<div style="position:relative;margin-bottom:18px"><i class="fa-solid fa-user" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:15px"></i><input type="text" placeholder="lincoln_reels" style="width:100%;height:54px;border-radius:15px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 16px 0 44px;font-size:15px;outline:none;transition:border-color .15s" style-focus="border-color:var(--grn)"></div>
+<label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Email</label>
+<div style="position:relative;margin-bottom:18px"><i class="fa-regular fa-envelope" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:15px"></i><input type="email" placeholder="lincoln@thelake.com" style="width:100%;height:54px;border-radius:15px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 16px 0 44px;font-size:15px;outline:none;transition:border-color .15s" style-focus="border-color:var(--grn)"></div>
+<label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Password</label>
+<div style="position:relative;margin-bottom:26px"><i class="fa-solid fa-lock" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:15px"></i><input type="password" placeholder="Create a password" style="width:100%;height:54px;border-radius:15px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 16px 0 44px;font-size:15px;outline:none;transition:border-color .15s" style-focus="border-color:var(--grn)"></div>
+<button onClick="{{ enter }}" style="width:100%;height:56px;border:none;border-radius:16px;background:var(--grn);color:var(--grnk);font-family:var(--dsp);font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 8px 26px rgba(55,226,123,.28)" style-active="transform:scale(.98)">Create Account</button>
+<p style="text-align:center;margin:22px 0 0;color:var(--tx2);font-size:14px">Already have an account? <a onClick="{{ goLogin }}" style="cursor:pointer;font-weight:700">Log in</a></p>
+</div>
+</div>
+</sc-if>
+
+<!-- ============ APP SHELL ============ -->
+<sc-if value="{{ screenApp }}">
+<div style="position:absolute;inset:0;display:flex;flex-direction:column;background:var(--bg)">
+<div style="flex:1;overflow:auto;position:relative">
+
+<!-- DASHBOARD -->
+<sc-if value="{{ tabDashboard }}">
+<div style="min-height:100%;padding:56px 20px 26px;animation:fadeUp .4s ease">
+<div style="display:flex;align-items:center;gap:12px;margin-bottom:22px">
+<div><div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grn)">{{ todayStr }}</div>
+<h1 style="margin:3px 0 0;font-family:var(--dsp);font-weight:800;font-size:25px;color:var(--tx)">Morning, Lincoln</h1></div>
+<button onClick="{{ goProfile }}" style="margin-left:auto;width:46px;height:46px;border-radius:14px;overflow:hidden;border:1px solid var(--bd2);background:var(--s2);flex:none;cursor:pointer;padding:0"><image-slot id="profile-avatar" shape="rect" placeholder="You"></image-slot></button>
+</div>
+<div style="position:relative;border-radius:24px;padding:22px;background:linear-gradient(150deg, #143324 0%, #0f1c15 58%, #0c130f 100%);border:1px solid rgba(55,226,123,.22);overflow:hidden;margin-bottom:16px">
+<div style="position:absolute;right:-24px;bottom:-30px;color:rgba(55,226,123,.09);font-size:160px;transform:rotate(-8deg)"><i class="fa-solid fa-fish"></i></div>
+<div style="position:relative">
+<div style="font-size:13px;font-weight:700;color:var(--tx2);letter-spacing:.01em">Total catches logged</div>
+<div style="display:flex;align-items:baseline;gap:11px;margin-top:6px">
+<div style="font-family:var(--dsp);font-weight:900;font-size:58px;line-height:1;color:#fff">{{ total }}</div>
+<div style="display:flex;align-items:center;gap:5px;color:var(--grn);font-weight:700;font-size:12.5px;background:var(--grnt);padding:5px 9px;border-radius:999px"><i class="fa-solid fa-arrow-trend-up"></i>+2 this week</div>
+</div>
+<button onClick="{{ openAdd }}" style="margin-top:18px;width:100%;height:50px;border-radius:15px;background:#37E27B;color:#04220F;border:none;font-family:var(--dsp);font-weight:800;font-size:15px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px" style-active="transform:scale(.98)"><i class="fa-solid fa-plus"></i>Log a Catch</button>
+</div>
+</div>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px">
+<div style="background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:15px"><div style="width:34px;height:34px;border-radius:10px;background:var(--grnt);color:var(--grn2);display:flex;align-items:center;justify-content:center;margin-bottom:12px"><i class="fa-solid fa-trophy" style="font-size:14px"></i></div><div style="font-family:var(--dsp);font-weight:800;font-size:19px;color:var(--tx);line-height:1.1">{{ biggestStr }}</div><div style="color:var(--tx2);font-size:12px;margin-top:3px">Biggest · {{ biggestSpecies }}</div></div>
+<div style="background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:15px"><div style="width:34px;height:34px;border-radius:10px;background:var(--grnt);color:var(--grn2);display:flex;align-items:center;justify-content:center;margin-bottom:12px"><i class="fa-solid fa-star" style="font-size:14px"></i></div><div style="font-family:var(--dsp);font-weight:800;font-size:19px;color:var(--tx);line-height:1.1">{{ favSpecies }}</div><div style="color:var(--tx2);font-size:12px;margin-top:3px">Top species · {{ favCountStr }}</div></div>
+<div style="background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:15px"><div style="width:34px;height:34px;border-radius:10px;background:var(--grnt);color:var(--grn2);display:flex;align-items:center;justify-content:center;margin-bottom:12px"><i class="fa-solid fa-location-dot" style="font-size:14px"></i></div><div style="font-family:var(--dsp);font-weight:800;font-size:19px;color:var(--tx);line-height:1.1">{{ topSpotName }}</div><div style="color:var(--tx2);font-size:12px;margin-top:3px">Favorite · {{ topSpotCountStr }}</div></div>
+<div style="background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:15px"><div style="width:34px;height:34px;border-radius:10px;background:var(--grnt);color:var(--grn2);display:flex;align-items:center;justify-content:center;margin-bottom:12px"><i class="fa-solid fa-water" style="font-size:14px"></i></div><div style="font-family:var(--dsp);font-weight:800;font-size:19px;color:var(--tx);line-height:1.1">{{ speciesCount }} species</div><div style="color:var(--tx2);font-size:12px;margin-top:3px">Logged this year</div></div>
+</div>
+<div style="display:flex;align-items:center;margin-bottom:14px"><h3 style="margin:0;font-family:var(--dsp);font-weight:700;font-size:18px">Recent catches</h3><button onClick="{{ goLog }}" style="margin-left:auto;background:none;border:none;color:var(--grn);font-weight:700;font-size:13px;cursor:pointer">See all&nbsp;<i class="fa-solid fa-chevron-right" style="font-size:10px"></i></button></div>
+<div style="display:flex;gap:14px;overflow-x:auto;margin:0 -20px;padding:0 20px 6px">
+<sc-for list="{{ recent }}" as="c" hint-placeholder-count="4">
+<button onClick="{{ c.open }}" style="flex:none;width:166px;text-align:left;background:var(--s1);border:1px solid var(--bd);border-radius:18px;overflow:hidden;cursor:pointer;padding:0;transition:border-color .15s" style-hover="border-color:rgba(55,226,123,.4)">
+<div style="position:relative;height:116px"><image-slot id="{{ c.photoId }}" shape="rect" placeholder="Fish photo"></image-slot><div style="position:absolute;top:8px;left:8px;background:rgba(6,8,6,.72);backdrop-filter:blur(6px);border:1px solid rgba(255,255,255,.14);color:#fff;font-family:var(--mono);font-weight:600;font-size:11.5px;padding:4px 8px;border-radius:8px">{{ c.weightStr }} lb</div></div>
+<div style="padding:11px 12px 13px"><div style="font-weight:700;font-size:14px;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.species }}</div><div style="display:flex;align-items:center;gap:6px;margin-top:4px;color:var(--tx3);font-size:12px"><i class="fa-solid fa-location-dot" style="font-size:10px"></i><span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.location }}</span></div></div>
+</button>
+</sc-for>
+</div>
+<h3 style="margin:28px 0 14px;font-family:var(--dsp);font-weight:700;font-size:18px">Favorite spots</h3>
+<div style="display:flex;flex-direction:column;gap:10px">
+<sc-for list="{{ topSpots }}" as="s" hint-placeholder-count="3">
+<button onClick="{{ goMap }}" style="text-align:left;display:flex;align-items:center;gap:14px;background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:14px;cursor:pointer" style-hover="border-color:rgba(55,226,123,.4)">
+<div style="width:42px;height:42px;border-radius:12px;background:var(--grnt);color:var(--grn2);display:flex;align-items:center;justify-content:center;flex:none"><i class="fa-solid fa-location-dot"></i></div>
+<div style="flex:1;min-width:0"><div style="font-weight:700;font-size:15px;color:var(--tx)">{{ s.name }}</div><div style="color:var(--tx3);font-size:12.5px;margin-top:2px">{{ s.countStr }} · best {{ s.bestStr }}</div></div>
+<i class="fa-solid fa-chevron-right" style="color:var(--tx3);font-size:12px"></i>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<!-- LOG -->
+<sc-if value="{{ tabLog }}">
+<div style="min-height:100%;padding:56px 20px 26px;animation:fadeUp .4s ease">
+<div style="display:flex;align-items:flex-end;gap:10px;margin-bottom:4px"><h1 style="margin:0;font-family:var(--dsp);font-weight:800;font-size:30px;color:var(--tx)">Fishing Log</h1></div>
+<div style="color:var(--tx2);font-size:13.5px;margin-bottom:16px">{{ resultCountStr }} in your records</div>
+<div style="position:relative;margin-bottom:14px"><i class="fa-solid fa-magnifying-glass" style="position:absolute;left:16px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:14px"></i><input value="{{ search }}" onInput="{{ onSearch }}" placeholder="Search species, spot, or lure…" style="width:100%;height:50px;border-radius:15px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 16px 0 44px;font-size:14.5px;outline:none;transition:border-color .15s" style-focus="border-color:var(--grn)"></div>
+<div style="display:flex;gap:8px;overflow-x:auto;margin:0 -20px 12px;padding:0 20px">
+<sc-for list="{{ speciesChips }}" as="ch" hint-placeholder-count="5"><button onClick="{{ ch.on }}" style="flex:none;padding:8px 14px;border-radius:999px;border:1px solid {{ ch.border }};background:{{ ch.bg }};color:{{ ch.color }};font-weight:700;font-size:13px;cursor:pointer;white-space:nowrap">{{ ch.label }}</button></sc-for>
+</div>
+<div style="display:flex;align-items:center;gap:8px;margin-bottom:18px"><span style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3)">Sort</span>
+<sc-for list="{{ sortChips }}" as="ch" hint-placeholder-count="3"><button onClick="{{ ch.on }}" style="padding:7px 12px;border-radius:10px;border:1px solid {{ ch.border }};background:{{ ch.bg }};color:{{ ch.color }};font-weight:700;font-size:12.5px;cursor:pointer">{{ ch.label }}</button></sc-for>
+</div>
+<sc-for list="{{ filtered }}" as="c" hint-placeholder-count="4">
+<button onClick="{{ c.open }}" style="text-align:left;width:100%;background:var(--s1);border:1px solid var(--bd);border-radius:20px;overflow:hidden;cursor:pointer;padding:0;margin-bottom:14px;transition:border-color .15s,transform .1s" style-hover="border-color:rgba(55,226,123,.4)" style-active="transform:scale(.99)">
+<div style="position:relative;height:186px"><image-slot id="{{ c.photoId }}" shape="rect" placeholder="Add fish photo"></image-slot>
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,transparent 42%,rgba(6,8,6,.86));pointer-events:none"></div>
+<div style="position:absolute;top:12px;left:12px;display:flex;gap:7px"><span style="background:var(--grnt);color:var(--grn2);border:1px solid rgba(55,226,123,.35);font-family:var(--mono);font-weight:600;font-size:12px;padding:4px 9px;border-radius:9px;backdrop-filter:blur(6px)">{{ c.weightStr }} lb</span><span style="background:rgba(6,8,6,.66);color:#fff;border:1px solid rgba(255,255,255,.14);font-family:var(--mono);font-weight:600;font-size:12px;padding:4px 9px;border-radius:9px;backdrop-filter:blur(6px)">{{ c.lengthStr }} in</span></div>
+<div style="position:absolute;left:14px;bottom:12px;right:14px"><div style="font-family:var(--dsp);font-weight:800;font-size:22px;color:#fff">{{ c.species }}</div><div style="display:flex;align-items:center;gap:14px;color:rgba(255,255,255,.82);font-size:12.5px;margin-top:3px"><span><i class="fa-solid fa-location-dot" style="font-size:11px"></i>&nbsp;{{ c.location }}</span><span><i class="fa-solid fa-calendar-day" style="font-size:11px"></i>&nbsp;{{ c.dateStr }}</span></div></div>
+</div>
+<div style="display:flex;align-items:center;gap:10px;padding:12px 14px"><i class="fa-solid fa-worm" style="color:var(--grn2);font-size:14px"></i><span style="font-size:13px;color:var(--tx2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">{{ c.lure }}</span><i class="fa-solid {{ c.weatherIcon }}" style="color:var(--tx3);font-size:14px"></i></div>
+</button>
+</sc-for>
+</div>
+</sc-if>
+
+<!-- MAP -->
+<sc-if value="{{ tabMap }}">
+<div style="height:100%;position:relative;display:flex;flex-direction:column;background:#080d0b;animation:fadeIn .3s ease">
+<div style="position:absolute;top:0;left:0;right:0;z-index:8;padding:54px 20px 18px;background:linear-gradient(180deg,rgba(8,13,11,.94) 30%,transparent);pointer-events:none">
+<h1 style="margin:0;font-family:var(--dsp);font-weight:800;font-size:26px;color:var(--tx)">Catch Map</h1>
+<div style="color:var(--tx2);font-size:13px;margin-top:2px">{{ total }} catches across {{ spotCount }} spots</div>
+</div>
+<div style="flex:1;position:relative;overflow:hidden">
+<div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.028) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.028) 1px,transparent 1px);background-size:46px 46px"></div>
+<div style="position:absolute;inset:0;background:radial-gradient(54% 40% at 46% 44%, #123830 0%, #0e2a24 44%, transparent 74%),radial-gradient(30% 26% at 64% 63%, #10312a 0%, transparent 72%),radial-gradient(26% 22% at 28% 62%, #0f2c25 0%, transparent 70%)"></div>
+<div style="position:absolute;left:46%;top:44%;width:130px;height:104px;transform:translate(-50%,-50%);border:1px solid rgba(55,226,123,.1);border-radius:50%"></div>
+<div style="position:absolute;left:46%;top:44%;width:210px;height:168px;transform:translate(-50%,-50%);border:1px solid rgba(55,226,123,.07);border-radius:50%"></div>
+<div style="position:absolute;left:46%;top:44%;width:300px;height:238px;transform:translate(-50%,-50%);border:1px solid rgba(55,226,123,.045);border-radius:50%"></div>
+<div style="position:absolute;left:46%;top:44%;transform:translate(-50%,-50%);font-family:var(--mono);font-size:10px;letter-spacing:.14em;color:rgba(95,242,155,.28);text-transform:uppercase">Home Lake</div>
+<sc-for list="{{ catchesVM }}" as="c" hint-placeholder-count="6">
+<button onClick="{{ c.pin }}" style="position:absolute;left:{{ c.mapX }}%;top:{{ c.mapY }}%;transform:translate(-50%,-100%);background:none;border:none;cursor:pointer;padding:0;z-index:{{ c.pinZ }}">
+<sc-if value="{{ c.isSelected }}"><div style="position:absolute;left:50%;top:0;width:46px;height:46px;border-radius:50%;border:2px solid var(--grn);animation:pulseRing 1.7s ease-out infinite"></div></sc-if>
+<div style="position:relative;width:{{ c.pinSize }}px;height:{{ c.pinSize }}px;border-radius:50% 50% 50% 4px;transform:rotate(45deg);background:{{ c.pinBg }};border:2px solid {{ c.pinBorder }};box-shadow:0 6px 14px rgba(0,0,0,.55)"><i class="fa-solid fa-fish" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:rotate(-45deg);color:{{ c.pinIcon }};font-size:12px"></i></div>
+</button>
+</sc-for>
+<div style="position:absolute;right:16px;bottom:16px;display:flex;flex-direction:column;gap:8px;z-index:9"><div style="width:38px;height:38px;border-radius:11px;background:rgba(18,21,18,.86);backdrop-filter:blur(8px);border:1px solid var(--bd);color:var(--tx2);display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-compass"></i></div></div>
+</div>
+<div style="position:relative;z-index:8;margin:0 14px;padding-bottom:14px">
+<button onClick="{{ mapSel.open }}" style="text-align:left;width:100%;background:var(--s1);border:1px solid var(--bd2);border-radius:20px;padding:12px;display:flex;gap:13px;align-items:center;cursor:pointer;animation:fadeUp .3s ease;box-shadow:0 -6px 30px rgba(0,0,0,.4)">
+<div style="width:66px;height:66px;border-radius:15px;overflow:hidden;flex:none;border:1px solid var(--bd)"><image-slot id="{{ mapSel.photoId }}" shape="rect" placeholder="Fish"></image-slot></div>
+<div style="flex:1;min-width:0"><div style="font-family:var(--dsp);font-weight:800;font-size:17px;color:var(--tx)">{{ mapSel.species }}</div><div style="color:var(--tx3);font-size:12.5px;margin-top:2px"><i class="fa-solid fa-location-dot" style="font-size:10px"></i>&nbsp;{{ mapSel.location }}</div><div style="display:flex;gap:8px;margin-top:8px"><span style="font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--grn2);background:var(--grnt);padding:3px 8px;border-radius:7px">{{ mapSel.weightStr }} lb</span><span style="font-family:var(--mono);font-size:11.5px;font-weight:600;color:var(--tx2);background:var(--s2);padding:3px 8px;border-radius:7px">{{ mapSel.lengthStr }} in</span></div></div>
+<div style="width:36px;height:36px;border-radius:11px;background:var(--grn);color:var(--grnk);display:flex;align-items:center;justify-content:center;flex:none"><i class="fa-solid fa-chevron-right"></i></div>
+</button>
+</div>
+</div>
+</sc-if>
+
+<!-- PROFILE -->
+<sc-if value="{{ tabProfile }}">
+<div style="min-height:100%;animation:fadeUp .4s ease">
+<div style="position:relative;padding:56px 20px 22px;background:linear-gradient(160deg,#143324 0%,#0d1510 70%);border-bottom:1px solid var(--bd);overflow:hidden">
+<div style="position:absolute;inset:0;opacity:.55;background:radial-gradient(90% 66% at 82% 0,rgba(55,226,123,.18),transparent 58%);pointer-events:none"></div>
+<div style="position:relative;display:flex;align-items:center;gap:16px">
+<div style="width:78px;height:78px;border-radius:24px;overflow:hidden;border:2px solid var(--grn);flex:none;box-shadow:0 6px 20px rgba(55,226,123,.25)"><image-slot id="profile-avatar" shape="rect" placeholder="Profile"></image-slot></div>
+<div style="flex:1"><h1 style="margin:0;font-family:var(--dsp);font-weight:800;font-size:23px;color:#fff">Lincoln Reyes</h1><div style="font-family:var(--mono);font-size:12.5px;color:var(--grn2);margin-top:2px">@lincoln_reels</div><div style="color:rgba(255,255,255,.6);font-size:12px;margin-top:5px"><i class="fa-solid fa-fish" style="font-size:10px"></i>&nbsp;Angler since 2019 · Home Lake</div></div>
+</div>
+<div style="position:relative;display:flex;gap:10px;margin-top:20px">
+<div style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:13px;text-align:center"><div style="font-family:var(--dsp);font-weight:900;font-size:24px;color:#fff">{{ total }}</div><div style="color:rgba(255,255,255,.6);font-size:11px;font-weight:600;margin-top:1px">Catches</div></div>
+<div style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:13px;text-align:center"><div style="font-family:var(--dsp);font-weight:900;font-size:24px;color:var(--grn)">{{ biggestStr }}</div><div style="color:rgba(255,255,255,.6);font-size:11px;font-weight:600;margin-top:1px">Personal best</div></div>
+<div style="flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.09);border-radius:16px;padding:13px;text-align:center"><div style="font-family:var(--dsp);font-weight:900;font-size:24px;color:#fff">{{ speciesCount }}</div><div style="color:rgba(255,255,255,.6);font-size:11px;font-weight:600;margin-top:1px">Species</div></div>
+</div>
+</div>
+<div style="padding:22px 20px 26px">
+<div style="display:flex;align-items:center;gap:14px;background:linear-gradient(140deg,var(--grnt),transparent);border:1px solid rgba(55,226,123,.28);border-radius:18px;padding:16px;margin-bottom:24px"><div style="width:46px;height:46px;border-radius:14px;background:var(--grn);color:var(--grnk);display:flex;align-items:center;justify-content:center;flex:none"><i class="fa-solid fa-fish" style="font-size:19px"></i></div><div><div style="font-size:12px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--grn2)">Signature species</div><div style="font-family:var(--dsp);font-weight:800;font-size:19px;color:var(--tx);margin-top:2px">{{ favSpecies }}</div></div></div>
+<h3 style="margin:0 0 14px;font-family:var(--dsp);font-weight:700;font-size:17px">Species breakdown</h3>
+<div style="display:flex;flex-direction:column;gap:13px;margin-bottom:26px">
+<sc-for list="{{ speciesBreakdown }}" as="s" hint-placeholder-count="4">
+<div><div style="display:flex;align-items:center;margin-bottom:6px"><span style="font-size:13.5px;font-weight:600;color:var(--tx)">{{ s.name }}</span><span style="margin-left:auto;font-family:var(--mono);font-size:12.5px;color:var(--tx2)">{{ s.countStr }}</span></div><div style="height:8px;border-radius:99px;background:var(--s2);overflow:hidden"><div style="height:100%;width:{{ s.pct }};border-radius:99px;background:linear-gradient(90deg,#2bbf68,#5ff29b)"></div></div></div>
+</sc-for>
+</div>
+<h3 style="margin:0 0 12px;font-family:var(--dsp);font-weight:700;font-size:17px">Settings</h3>
+<div style="background:var(--s1);border:1px solid var(--bd);border-radius:18px;overflow:hidden;margin-bottom:22px">
+<div style="display:flex;align-items:center;gap:13px;padding:15px 16px;border-bottom:1px solid var(--bd)"><i class="fa-solid fa-ruler" style="color:var(--tx2);width:20px;text-align:center"></i><span style="flex:1;font-size:14.5px;color:var(--tx)">Units</span><span style="color:var(--tx3);font-size:13px;font-family:var(--mono)">lb · in</span></div>
+<div style="display:flex;align-items:center;gap:13px;padding:15px 16px;border-bottom:1px solid var(--bd)"><i class="fa-solid fa-bell" style="color:var(--tx2);width:20px;text-align:center"></i><span style="flex:1;font-size:14.5px;color:var(--tx)">Notifications</span><i class="fa-solid fa-chevron-right" style="color:var(--tx3);font-size:12px"></i></div>
+<div style="display:flex;align-items:center;gap:13px;padding:15px 16px"><i class="fa-solid fa-file-export" style="color:var(--tx2);width:20px;text-align:center"></i><span style="flex:1;font-size:14.5px;color:var(--tx)">Export logbook</span><i class="fa-solid fa-chevron-right" style="color:var(--tx3);font-size:12px"></i></div>
+</div>
+<button onClick="{{ signOut }}" style="width:100%;height:52px;border-radius:15px;background:var(--s2);border:1px solid var(--bd);color:#ff8a8a;font-weight:700;font-size:14.5px;cursor:pointer">Sign out</button>
+</div>
+</div>
+</sc-if>
+
+</div>
+<!-- TAB BAR -->
+<div style="position:relative;flex:none;background:rgba(9,11,10,.92);backdrop-filter:blur(20px);border-top:1px solid var(--bd);display:flex;align-items:flex-start;justify-content:space-around;padding:10px 14px 22px">
+<button onClick="{{ goDash }}" style="flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding-top:4px;color:{{ dashColor }};transition:color .15s"><i class="fa-solid fa-house" style="font-size:18px"></i><span style="font-size:10px;font-weight:700">Home</span></button>
+<button onClick="{{ goLog }}" style="flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding-top:4px;color:{{ logColor }};transition:color .15s"><i class="fa-solid fa-book" style="font-size:18px"></i><span style="font-size:10px;font-weight:700">Log</span></button>
+<button onClick="{{ openAdd }}" style="flex:none;margin-top:-24px;width:58px;height:58px;border-radius:19px;background:var(--grn);color:var(--grnk);border:4px solid var(--bg);box-shadow:0 8px 22px rgba(55,226,123,.42);cursor:pointer;display:flex;align-items:center;justify-content:center" style-active="transform:scale(.94)"><i class="fa-solid fa-plus" style="font-size:22px"></i></button>
+<button onClick="{{ goMap }}" style="flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding-top:4px;color:{{ mapColor }};transition:color .15s"><i class="fa-solid fa-map" style="font-size:18px"></i><span style="font-size:10px;font-weight:700">Map</span></button>
+<button onClick="{{ goProfile }}" style="flex:1;background:none;border:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:5px;padding-top:4px;color:{{ profileColor }};transition:color .15s"><i class="fa-solid fa-user" style="font-size:18px"></i><span style="font-size:10px;font-weight:700">You</span></button>
+</div>
+</div>
+</sc-if>
+
+<!-- ============ ADD CATCH ============ -->
+<sc-if value="{{ overlayAdd }}">
+<div style="position:absolute;inset:0;z-index:40;background:var(--bg);display:flex;flex-direction:column;animation:sheetUp .36s cubic-bezier(.2,.8,.2,1)">
+<div style="padding:54px 20px 14px;display:flex;align-items:center;gap:14px;border-bottom:1px solid var(--bd)">
+<button onClick="{{ closeAdd }}" style="width:40px;height:40px;border-radius:12px;background:var(--s2);border:1px solid var(--bd);color:var(--tx2);cursor:pointer;flex:none"><i class="fa-solid fa-xmark"></i></button>
+<div><div style="font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--grn)">New entry</div><h2 style="margin:1px 0 0;font-family:var(--dsp);font-weight:800;font-size:21px;color:var(--tx)">Log a Catch</h2></div>
+</div>
+<div style="flex:1;overflow:auto;padding:20px">
+<div style="height:196px;border-radius:20px;overflow:hidden;border:1px dashed var(--bd2);margin-bottom:22px"><image-slot id="new-catch-photo" shape="rect" placeholder="Tap to add a photo of your catch"></image-slot></div>
+<label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 10px">Species</label>
+<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px">
+<sc-for list="{{ speciesChoices }}" as="sp" hint-placeholder-count="6"><button onClick="{{ sp.on }}" style="padding:9px 13px;border-radius:12px;border:1px solid {{ sp.border }};background:{{ sp.bg }};color:{{ sp.color }};font-weight:700;font-size:13px;cursor:pointer">{{ sp.name }}</button></sc-for>
+</div>
+<div style="display:flex;gap:12px;margin-bottom:18px">
+<div style="flex:1"><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Weight (lb)</label><input name="weight" value="{{ fWeight }}" onInput="{{ onField }}" inputmode="decimal" placeholder="5.8" style="width:100%;height:52px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 15px;font-size:15px;font-family:var(--mono);outline:none" style-focus="border-color:var(--grn)"></div>
+<div style="flex:1"><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Length (in)</label><input name="length" value="{{ fLength }}" onInput="{{ onField }}" inputmode="decimal" placeholder="21" style="width:100%;height:52px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 15px;font-size:15px;font-family:var(--mono);outline:none" style-focus="border-color:var(--grn)"></div>
+</div>
+<div style="display:flex;gap:12px;margin-bottom:18px">
+<div style="flex:1"><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Date</label><input name="date" value="{{ fDate }}" onInput="{{ onField }}" type="date" style="width:100%;height:52px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 15px;font-size:14px;outline:none;color-scheme:dark" style-focus="border-color:var(--grn)"></div>
+<div style="flex:1"><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Location</label><input name="location" value="{{ fLocation }}" onInput="{{ onField }}" placeholder="Cedar Point Cove" style="width:100%;height:52px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 15px;font-size:14px;outline:none" style-focus="border-color:var(--grn)"></div>
+</div>
+<div style="display:flex;gap:12px;margin-bottom:18px">
+<div style="flex:1"><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Weather</label><input name="weather" value="{{ fWeather }}" onInput="{{ onField }}" placeholder="Overcast, 66°F" style="width:100%;height:52px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 15px;font-size:14px;outline:none" style-focus="border-color:var(--grn)"></div>
+<div style="flex:1"><label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Water</label><input name="water" value="{{ fWater }}" onInput="{{ onField }}" placeholder="Stained · 68°F" style="width:100%;height:52px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 15px;font-size:14px;outline:none" style-focus="border-color:var(--grn)"></div>
+</div>
+<label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Lure / bait</label>
+<input name="lure" value="{{ fLure }}" onInput="{{ onField }}" placeholder="Green Pumpkin Senko" style="width:100%;height:52px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 15px;font-size:14px;outline:none;margin-bottom:18px" style-focus="border-color:var(--grn)">
+<label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Rod &amp; reel</label>
+<input name="rodReel" value="{{ fRodReel }}" onInput="{{ onField }}" placeholder="7'2&quot; MH · Curado 200" style="width:100%;height:52px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:0 15px;font-size:14px;outline:none;margin-bottom:18px" style-focus="border-color:var(--grn)">
+<label style="display:block;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px">Notes</label>
+<textarea name="notes" value="{{ fNotes }}" onInput="{{ onField }}" placeholder="How'd it go down? Structure, retrieve, the fight…" style="width:100%;height:96px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);padding:14px 15px;font-size:14px;outline:none;resize:none;line-height:1.5" style-focus="border-color:var(--grn)"></textarea>
+</div>
+<div style="padding:14px 20px 26px;border-top:1px solid var(--bd);background:var(--bg)">
+<button onClick="{{ saveCatch }}" style="width:100%;height:56px;border:none;border-radius:16px;background:var(--grn);color:var(--grnk);font-family:var(--dsp);font-weight:800;font-size:16px;cursor:pointer;box-shadow:0 8px 26px rgba(55,226,123,.3);display:flex;align-items:center;justify-content:center;gap:9px" style-active="transform:scale(.98)"><i class="fa-solid fa-check"></i>Save Catch</button>
+</div>
+</div>
+</sc-if>
+
+<!-- ============ CATCH DETAIL ============ -->
+<sc-if value="{{ overlayDetail }}">
+<div style="position:absolute;inset:0;z-index:45;background:var(--bg);display:flex;flex-direction:column;animation:sheetUp .36s cubic-bezier(.2,.8,.2,1)">
+<div style="flex:1;overflow:auto">
+<div style="position:relative;height:352px">
+<image-slot id="{{ detail.photoId }}" shape="rect" placeholder="Add your catch photo"></image-slot>
+<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,8,6,.45) 0%,transparent 26%,transparent 52%,rgba(10,12,11,.98));pointer-events:none"></div>
+<button onClick="{{ closeDetail }}" style="position:absolute;top:52px;left:18px;width:42px;height:42px;border-radius:13px;background:rgba(6,8,6,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.16);color:#fff;cursor:pointer"><i class="fa-solid fa-arrow-left"></i></button>
+<div style="position:absolute;top:52px;right:18px;display:flex;gap:9px"><div style="width:42px;height:42px;border-radius:13px;background:rgba(6,8,6,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.16);color:#fff;display:flex;align-items:center;justify-content:center"><i class="fa-regular fa-bookmark"></i></div><div style="width:42px;height:42px;border-radius:13px;background:rgba(6,8,6,.55);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.16);color:#fff;display:flex;align-items:center;justify-content:center"><i class="fa-solid fa-share-nodes"></i></div></div>
+<div style="position:absolute;left:20px;right:20px;bottom:16px"><div style="display:inline-flex;align-items:center;gap:6px;background:var(--grnt);border:1px solid rgba(55,226,123,.4);color:var(--grn2);font-family:var(--mono);font-size:11px;font-weight:600;padding:4px 9px;border-radius:8px;margin-bottom:10px;white-space:nowrap"><i class="fa-solid fa-fish" style="font-size:10px"></i>PERSONAL LOG</div><h1 style="margin:0;font-family:var(--dsp);font-weight:900;font-size:32px;line-height:1;color:#fff">{{ detail.species }}</h1><div style="display:flex;align-items:center;gap:14px;color:rgba(255,255,255,.82);font-size:13px;margin-top:8px"><span><i class="fa-solid fa-location-dot" style="font-size:11px"></i>&nbsp;{{ detail.location }}</span><span><i class="fa-solid fa-calendar-day" style="font-size:11px"></i>&nbsp;{{ detail.dateStr }}</span></div></div>
+</div>
+<div style="display:flex;gap:12px;padding:20px 20px 6px">
+<div style="flex:1;background:linear-gradient(150deg,#143324,#0d1510);border:1px solid rgba(55,226,123,.24);border-radius:18px;padding:16px"><div style="display:flex;align-items:center;gap:7px;color:var(--grn2);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em"><i class="fa-solid fa-trophy" style="font-size:12px"></i>Weight</div><div style="font-family:var(--dsp);font-weight:900;font-size:32px;color:#fff;margin-top:6px">{{ detail.weightStr }}<span style="font-size:16px;color:var(--tx2);font-weight:700"> lb</span></div></div>
+<div style="flex:1;background:var(--s1);border:1px solid var(--bd);border-radius:18px;padding:16px"><div style="display:flex;align-items:center;gap:7px;color:var(--tx2);font-size:11.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em"><i class="fa-solid fa-ruler" style="font-size:12px"></i>Length</div><div style="font-family:var(--dsp);font-weight:900;font-size:32px;color:var(--tx);margin-top:6px">{{ detail.lengthStr }}<span style="font-size:16px;color:var(--tx2);font-weight:700"> in</span></div></div>
+</div>
+<div style="padding:16px 20px 6px"><h3 style="margin:0 0 12px;font-family:var(--dsp);font-weight:700;font-size:17px">Conditions &amp; gear</h3>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:11px">
+<div style="background:var(--s1);border:1px solid var(--bd);border-radius:15px;padding:13px"><div style="display:flex;align-items:center;gap:8px;color:var(--tx3);font-size:11.5px;font-weight:600"><i class="fa-solid {{ detail.weatherIcon }}"></i>Weather</div><div style="font-size:14px;font-weight:600;color:var(--tx);margin-top:6px">{{ detail.weather }}</div></div>
+<div style="background:var(--s1);border:1px solid var(--bd);border-radius:15px;padding:13px"><div style="display:flex;align-items:center;gap:8px;color:var(--tx3);font-size:11.5px;font-weight:600"><i class="fa-solid fa-droplet"></i>Water</div><div style="font-size:14px;font-weight:600;color:var(--tx);margin-top:6px">{{ detail.water }}</div></div>
+<div style="background:var(--s1);border:1px solid var(--bd);border-radius:15px;padding:13px"><div style="display:flex;align-items:center;gap:8px;color:var(--tx3);font-size:11.5px;font-weight:600"><i class="fa-solid fa-worm"></i>Lure / bait</div><div style="font-size:14px;font-weight:600;color:var(--tx);margin-top:6px">{{ detail.lure }}</div></div>
+<div style="background:var(--s1);border:1px solid var(--bd);border-radius:15px;padding:13px"><div style="display:flex;align-items:center;gap:8px;color:var(--tx3);font-size:11.5px;font-weight:600"><i class="fa-solid fa-screwdriver-wrench"></i>Rod &amp; reel</div><div style="font-size:14px;font-weight:600;color:var(--tx);margin-top:6px">{{ detail.rodReel }}</div></div>
+</div></div>
+<div style="padding:16px 20px 6px"><h3 style="margin:0 0 12px;font-family:var(--dsp);font-weight:700;font-size:17px">Field notes</h3>
+<div style="background:var(--s1);border:1px solid var(--bd);border-radius:16px;padding:16px;color:var(--tx2);font-size:14.5px;line-height:1.6">{{ detail.notes }}</div></div>
+<div style="padding:16px 20px 30px"><h3 style="margin:0 0 12px;font-family:var(--dsp);font-weight:700;font-size:17px">Where it happened</h3>
+<button onClick="{{ goMapFromDetail }}" style="position:relative;width:100%;height:130px;border-radius:16px;overflow:hidden;border:1px solid var(--bd);cursor:pointer;padding:0;background:#0a1512">
+<div style="position:absolute;inset:0;background:radial-gradient(60% 60% at 50% 50%, #123830 0%, #0e2a24 50%, transparent 78%)"></div>
+<div style="position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.03) 1px,transparent 1px);background-size:30px 30px"></div>
+<div style="position:absolute;left:50%;top:50%;transform:translate(-50%,-100%)"><div style="width:32px;height:32px;border-radius:50% 50% 50% 4px;transform:rotate(45deg);background:var(--grn);border:2px solid var(--grn2);box-shadow:0 6px 14px rgba(0,0,0,.5)"><i class="fa-solid fa-fish" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;transform:rotate(-45deg);color:var(--grnk);font-size:12px"></i></div></div>
+<div style="position:absolute;left:14px;bottom:12px;display:flex;align-items:center;gap:7px;color:#fff;font-size:13px;font-weight:700"><i class="fa-solid fa-location-dot" style="color:var(--grn2)"></i>{{ detail.location }}</div>
+<div style="position:absolute;right:14px;bottom:12px;color:var(--grn2);font-size:12px;font-weight:700">View map&nbsp;<i class="fa-solid fa-chevron-right" style="font-size:10px"></i></div>
+</button></div>
+</div>
+</div>
+</sc-if>
+
+</div>
+</x-import>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;startScreen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;welcome&quot;,&quot;dashboard&quot;,&quot;log&quot;,&quot;map&quot;,&quot;profile&quot;],&quot;default&quot;:&quot;welcome&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Prototype&quot;,&quot;label&quot;:&quot;Open on screen&quot;},&quot;defaultSort&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;recent&quot;,&quot;heaviest&quot;,&quot;longest&quot;],&quot;default&quot;:&quot;recent&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;Prototype&quot;,&quot;label&quot;:&quot;Log sort order&quot;}}">
+class Component extends DCLogic {
+  NOW = new Date('2026-07-19T12:00:00');
+  constructor(props){
+    super(props);
+    this.state = {
+      screen:(props.startScreen&&props.startScreen!=='welcome')?'app':'welcome',
+      tab:['dashboard','log','map','profile'].includes(props.startScreen)?props.startScreen:'dashboard',
+      overlay:null,
+      selectedId:1, mapSelectedId:7,
+      search:'', sortBy:props.defaultSort||'recent', speciesFilter:'All',
+      form:this.blankForm(),
+      catches:[
+        {id:1,species:'Largemouth Bass',weight:5.8,length:21,date:'2026-06-14',location:'Cedar Point Cove',weather:'Overcast · 66°F',weatherIcon:'fa-cloud',water:'Stained · 68°F',lure:'Green Pumpkin Senko',rodReel:"7'2\" MH · Curado 200",notes:'Blew up on a slow fall next to a laydown. New personal best on this lake — measured her twice to be sure before the release.',mapX:43,mapY:39,photoId:'catch-1-photo'},
+        {id:2,species:'Smallmouth Bass',weight:3.4,length:18,date:'2026-06-02',location:'Rocky Narrows',weather:'Sunny · 74°F',weatherIcon:'fa-sun',water:'Clear · 70°F',lure:'Ned Rig (green)',rodReel:"6'10\" M Spin · Stradic 2500",notes:'Fought like a freight train over the rock hump. Smallies punch way above their weight.',mapX:66,mapY:29,photoId:'catch-2-photo'},
+        {id:3,species:'Northern Pike',weight:8.1,length:31,date:'2026-05-20',location:'The Lily Pads',weather:'Partly cloudy · 68°F',weatherIcon:'fa-cloud-sun',water:'Stained · 65°F',lure:'Chartreuse Spinnerbait',rodReel:"7'6\" H · Tatula 300",notes:'Ambushed the blade right at the weed edge. Toothy customer — glad I had the wire leader on.',mapX:27,mapY:57,photoId:'catch-3-photo'},
+        {id:4,species:'Walleye',weight:4.2,length:24,date:'2026-05-11',location:'Sunken Island',weather:'Foggy dawn · 55°F',weatherIcon:'fa-smog',water:'Clear · 60°F',lure:'Firetiger Crankbait',rodReel:"6'10\" M Spin · Stradic 2500",notes:'First-light troll over the hump paid off. Textbook eye eating time.',mapX:54,mapY:51,photoId:'catch-4-photo'},
+        {id:5,species:'Largemouth Bass',weight:4.9,length:20,date:'2026-04-28',location:'Cedar Point Cove',weather:'Light rain · 59°F',weatherIcon:'fa-cloud-rain',water:'Muddy · 58°F',lure:'Black/Blue Jig',rodReel:"7'2\" MH · Curado 200",notes:'Flipped the jig into the willows in a steady drizzle. Rain bite was on.',mapX:40,mapY:45,photoId:'catch-5-photo'},
+        {id:6,species:'Bluegill',weight:0.9,length:10,date:'2026-04-15',location:'Boathouse Channel',weather:'Sunny · 70°F',weatherIcon:'fa-sun',water:'Clear · 64°F',lure:'Drop Shot Worm',rodReel:"6'10\" M Spin · Stradic 2500",notes:'Slab gill on ultralight — the kids lost their minds. Perfect afternoon.',mapX:49,mapY:71,photoId:'catch-6-photo'},
+        {id:7,species:'Channel Catfish',weight:9.6,length:28,date:'2025-09-30',location:'Dam Outflow',weather:'Warm night · 72°F',weatherIcon:'fa-moon',water:'Muddy · 71°F',lure:'Cut Bait',rodReel:"7'6\" H · Tatula 300",notes:'Night bite below the dam. She screamed drag twice before I got her to the bank.',mapX:74,mapY:63,photoId:'catch-7-photo'},
+        {id:8,species:'Crappie',weight:1.6,length:14,date:'2026-03-22',location:'The Lily Pads',weather:'Overcast · 52°F',weatherIcon:'fa-cloud',water:'Stained · 55°F',lure:'Bobber + Minnow',rodReel:"6'10\" M Spin · Stradic 2500",notes:'Early-spring crappie stacked on the brush pile. Filled the livewell for a fry.',mapX:25,mapY:60,photoId:'catch-8-photo'}
+      ]
+    };
+  }
+  blankForm(){return {species:'',weight:'',length:'',date:'',location:'',weather:'',water:'',lure:'',rodReel:'',notes:''};}
+  fmtDate(iso){return new Date(iso+'T12:00:00').toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+  setForm(k,v){this.setState(s=>({form:{...s.form,[k]:v}}));}
+  saveCatch(){
+    const f=this.state.form; const id='n'+Date.now();
+    const c={id,species:f.species||'Largemouth Bass',weight:parseFloat(f.weight)||0,length:parseFloat(f.length)||0,date:f.date||'2026-07-19',location:f.location||'Home Lake',weather:f.weather||'Fair skies',weatherIcon:'fa-cloud-sun',water:f.water||'Clear',lure:f.lure||'—',rodReel:f.rodReel||'—',notes:f.notes||'A fresh one for the books.',mapX:26+Math.random()*46,mapY:30+Math.random()*40,photoId:f.photoId||'new-catch-photo'};
+    this.setState(s=>({catches:[c,...s.catches],overlay:null,tab:'log',selectedId:id,form:this.blankForm()}));
+  }
+  componentDidUpdate(prev){
+    const p=this.props,pp=prev.props||{};
+    if(p.startScreen&&p.startScreen!==pp.startScreen){const m=['dashboard','log','map','profile'];if(p.startScreen==='welcome')this.setState({screen:'welcome',overlay:null});else this.setState({screen:'app',tab:m.includes(p.startScreen)?p.startScreen:'dashboard',overlay:null});}
+    if(p.defaultSort&&p.defaultSort!==pp.defaultSort)this.setState({sortBy:p.defaultSort});
+  }
+  renderVals(){
+    const S=this.state; const set=(o)=>this.setState(o);
+    const base=S.catches.map(c=>({...c,weightStr:Number(c.weight).toFixed(1),lengthStr:String(c.length),dateStr:this.fmtDate(c.date),open:()=>set({overlay:'detail',selectedId:c.id}),pin:()=>set({mapSelectedId:c.id})}));
+    const total=base.length;
+    const biggest=base.reduce((a,b)=>b.weight>a.weight?b:a,base[0]);
+    const sc={}; base.forEach(c=>sc[c.species]=(sc[c.species]||0)+1);
+    const favSpecies=Object.keys(sc).sort((a,b)=>sc[b]-sc[a])[0];
+    const speciesCount=Object.keys(sc).length;
+    const sp={}; base.forEach(c=>{const k=c.location; if(!sp[k])sp[k]={name:k,count:0,best:0}; sp[k].count++; sp[k].best=Math.max(sp[k].best,c.weight);});
+    const topSpots=Object.values(sp).sort((a,b)=>b.count-a.count||b.best-a.best).slice(0,3).map(s=>({...s,countStr:s.count+(s.count>1?' catches':' catch'),bestStr:Number(s.best).toFixed(1)+' lb'}));
+    const spotCount=Object.keys(sp).length;
+    const recent=[...base].sort((a,b)=>a.date<b.date?1:-1).slice(0,6);
+    let filtered=base;
+    if(S.speciesFilter!=='All')filtered=filtered.filter(c=>c.species===S.speciesFilter);
+    const q=S.search.trim().toLowerCase();
+    if(q)filtered=filtered.filter(c=>(c.species+' '+c.location+' '+c.lure+' '+c.notes).toLowerCase().includes(q));
+    filtered=[...filtered].sort((a,b)=>{if(S.sortBy==='heaviest')return b.weight-a.weight; if(S.sortBy==='longest')return b.length-a.length; return a.date<b.date?1:-1;});
+    const chip=(a)=>a?{bg:'#37E27B',color:'#04220F',border:'#37E27B'}:{bg:'var(--s2)',color:'var(--tx2)',border:'var(--bd)'};
+    const speciesOptions=['All',...Object.keys(sc).sort()];
+    const speciesChips=speciesOptions.map(n=>({label:n,...chip(S.speciesFilter===n),on:()=>set({speciesFilter:n})}));
+    const sortChips=[['recent','Recent'],['heaviest','Heaviest'],['longest','Longest']].map(([v,l])=>({label:l,...chip(S.sortBy===v),on:()=>set({sortBy:v})}));
+    const catchesVM=base.map(c=>{const a=c.id===S.mapSelectedId; return {...c,isSelected:a,pinSize:a?42:32,pinZ:a?20:3,pinBg:a?'#37E27B':'rgba(16,28,22,.96)',pinBorder:a?'#5FF29B':'rgba(55,226,123,.55)',pinIcon:a?'#04220F':'#5FF29B'};});
+    const mapSel=base.find(c=>c.id===S.mapSelectedId)||base[0];
+    const detail=base.find(c=>c.id===S.selectedId)||base[0];
+    const maxc=Math.max(...Object.values(sc));
+    const speciesBreakdown=Object.keys(sc).sort((a,b)=>sc[b]-sc[a]).map(n=>({name:n,count:sc[n],countStr:String(sc[n]),pct:(sc[n]/maxc*100)+'%'}));
+    const speciesChoices=['Largemouth Bass','Smallmouth Bass','Northern Pike','Walleye','Crappie','Bluegill','Channel Catfish','Rainbow Trout'].map(n=>{const a=S.form.species===n; return {name:n,active:a,bg:a?'#37E27B':'var(--s2)',color:a?'#04220F':'var(--tx2)',border:a?'#37E27B':'var(--bd)',on:()=>this.setForm('species',n)};});
+    const tc=(t)=>S.tab===t?'var(--grn)':'var(--tx3)';
+    return {
+      dark:true,
+      screenWelcome:S.screen==='welcome',screenLogin:S.screen==='login',screenSignup:S.screen==='signup',screenApp:S.screen==='app',
+      tabDashboard:S.tab==='dashboard',tabLog:S.tab==='log',tabMap:S.tab==='map',tabProfile:S.tab==='profile',
+      overlayAdd:S.overlay==='add',overlayDetail:S.overlay==='detail',
+      goWelcome:()=>set({screen:'welcome',overlay:null}),goLogin:()=>set({screen:'login'}),goSignup:()=>set({screen:'signup'}),
+      enter:()=>set({screen:'app',tab:'dashboard',overlay:null}),
+      goDash:()=>set({tab:'dashboard'}),goLog:()=>set({tab:'log'}),goMap:()=>set({tab:'map'}),goProfile:()=>set({tab:'profile'}),
+      goMapFromDetail:()=>set({overlay:null,tab:'map',mapSelectedId:S.selectedId}),
+      openAdd:()=>set({overlay:'add'}),closeAdd:()=>set({overlay:null,form:this.blankForm()}),closeDetail:()=>set({overlay:null}),
+      saveCatch:()=>this.saveCatch(),signOut:()=>set({screen:'welcome',overlay:null,tab:'dashboard'}),
+      onSearch:(e)=>set({search:e.target.value}),onField:(e)=>this.setForm(e.target.name,e.target.value),
+      todayStr:this.NOW.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'}),
+      total,biggestStr:Number(biggest.weight).toFixed(1)+' lb',biggestSpecies:biggest.species,
+      favSpecies,favCountStr:sc[favSpecies]+' logged',speciesCount:String(speciesCount),
+      topSpotName:topSpots[0].name,topSpotCountStr:topSpots[0].countStr,spotCount:String(spotCount),
+      topSpots,recent,filtered,resultCountStr:filtered.length+(filtered.length===1?' catch':' catches'),
+      speciesChips,sortChips,catchesVM,mapSel,detail,speciesBreakdown,speciesChoices,
+      search:S.search,
+      fWeight:S.form.weight,fLength:S.form.length,fDate:S.form.date,fLocation:S.form.location,fWeather:S.form.weather,fWater:S.form.water,fLure:S.form.lure,fRodReel:S.form.rodReel,fNotes:S.form.notes,
+      dashColor:tc('dashboard'),logColor:tc('log'),mapColor:tc('map'),profileColor:tc('profile')
+    };
+  }
+}
+</script>
+</body>
+</html>

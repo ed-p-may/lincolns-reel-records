@@ -2,6 +2,9 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Lincoln Fisher
+15 year old, Massachusetts fisherman (Ed May's nephew). Lives in Sheffield, MA. 
+
 ## What this is
 
 **Reel Records** — a personal-use iOS app for logging, tracking, and remembering fishing catches.
@@ -29,8 +32,8 @@ doc before building the corresponding feature; keep these docs current as decisi
 
 - `context/PRD.md` — product requirements: what the app does and why.
 - `context/user-stories.md` — user stories / acceptance criteria driving each feature.
-- `context/design-guidelines.md` — visual + interaction language (the "premium journal" feel), derived
-  from the Claude Design wireframe once shared.
+- `context/design-system.md` — design tokens + component specs (colors, type, motion), extracted from
+  the Claude Design prototype.
 - `context/decisions.md` — running log of architecture/tech decisions (ADR-style), including the
   pending database choice.
 
