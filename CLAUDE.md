@@ -7,9 +7,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-**Reel Records** — a personal-use iOS app for logging, tracking, and remembering fishing catches.
-The intended feel is a **premium fishing journal** crossed with a **modern social tracking app**
-(clean, tactile, image-forward; personal record-keeping, not a public social network).
+**Reel Records** — an iOS app for a small invite-only circle of anglers to log, track, and remember
+fishing catches; each keeps a **private logbook**. The feel is a **premium fishing journal** crossed
+with a **modern tracking app** (clean, tactile, image-forward). Multi-user backend, but **not** a public
+social network — no feed, following, or sharing between users.
 
 Status: **pre-code / planning done.** The Claude Design prototype has been reviewed (vendored under
 `Lincoln's Reel Records - Claude Design/`), the PRD / design system / user stories are written, and all
@@ -32,8 +33,9 @@ doc before building the corresponding feature; keep these docs current as decisi
 - `context/user-stories.md` — user stories / acceptance criteria driving each feature.
 - `context/design-system.md` — design tokens + component specs (colors, type, motion), extracted from
   the Claude Design prototype.
-- `context/decisions.md` — running log of architecture/tech decisions (ADR-style), including the
-  pending database choice.
+- `context/decisions.md` — running log of architecture/tech decisions (ADR-style); the 9 PRD questions
+  are resolved, with a short remaining "Open decisions" list for implementation-time details.
+- `mockups/` — static HTML mockups in the app design language (e.g. `tacklebox.html`).
 
 ## Decided architecture (see `context/decisions.md`, 2026-07-19)
 

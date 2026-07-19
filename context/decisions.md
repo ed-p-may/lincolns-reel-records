@@ -13,6 +13,14 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-07-19 — UI conventions: dark-only + SF Symbols
+- **Context:** design-system flagged two conventions to confirm.
+- **Decision:** (1) **Dark-only** in v1 — the prototype's dark theme is the design; no light mode.
+  (2) **SF Symbols** are the primary icon source; bundle a custom/FontAwesome glyph only where SF
+  Symbols has no good match (e.g. lure/worm). Encode design tokens once (Theme + asset catalog + Font
+  extension), per `design-system.md`.
+- **Consequences:** simpler theming; revisit light mode only if a user asks.
+
 ## 2026-07-19 — Add a Tackle Box (structured lures/bait) — new feature
 - **Context:** The prototype's `lure` is a single free-text field — messy and un-analyzable. Ed wants a
   catalog of gear to pick from.

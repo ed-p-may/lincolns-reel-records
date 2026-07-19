@@ -1,6 +1,7 @@
 # Reel Records — User Stories
 
-> Derived from the PRD and the Claude Design prototype. One user: **Lincoln** (the angler).
+> Derived from the PRD and the Claude Design prototype. Users: a small invite-only circle of anglers,
+> each with a private logbook (admins Ed/Lincoln also approve accounts).
 > Format: _As an angler, I want [capability] so that [benefit]._ Acceptance criteria are testable.
 > Priority: **P0** = v1 core, **P1** = v1 if time, **P2** = post-v1.
 
@@ -31,13 +32,16 @@ _As an angler, I want to note weather, water, lure, and rod/reel so I can spot p
 - **Decided (Q7):** air temp auto-fills from **Open-Meteo** (GPS + time) when online and stays editable;
   **offline → manual** entry. **Sky condition** and **water clarity** are **structured pickers**; water
   temp is manual. Sky condition drives the weather icon.
-- Free-text fields remain for **lure/bait, rod & reel, notes**.
+- **Lure/bait** is chosen via the Tackle Box picker (story A7), not free text. Free-text fields remain
+  for **rod & reel** and **notes**.
 - All optional; conditions fetch never blocks a save.
 
 **A5 · Record the spot (P0)**
-_As an angler, I want to name where I caught it so I can find my productive spots._
-- Location is a free-text named spot (e.g. "Cedar Point Cove").
-- _(P1)_ Optionally capture GPS coordinates for the map — see Epic D.
+_As an angler, I want to capture where I caught it so I can find my productive spots._
+- A free-text named `location` (e.g. "Cedar Point Cove"), **plus** GPS `latitude`/`longitude` captured
+  automatically when permission is granted (decided Q3).
+- **Manual pin-drop / map-search fallback** when GPS is off, denied, or the catch is logged later.
+- Feeds the Map (Epic D) and derived "favorite spots".
 
 **A6 · Edit or delete a catch (P0, not in prototype)**
 _As an angler, I want to fix or remove a catch so my logbook stays accurate._
@@ -111,9 +115,9 @@ _As an angler, I want a profile with a species breakdown so I can see my variety
 
 **D1 · See catches on a map (P0)**
 _As an angler, I want my catches on a map so I can see where I fish._
-- All catches render as pins; header shows catch + spot counts.
+- All catches render as pins **at their real GPS locations** on a dark-styled **MapKit** map (Q3).
 - Selecting a pin highlights it and shows a catch card → Catch Detail.
-- _v1 decision (PRD §6.4 / decisions.md): stylized abstract map vs. real MapKit + GPS._
+- Header shows catch + spot counts.
 
 **D2 · Jump from a catch to its spot (P1)**
 _As an angler, I want to go from a catch to its place on the map._
@@ -138,9 +142,9 @@ _As an angler, I never want to lose my catches._
 - Data is recoverable on a new device by logging back in.
 
 **E3 · Set preferences (P1)**
-_As an angler, I want to control units and notifications._
-- Units setting (lb·in; metric toggle TBD).
-- Notifications entry (scope TBD).
+_As an angler, I want to control my preferences._
+- Units row shows lb·in (imperial-only in v1; metric deferred — Q5).
+- Notifications entry (scope TBD — likely opt-in reminders; not a v1 blocker).
 
 **E4 · Export my logbook (P2 — deferred)**
 _As an angler, I want to export my whole logbook so I have a keepsake._
@@ -180,5 +184,6 @@ _(Selecting a Tackle Box item while logging is story **A7**, in Epic A.)_
 
 ## Not in scope (v1)
 
-Followers / public feed / likes / comments; multi-user; AI species ID; catch-photo species recognition;
-regulations or license tracking. Sharing tackle between anglers. (See PRD §4.)
+Followers / public feed / likes / comments; **any visibility or sharing between users** (multi-user
+accounts exist, but each logbook is private); AI / catch-photo species recognition; regulations or
+license tracking; full-logbook PDF/CSV export; metric units; a first-class Spot entity. (See PRD §4.)

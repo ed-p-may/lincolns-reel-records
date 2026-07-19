@@ -96,8 +96,9 @@ Three families (loaded from Google Fonts in prototype; bundle equivalents in-app
   `fa-water`/`fa-droplet`, `fa-worm` (lure), `fa-ruler` (length), weather set
   (`fa-sun`, `fa-cloud`, `fa-cloud-sun`, `fa-cloud-rain`, `fa-smog`, `fa-moon`), tab bar
   (`fa-house`, `fa-book`, `fa-map`, `fa-user`, `fa-plus`).
-- **iOS note:** map these to **SF Symbols** where possible (native, free, weight-matched); bundle
-  FontAwesome only for glyphs SF Symbols lacks. Log the icon-source decision in `decisions.md`.
+- **iOS note (decided):** **SF Symbols** are the primary icon source (native, free, weight-matched);
+  bundle a custom/FontAwesome glyph only for the few shapes SF Symbols lacks (e.g. a good lure/worm).
+  See `decisions.md`.
 
 ## 5. Spacing & layout
 
@@ -139,6 +140,6 @@ Keyframes from the prototype — keep durations/easing:
 - Encode tokens once as a `Theme`/`Color` asset catalog + a `Font` extension (Archivo / Manrope /
   JetBrains Mono as bundled custom fonts). Don't scatter literal hex values in views.
 - Prefer **SF Symbols**; bundle custom fonts + any needed FontAwesome glyphs.
-- App is **dark-only** by design — no light theme in v1 (confirm in `decisions.md`).
+- App is **dark-only** in v1 — no light theme (decided; see `decisions.md`).
 - Build reusable views mirroring §6 (PrimaryButton, FieldInput, Chip, StatTile, CatchCard, BottomSheet)
   so screens stay declarative.
