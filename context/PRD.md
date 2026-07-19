@@ -43,9 +43,10 @@ These are parked, not rejected — revisit post-v1.
 
 ## 5. Data model
 
-Four stored tables — **User**, **Catch**, **TackleItem**, and **CatchPhoto** (a catch's ordered photos,
-§5.3) — plus derived **Spots** (§5.3). Every `ownerId` / `userId` is RLS-scoped so a user only ever
-sees their own rows.
+Four app data concepts — **User/Profile**, **Catch**, **TackleItem**, and **CatchPhoto** (a catch's
+ordered photos, §5.3) — plus derived **Spots** (§5.3). In Supabase, identity lives in `auth.users` and
+the app-owned User/Profile table is `public.profiles`; do not create a second public `users` table.
+Every `ownerId` / `userId` is RLS-scoped so a user only ever sees their own rows.
 
 ### 5.0 The core object: a Catch
 
@@ -107,8 +108,8 @@ field with structured, selectable, analyzable data. Mockup: `mockups/tacklebox.h
 | `createdAt` / `updatedAt` | timestamp | audit/sync fields (offline sync, like Catch) | yes (system) |
 
 - **Relationship:** a Catch references one TackleItem via `tackleItemId` (nullable); `lureText` is the
-  free-text fallback for a one-off not worth cataloging. A TackleItem's **catch count** is derived
-  (how many catches reference it) — shown on its card.
+  free-text fallback for a one-off not worth cataloging. A TackleItem's **catch count** can be derived
+  (how many catches reference it), but displaying productivity is post-v1 story F4 unless reprioritized.
 - **Ownership:** private to each user, like catches. Not shared between anglers in v1.
 
 ### 5.2 Third object: a User (account)
@@ -190,8 +191,8 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval
 - **Signature species** highlight.
 - **Species breakdown** bars (count per species).
 - **My Tackle Box** row → opens the Tackle Box (§6.8).
-- **Settings:** Units (lb · in), Notifications, **Export logbook** (full-export deferred → "coming
-  soon"; per-catch share image ships in v1 via the catch share action).
+- **Settings:** Units (lb · in); Notifications disabled/"Coming Soon" (behavior deferred); **Export
+  logbook** disabled/"Coming Soon" (full export deferred; per-catch share image ships via Catch share).
 - Sign out.
 
 ### 6.6 Add Catch (overlay)
@@ -217,7 +218,7 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval
 ### 6.8 Tackle Box
 - A per-user catalog of lures & bait (see §5.1). Mockup: `mockups/tacklebox.html`.
 - **Catalog:** header + count, **search**, **type filter** chips, 2-col grid of item cards (photo, type
-  badge, color swatch, name, size · brand, **catch count**). Tap a card → edit.
+  badge, color swatch, name, size · brand). Tap a card → edit. Per-item **catch count** is post-v1 F4.
 - **Add / Edit item** (bottom sheet): photo, name, type chips, size, color (+ swatch), optional brand →
   Save.
 - **Entry points:** from Profile ("My Tackle Box") and inline from the Add-Catch lure picker.
@@ -269,7 +270,8 @@ Keep these as pure derivations over the stored catches.
 9. ~~**Min iOS version**~~ — ✅ **Decided:** build on iOS 26, **minimum target iOS 18** (keeps
    SwiftData + modern APIs). See `decisions.md`.
 
-All nine are resolved. **Remaining open items are implementation-time details** (tracked in
-`decisions.md` → "Open decisions"), not product scope: (a) on-device persistence + offline-sync
-strategy, (b) app architecture pattern, (c) Notifications scope. These get decided as we build; they
-don't block the phase plan.
+All nine are resolved. **Architecture is also decided:** feature-oriented SwiftUI + Observation, with
+SwiftData as the local source and an explicit outbox/sync coordinator (see `decisions.md` and
+`implementation-plan.md`). Remaining implementation-time details are the exact conflict/tombstone/
+unsynced-sign-out rules and signup email-confirmation/offline-session behavior. They are tracked in
+`decisions.md` and assigned to pre-scaffold/phase gates.

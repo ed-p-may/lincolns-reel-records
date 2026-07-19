@@ -32,8 +32,8 @@ _As an angler, I want to note weather, water, lure, and rod/reel so I can spot p
 - **Decided (Q7):** air temp auto-fills from **Open-Meteo** (GPS + time) when online and stays editable;
   **offline → manual** entry. **Sky condition** and **water clarity** are **structured pickers**; water
   temp is manual. Sky condition drives the weather icon.
-- **Lure/bait** is chosen via the Tackle Box picker (story A7), not free text. Free-text fields remain
-  for **rod & reel** and **notes**.
+- **Lure/bait** uses the Tackle Box picker when a saved item is appropriate (story A7), with the
+  always-available free-text `lureText` fallback for one-offs. **Rod & reel** and **notes** remain free text.
 - All optional; conditions fetch never blocks a save.
 
 **A5 · Record the spot (P0)**
@@ -141,7 +141,7 @@ _As an angler, I never want to lose my catches._
 **E3 · Set preferences (P1)**
 _As an angler, I want to control my preferences._
 - Units row shows lb·in (imperial-only in v1; metric deferred — Q5).
-- Notifications entry (scope TBD — likely opt-in reminders; not a v1 blocker).
+- Notifications row is disabled and labeled **Coming Soon**; notification behavior is post-v1.
 
 **E4 · Export my logbook (P2 — deferred)**
 _As an angler, I want to export my whole logbook so I have a keepsake._
@@ -152,7 +152,7 @@ _As an angler, I want to export my whole logbook so I have a keepsake._
 **E5 · Work offline (P0)**
 _As an angler, I want to log on the water without signal._
 - All logging, browsing, and viewing work fully offline — including **adding/editing Tackle Box items**
-  and queuing **photo uploads** (they sync when back online).
+  when Tackle Box is included in the release, and queuing **photo uploads** (they sync when back online).
 - Weather auto-fill and sync degrade gracefully offline (manual entry; sync when back online).
 
 **E6 · Edit my profile (P1)**

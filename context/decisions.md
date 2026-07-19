@@ -5,14 +5,52 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Open decisions
 
-- **On-device persistence + offline strategy** — backend is Supabase (decided), but how the iOS client
-  caches locally for offline logging (PRD E5) is open: e.g. **SwiftData/Core Data local store synced to
-  Supabase**, vs. a lighter **write-through + outbox queue**. Drivers: offline-first, min iOS version.
-- **App architecture pattern** — _undecided_ (e.g. plain SwiftUI + Observation, MVVM).
-- **Notifications scope** (Profile Settings row) — undefined; likely opt-in reminders, post-v1. Cut the
-  row or spec it before build.
+- **Detailed sync semantics** — local-first SwiftData + an explicit outbox is decided. Before Phase 02,
+  fix conflict detection/resolution and remote tombstone retention. Before Phase 01, fix the minimum
+  sign-out behavior when an unsynced creation exists. Phase 01 may use the smallest creation-only form
+  of the remaining sync contract.
+- **Signup email confirmation + offline session behavior** — “signup → straight in” must match the
+  Supabase Auth configuration. Before Phase 01, decide whether email confirmation is disabled for the
+  invite-only beta and define what an already-authenticated user can do after an offline relaunch.
 
 ## Decisions made
+
+## 2026-07-19 — Notifications behavior deferred; v1 row is disabled
+- **Context:** The Profile mockup includes Notifications, but no notification event, cadence, permission
+  timing, or user value has been specified. Building notification infrastructure would expand scope
+  without an acceptance contract.
+- **Decision:** Notifications behavior is post-v1. If the Settings row is retained in v1, it is disabled
+  and labeled Coming Soon; it must not request notification permission or imply working behavior.
+- **Consequences:** Phase 09 owns the honest placeholder state. A future notification feature requires a
+  new decision/story before implementation.
+
+## 2026-07-19 — Local-first SwiftData persistence with an explicit outbox
+- **Context:** Offline logging/browsing is P0, including queued photo and Tackle Box work. An online-first
+  Supabase client with a cache added later would make save reliability and UI behavior network-dependent.
+- **Decision:** SwiftData is the authenticated UI's on-device source. Mutations commit locally first and
+  enter an explicit outbox; a sync coordinator pushes pending work and merges pulled Supabase state.
+  Client-generated UUIDs allow offline creation. Photos use local files plus separately queued uploads.
+- **Consequences:**
+  - Supabase DTOs stay separate from SwiftData persistence models.
+  - Sync failure preserves local authored data and exposes retry state; remote calls never block a save.
+  - Local data is account-scoped and must not leak across sign-out/account changes.
+  - Minimum unsynced sign-out behavior is a pre-Phase-01 decision. Conflict resolution and tombstone
+    retention remain pre-Phase-02 decisions.
+  - Phase 01 validates the minimum real path before the sync engine is generalized.
+
+## 2026-07-19 — Feature-oriented SwiftUI + Observation architecture
+- **Context:** The app needs clear state/dependency ownership without introducing broad MVVM ceremony or
+  a third-party state framework before actual complexity exists.
+- **Decision:** Use SwiftUI-native state and Observation, organized by vertical feature. Keep value state
+  local; introduce small `@Observable` feature models only for async or multi-step coordination. Feature
+  repositories own application data operations. Root wiring owns auth, repositories, sync, connectivity,
+  configuration, tabs, navigation paths, and enum-driven sheets.
+- **Consequences:**
+  - Views do not perform Supabase/SwiftData business operations directly.
+  - Start with one app target plus unit/UI-test targets; split packages only from demonstrated pressure.
+  - Add design-system components when a real slice first requires them rather than building a horizontal
+    component library.
+  - `context/implementation-plan.md` and `context/implementation-phases/` define the delivery sequence.
 
 ## 2026-07-19 — Drop in-app approval; TestFlight invite is the gate (supersedes part of Q1)
 - **Context:** The original Q1 decision added an in-app **manual approval** step. On review, TestFlight
@@ -68,8 +106,8 @@ made; keep the "Open" list current. Newest entries at the top.
   - Mockup built in the app's design language: **`mockups/tacklebox.html`** (catalog / add / pick-in-log).
 - **Consequences:**
   - Catch model: replace free-text `lure` with `tackleItemId` (nullable) + `lureText` fallback.
-  - New table `tackle_items`; derived **catch count** per item; `archived` flag to retire gear without
-    breaking historical catches.
+  - New table `tackle_items`; `archived` flag to retire gear without breaking historical catches.
+    Per-item catch count is derivable but its display remains post-v1 F4 unless reprioritized.
   - New user stories **Epic F** + **A7**; design-system gains a tackle-card + color-swatch component.
 
 ## 2026-07-19 — Minimum iOS target: iOS 18 (PRD Q9)

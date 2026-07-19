@@ -122,7 +122,7 @@ Three families (loaded from Google Fonts in prototype; bundle equivalents in-app
 | **Tab bar** | 5 slots, blurred `rgba(9,11,10,.92)`, top hairline; center **FAB** (58px, green, raised `-24px`, 4px `--bg` ring) for Add Catch; active tab = `--grn`, idle = `--tx3` |
 | **Bottom sheet** | full-height overlay, `--bg`, header with close (✕) + title, scroll body, pinned footer action; `sheetUp` entrance |
 | **Badge (mono)** | small, `--grnt`/dark fill, JetBrains Mono, for weight/length/counts |
-| **Tackle card** | `--s1` card; photo thumb with a mono **type badge** (top-left) + **color swatch** dot (top-right); name, `size · brand` in mono, and a green `--grnt` **catch-count** pill. See `mockups/tacklebox.html` |
+| **Tackle card** | `--s1` card; photo thumb with a mono **type badge** (top-left) + **color swatch** dot (top-right); name and `size · brand` in mono. The mockup's green **catch-count** pill belongs to post-v1 F4 unless reprioritized. See `mockups/tacklebox.html` |
 | **Color swatch** | small circle (grid card ~18px) / rounded square (form ~50px), 1px light border, filled with the lure color |
 | **Lure picker** | selected item as a bordered card + a horizontal row of item pills; dashed **+ New lure** pill (`--grnt`); "Manage Tackle Box" row |
 
