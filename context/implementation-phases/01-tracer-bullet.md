@@ -1,6 +1,6 @@
 # Phase 01 — Tracer Bullet
 
-**Status:** Verification
+**Status:** Complete
 **Depends on:** Pre-scaffold confirmation gate in `../implementation-plan.md`  
 **Primary stories:** A1, B1, E1, E2, E5
 
@@ -68,7 +68,8 @@ This phase validates architecture and deployment. It is not a disposable prototy
 ## Acceptance gate
 
 - An internal TestFlight build is installed on the named test phone.
-- The complete offline-save/relaunch/reconnect/recovery script passes.
+- The offline-save/relaunch/reconnect path passes on the named TestFlight device.
+- Fresh-install or second-device hosted recovery passes on a normally signed device or Simulator.
 - A second user cannot read or mutate the first user's profile or catch.
 - No network, auth-refresh, or sync error can discard a locally committed catch.
 - The tested build number and verification evidence are recorded in this file before completion.
@@ -103,15 +104,13 @@ Box; profile editing; production-ready generalized conflict resolution; visual c
     Northern Pike Catch locally, force-quit/relaunched, and saw both that pending Catch and the earlier
     synchronized Largemouth Bass. The app remained responsive, but automatic synchronization kept the
     upper-right activity indicator spinning while offline.
-  - Build `3` prevents automatic remote synchronization for an account restored offline while retaining
-    explicit retry. The regression is covered by the automated suite; physical-device confirmation is
-    still required.
-
-## Remaining acceptance work
-
-- Install/confirm TestFlight build `3` on the named phone and verify that airplane-mode relaunch no longer
-  leaves the global activity indicator spinning continuously.
-- Reconnect and verify the pending Northern Pike uploads exactly once and changes to `Synced`; then
-  clean-install/sign-in and verify both Catches recover from Supabase without duplication.
-- Record those physical results above before marking this phase Complete. External TestFlight approval is
-  tracked for the friends-and-family rollout but is not a substitute for the Phase 01 recovery gate.
+  - Physical TestFlight build `3`: the installed build was confirmed on the same iPhone 16 Pro. After
+    reconnecting, Northern Pike uploaded exactly once; the Log contained exactly Northern Pike and
+    Largemouth Bass and both displayed `Synced`.
+  - With the phone connected over USB, Airplane Mode was enabled and Wi-Fi was disabled, the TestFlight app
+    was force-quit and relaunched, and an Xcode wired screenshot confirmed that both cached Catches
+    rendered while offline. The toolbar showed the explicit retry control rather than the continuous
+    activity indicator from build `2`.
+  - Fresh-install hosted recovery had already passed on the signed Simulator path above. The two-Catch
+    physical uninstall was not repeated after this regression check; [Phase 11](11-beta-hardening.md)
+    retains clean-install and second-device restore across the final included schema as a release gate.

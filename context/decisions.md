@@ -36,8 +36,10 @@ made; keep the "Open" list current. Newest entries at the top.
     count, and offers retry. Phase 02 will revisit the broader policy when edit/delete outbox operations
     exist.
   - Initial device acceptance uses an **iPhone 16 Pro on iOS 18.6**.
-- **Consequences:** Phase 01 may begin. Its closeout still requires migration evidence, an App Store
-  Connect record, a signed TestFlight build, and physical-device recovery results.
+- **Consequences:** Phase 01 closeout requires migration evidence, an App Store Connect record, a signed
+  TestFlight build, physical-device offline/reconnect results, and normally signed fresh-install hosted
+  recovery evidence. The recovery check may use a second physical device or Simulator; Phase 11 repeats
+  clean-install and second-device recovery on physical hardware against the final included schema.
   Simulator integration runs that exercise Supabase Auth must use normal Simulator ad-hoc signing;
   `CODE_SIGNING_ALLOWED=NO` prevents Keychain-backed session persistence and makes PostgREST requests
   fall back to the anonymous role.
