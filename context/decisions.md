@@ -13,6 +13,22 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-07-19 — Add a Tackle Box (structured lures/bait) — new feature
+- **Context:** The prototype's `lure` is a single free-text field — messy and un-analyzable. Ed wants a
+  catalog of gear to pick from.
+- **Decision:** Add a **Tackle Box**: a per-user catalog of **TackleItem** records (name, type, size,
+  color, brand, photo — see PRD §5.1). When logging a catch, the lure field becomes a **picker** from
+  the Tackle Box (`tackleItemId`), with a **free-text fallback** (`lureText`) for one-offs.
+  - New screen **Tackle Box** (catalog grid + add/edit sheet), reached from **Profile** and from the
+    **Add-Catch lure picker** — **not** a 6th tab (tab bar is full at 5).
+  - Items are private (RLS-scoped), stored in Supabase; photos in Supabase Storage.
+  - Mockup built in the app's design language: **`mockups/tacklebox.html`** (catalog / add / pick-in-log).
+- **Consequences:**
+  - Catch model: replace free-text `lure` with `tackleItemId` (nullable) + `lureText` fallback.
+  - New table `tackle_items`; derived **catch count** per item; `archived` flag to retire gear without
+    breaking historical catches.
+  - New user stories **Epic F** + **A7**; design-system gains a tackle-card + color-swatch component.
+
 ## 2026-07-19 — Minimum iOS target: iOS 18 (PRD Q9)
 - **Context:** Ed & Lincoln are on iOS 26 (current, year-named; the version after iOS 18). Question was
   whether to set the floor that high.

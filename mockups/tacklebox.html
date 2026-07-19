@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reel Records — Tackle Box mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<style>
+:root{
+  --bg:#0A0C0B;--s1:#121512;--s2:#181C18;--s3:#20251F;
+  --bd:rgba(255,255,255,.07);--bd2:rgba(255,255,255,.13);
+  --grn:#37E27B;--grn2:#5FF29B;--grnk:#04220F;--grnt:rgba(55,226,123,.12);
+  --tx:#F1F4F0;--tx2:#9AA39C;--tx3:#5C645D;
+  --dsp:'Archivo',system-ui,sans-serif;--mono:'JetBrains Mono',ui-monospace,monospace;
+}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(120% 70% at 50% -8%, #161c18 0%, #0a0c0b 52%, #060706 100%);
+  min-height:100vh;font-family:'Manrope',system-ui,sans-serif;color:var(--tx);
+  -webkit-font-smoothing:antialiased;padding:40px 24px 64px}
+.page-head{max-width:1240px;margin:0 auto 34px;text-align:center}
+.page-head .kick{font-family:var(--mono);font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--grn)}
+.page-head h1{font-family:var(--dsp);font-weight:900;font-size:34px;letter-spacing:-.02em;margin:8px 0 6px}
+.page-head p{color:var(--tx2);font-size:15px;margin:0;max-width:640px;margin-inline:auto;line-height:1.5}
+.stage{display:flex;flex-wrap:wrap;gap:40px 46px;justify-content:center;align-items:flex-start;max-width:1240px;margin:0 auto}
+.frame-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.frame-cap{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;color:var(--tx2);text-align:center;max-width:360px;line-height:1.5}
+.frame-cap b{color:var(--tx);font-weight:600}
+/* phone */
+.phone{width:378px;height:812px;border-radius:46px;background:#000;padding:11px;
+  box-shadow:0 34px 70px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.05),inset 0 0 0 2px #1c1f1c;position:relative}
+.screen{position:relative;width:100%;height:100%;border-radius:36px;overflow:hidden;background:var(--bg);display:flex;flex-direction:column}
+.notch{position:absolute;top:11px;left:50%;transform:translateX(-50%);width:120px;height:30px;background:#000;border-radius:0 0 18px 18px;z-index:60}
+.scroll{flex:1;overflow:hidden;position:relative}
+.pad{padding:52px 18px 20px}
+
+/* generic bits */
+.kicker{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--grn)}
+.h1{font-family:var(--dsp);font-weight:800;font-size:27px;margin:3px 0 0}
+.sub{color:var(--tx2);font-size:13px;margin-top:3px}
+.label{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--tx3);margin:0 0 8px;display:block}
+.search{position:relative;margin:16px 0 12px}
+.search i{position:absolute;left:15px;top:50%;transform:translateY(-50%);color:var(--tx3);font-size:13px}
+.search input{width:100%;height:48px;border-radius:14px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);
+  padding:0 14px 0 40px;font-size:14px;outline:none;font-family:inherit}
+.search input::placeholder{color:var(--tx3)}
+.chips{display:flex;gap:8px;overflow-x:auto;margin:0 -18px 16px;padding:0 18px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;padding:8px 13px;border-radius:999px;border:1px solid var(--bd);background:var(--s2);
+  color:var(--tx2);font-weight:700;font-size:12.5px;white-space:nowrap;cursor:pointer}
+.chip.on{background:var(--grn);color:var(--grnk);border-color:var(--grn)}
+
+/* tackle grid */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:13px}
+.tcard{background:var(--s1);border:1px solid var(--bd);border-radius:18px;overflow:hidden;cursor:pointer;transition:border-color .15s}
+.tcard:hover{border-color:rgba(55,226,123,.4)}
+.thumb{position:relative;height:104px;display:flex;align-items:center;justify-content:center}
+.thumb .ico{font-size:34px;color:rgba(255,255,255,.14)}
+.type-badge{position:absolute;top:8px;left:8px;background:rgba(6,8,6,.62);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.14);color:#fff;font-family:var(--mono);font-weight:600;font-size:10px;
+  letter-spacing:.03em;padding:3px 7px;border-radius:7px}
+.swatch{position:absolute;top:8px;right:8px;width:18px;height:18px;border-radius:50%;border:2px solid rgba(255,255,255,.5);box-shadow:0 2px 6px rgba(0,0,0,.4)}
+.tbody{padding:10px 11px 12px}
+.tname{font-weight:700;font-size:13.5px;color:var(--tx);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tmeta{color:var(--tx3);font-size:11.5px;margin-top:3px;font-family:var(--mono)}
+.tcaught{display:inline-flex;align-items:center;gap:5px;margin-top:9px;color:var(--grn2);font-size:11px;font-weight:700;
+  background:var(--grnt);padding:3px 8px;border-radius:999px}
+.tcaught i{font-size:9px}
+
+/* add-lure form */
+.photo-drop{height:150px;border-radius:18px;border:1px dashed var(--bd2);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:9px;color:var(--tx3);margin-bottom:20px;background:var(--s1)}
+.photo-drop i{font-size:26px;color:var(--tx2)}
+.photo-drop span{font-size:13px}
+.field{margin-bottom:16px}
+.field input{width:100%;height:50px;border-radius:13px;background:var(--s2);border:1px solid var(--bd);color:var(--tx);
+  padding:0 14px;font-size:14px;outline:none;font-family:inherit}
+.field input::placeholder{color:var(--tx3)}
+.field input.mono{font-family:var(--mono)}
+.two{display:flex;gap:12px}
+.two .field{flex:1}
+.typewrap{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px}
+.tchip{padding:9px 13px;border-radius:12px;border:1px solid var(--bd);background:var(--s2);color:var(--tx2);
+  font-weight:700;font-size:12.5px;cursor:pointer;display:inline-flex;align-items:center;gap:7px}
+.tchip.on{background:var(--grn);color:var(--grnk);border-color:var(--grn)}
+.tchip i{font-size:11px}
+.color-row{display:flex;align-items:center;gap:11px;margin-bottom:20px}
+.color-row .field{flex:1;margin:0}
+.big-swatch{width:50px;height:50px;border-radius:13px;border:1px solid var(--bd2);flex:none}
+.footer-bar{padding:14px 18px 26px;border-top:1px solid var(--bd);background:var(--bg)}
+.btn{width:100%;height:54px;border:none;border-radius:15px;background:var(--grn);color:var(--grnk);
+  font-family:var(--dsp);font-weight:800;font-size:15.5px;cursor:pointer;display:flex;align-items:center;
+  justify-content:center;gap:9px;box-shadow:0 8px 24px rgba(55,226,123,.3)}
+.sheet-head{padding:52px 18px 14px;display:flex;align-items:center;gap:13px;border-bottom:1px solid var(--bd)}
+.xbtn{width:40px;height:40px;border-radius:12px;background:var(--s2);border:1px solid var(--bd);color:var(--tx2);
+  cursor:pointer;flex:none;display:flex;align-items:center;justify-content:center}
+
+/* picker (log a catch) */
+.pickcard{border:2px solid var(--grn);border-radius:16px;background:var(--s1);padding:11px;display:flex;gap:11px;align-items:center;margin-bottom:12px;position:relative}
+.pickcard .mini{width:52px;height:52px;border-radius:11px;flex:none;display:flex;align-items:center;justify-content:center}
+.pickcard .mini i{color:rgba(255,255,255,.2);font-size:20px}
+.pickcard .pk-name{font-weight:700;font-size:14.5px}
+.pickcard .pk-meta{color:var(--tx3);font-size:12px;margin-top:2px;font-family:var(--mono)}
+.pickcard .check{margin-left:auto;width:26px;height:26px;border-radius:50%;background:var(--grn);color:var(--grnk);display:flex;align-items:center;justify-content:center;font-size:12px}
+.pickrow{display:flex;gap:11px;overflow-x:auto;margin:0 -18px;padding:2px 18px 4px;scrollbar-width:none}
+.pickrow::-webkit-scrollbar{display:none}
+.pill{flex:none;width:96px;background:var(--s1);border:1px solid var(--bd);border-radius:14px;overflow:hidden;cursor:pointer}
+.pill .pthumb{height:60px;display:flex;align-items:center;justify-content:center}
+.pill .pthumb i{color:rgba(255,255,255,.16);font-size:18px}
+.pill .pn{font-size:11px;font-weight:700;padding:7px 8px 9px;line-height:1.25;color:var(--tx)}
+.addpill{flex:none;width:96px;border:1px dashed var(--bd2);border-radius:14px;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:7px;color:var(--grn2);font-size:11px;font-weight:700;cursor:pointer;background:var(--grnt)}
+.addpill i{font-size:16px}
+.manage{display:flex;align-items:center;gap:8px;margin-top:16px;padding:13px 14px;border-radius:14px;background:var(--s1);
+  border:1px solid var(--bd);color:var(--tx2);font-size:13px;font-weight:600;cursor:pointer}
+.manage .fa-toolbox{color:var(--grn2)}
+.manage .fa-chevron-right{margin-left:auto;color:var(--tx3);font-size:11px}
+.section-t{font-family:var(--dsp);font-weight:700;font-size:16px;margin:0 0 12px}
+
+/* tab bar */
+.tabbar{flex:none;background:rgba(9,11,10,.92);backdrop-filter:blur(20px);border-top:1px solid var(--bd);
+  display:flex;justify-content:space-around;align-items:flex-start;padding:9px 12px 20px}
+.tab{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--tx3);font-size:9.5px;font-weight:700}
+.tab i{font-size:17px}
+.tab.on{color:var(--grn)}
+.fab{flex:none;margin-top:-22px;width:54px;height:54px;border-radius:18px;background:var(--grn);color:var(--grnk);
+  border:4px solid var(--bg);display:flex;align-items:center;justify-content:center;box-shadow:0 8px 20px rgba(55,226,123,.42)}
+.fab i{font-size:20px}
+.headrow{display:flex;align-items:center;gap:12px}
+.addbtn{margin-left:auto;width:42px;height:42px;border-radius:13px;background:var(--grnt);border:1px solid rgba(55,226,123,.4);
+  color:var(--grn2);display:flex;align-items:center;justify-content:center;flex:none;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="kick">Reel Records · new feature</div>
+  <h1>Tackle Box</h1>
+  <p>A personal catalog of lures &amp; bait — name, type, size, color, and a photo — that you build once
+     and then pick from every time you log a catch. Same design language as the rest of the app.</p>
+</div>
+
+<div class="stage">
+
+  <!-- ============ FRAME 1: TACKLE BOX CATALOG ============ -->
+  <div class="frame-wrap">
+    <div class="phone"><div class="notch"></div><div class="screen">
+      <div class="scroll">
+        <div class="pad">
+          <div class="headrow">
+            <div>
+              <div class="kicker">Your gear</div>
+              <h1 class="h1">Tackle Box</h1>
+              <div class="sub">8 lures &amp; baits</div>
+            </div>
+            <button class="addbtn"><i class="fa-solid fa-plus"></i></button>
+          </div>
+
+          <div class="search"><i class="fa-solid fa-magnifying-glass"></i>
+            <input placeholder="Search your tackle…"></div>
+
+          <div class="chips">
+            <div class="chip on">All</div>
+            <div class="chip">Soft Plastic</div>
+            <div class="chip">Crankbait</div>
+            <div class="chip">Jig</div>
+            <div class="chip">Spinnerbait</div>
+            <div class="chip">Topwater</div>
+            <div class="chip">Live Bait</div>
+          </div>
+
+          <div class="grid">
+            <!-- card -->
+            <div class="tcard">
+              <div class="thumb" style="background:radial-gradient(120% 100% at 30% 20%, #2b331c, #10130d)">
+                <i class="fa-solid fa-worm ico"></i>
+                <span class="type-badge">Soft Plastic</span>
+                <span class="swatch" style="background:#6E7A43"></span>
+              </div>
+              <div class="tbody">
+                <div class="tname">Green Pumpkin Senko</div>
+                <div class="tmeta">5" · Yamamoto</div>
+                <div class="tcaught"><i class="fa-solid fa-fish"></i>2 catches</div>
+              </div>
+            </div>
+
+            <div class="tcard">
+              <div class="thumb" style="background:radial-gradient(120% 100% at 30% 20%, #33320f, #14130a)">
+                <i class="fa-solid fa-fan ico"></i>
+                <span class="type-badge">Spinnerbait</span>
+                <span class="swatch" style="background:#DFF24A"></span>
+              </div>
+              <div class="tbody">
+                <div class="tname">Chartreuse Spinner</div>
+                <div class="tmeta">3/8 oz · War Eagle</div>
+                <div class="tcaught"><i class="fa-solid fa-fish"></i>1 catch</div>
+              </div>
+            </div>
+
+            <div class="tcard">
+              <div class="thumb" style="background:radial-gradient(120% 100% at 30% 20%, #24331d, #0f130c)">
+                <i class="fa-solid fa-worm ico"></i>
+                <span class="type-badge">Soft Plastic</span>
+                <span class="swatch" style="background:#4E7A3A"></span>
+              </div>
+              <div class="tbody">
+                <div class="tname">Ned Rig (green)</div>
+                <div class="tmeta">2.75" · Z-Man</div>
+                <div class="tcaught"><i class="fa-solid fa-fish"></i>1 catch</div>
+              </div>
+            </div>
+
+            <div class="tcard">
+              <div class="thumb" style="background:radial-gradient(120% 100% at 30% 20%, #313a17, #13160b)">
+                <i class="fa-solid fa-fish-fins ico"></i>
+                <span class="type-badge">Crankbait</span>
+                <span class="swatch" style="background:#A9C43B"></span>
+              </div>
+              <div class="tbody">
+                <div class="tname">Firetiger Crank</div>
+                <div class="tmeta">2.5" · Rapala</div>
+                <div class="tcaught"><i class="fa-solid fa-fish"></i>1 catch</div>
+              </div>
+            </div>
+
+            <div class="tcard">
+              <div class="thumb" style="background:radial-gradient(120% 100% at 30% 20%, #1b2340, #0c0f16)">
+                <i class="fa-solid fa-feather ico"></i>
+                <span class="type-badge">Jig</span>
+                <span class="swatch" style="background:#2B3A6B"></span>
+              </div>
+              <div class="tbody">
+                <div class="tname">Black/Blue Jig</div>
+                <div class="tmeta">1/2 oz · Strike King</div>
+                <div class="tcaught"><i class="fa-solid fa-fish"></i>1 catch</div>
+              </div>
+            </div>
+
+            <div class="tcard">
+              <div class="thumb" style="background:radial-gradient(120% 100% at 30% 20%, #3a382c, #16150f)">
+                <i class="fa-solid fa-water ico"></i>
+                <span class="type-badge">Topwater</span>
+                <span class="swatch" style="background:#E8E2D0"></span>
+              </div>
+              <div class="tbody">
+                <div class="tname">Whopper Plopper</div>
+                <div class="tmeta">90mm · Bone</div>
+                <div class="tcaught"><i class="fa-solid fa-fish"></i>0 catches</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- tab bar (Tackle Box entered from Profile / picker) -->
+      <div class="tabbar">
+        <div class="tab"><i class="fa-solid fa-house"></i>Home</div>
+        <div class="tab"><i class="fa-solid fa-book"></i>Log</div>
+        <div class="fab"><i class="fa-solid fa-plus"></i></div>
+        <div class="tab"><i class="fa-solid fa-map"></i>Map</div>
+        <div class="tab on"><i class="fa-solid fa-user"></i>You</div>
+      </div>
+    </div></div>
+    <div class="frame-cap"><b>Tackle Box catalog.</b> Searchable, filterable by type. Each card shows the
+      photo, type, size, color swatch, and how many catches you've landed on it.</div>
+  </div>
+
+  <!-- ============ FRAME 2: ADD TO TACKLE BOX ============ -->
+  <div class="frame-wrap">
+    <div class="phone"><div class="notch"></div><div class="screen">
+      <div class="sheet-head">
+        <button class="xbtn"><i class="fa-solid fa-xmark"></i></button>
+        <div>
+          <div class="kicker">New item</div>
+          <h2 class="h1" style="font-size:21px">Add to Tackle Box</h2>
+        </div>
+      </div>
+      <div class="scroll">
+        <div style="padding:18px">
+          <div class="photo-drop">
+            <i class="fa-solid fa-camera"></i><span>Tap to add a photo of the lure</span>
+          </div>
+
+          <div class="field">
+            <label class="label">Name</label>
+            <input placeholder="Green Pumpkin Senko">
+          </div>
+
+          <label class="label">Type</label>
+          <div class="typewrap">
+            <div class="tchip on"><i class="fa-solid fa-worm"></i>Soft Plastic</div>
+            <div class="tchip"><i class="fa-solid fa-fish-fins"></i>Crankbait</div>
+            <div class="tchip"><i class="fa-solid fa-fan"></i>Spinnerbait</div>
+            <div class="tchip"><i class="fa-solid fa-feather"></i>Jig</div>
+            <div class="tchip"><i class="fa-solid fa-water"></i>Topwater</div>
+            <div class="tchip"><i class="fa-solid fa-worm"></i>Live Bait</div>
+          </div>
+
+          <div class="two">
+            <div class="field">
+              <label class="label">Size</label>
+              <input class="mono" placeholder='5"  /  1/2 oz'>
+            </div>
+            <div class="field">
+              <label class="label">Brand <span style="color:var(--tx3);font-weight:600;text-transform:none;letter-spacing:0">· optional</span></label>
+              <input placeholder="Yamamoto">
+            </div>
+          </div>
+
+          <label class="label">Color</label>
+          <div class="color-row">
+            <div class="big-swatch" style="background:#6E7A43"></div>
+            <div class="field"><input placeholder="Green Pumpkin"></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bar">
+        <button class="btn"><i class="fa-solid fa-check"></i>Save to Tackle Box</button>
+      </div>
+    </div></div>
+    <div class="frame-cap"><b>Add / edit an item.</b> Photo, name, type, size, color, and optional brand —
+      the same fields you asked for, styled like the Log-a-Catch form.</div>
+  </div>
+
+  <!-- ============ FRAME 3: PICK IN LOG-A-CATCH ============ -->
+  <div class="frame-wrap">
+    <div class="phone"><div class="notch"></div><div class="screen">
+      <div class="sheet-head">
+        <button class="xbtn"><i class="fa-solid fa-xmark"></i></button>
+        <div>
+          <div class="kicker">New entry</div>
+          <h2 class="h1" style="font-size:21px">Log a Catch</h2>
+        </div>
+      </div>
+      <div class="scroll">
+        <div style="padding:18px">
+          <div style="opacity:.5;pointer-events:none">
+            <label class="label">Species</label>
+            <div class="typewrap" style="margin-bottom:22px">
+              <div class="tchip on">Largemouth Bass</div>
+              <div class="tchip">Smallmouth Bass</div>
+              <div class="tchip">Walleye</div>
+            </div>
+          </div>
+
+          <label class="label">Lure / bait — from your Tackle Box</label>
+          <div class="pickcard">
+            <div class="mini" style="background:radial-gradient(120% 100% at 30% 20%, #2b331c, #10130d)">
+              <i class="fa-solid fa-worm"></i></div>
+            <div>
+              <div class="pk-name">Green Pumpkin Senko</div>
+              <div class="pk-meta">Soft Plastic · 5"</div>
+            </div>
+            <div class="check"><i class="fa-solid fa-check"></i></div>
+          </div>
+
+          <div class="pickrow">
+            <div class="addpill"><i class="fa-solid fa-plus"></i>New lure</div>
+            <div class="pill"><div class="pthumb" style="background:radial-gradient(120% 100% at 30% 20%, #33320f, #14130a)"><i class="fa-solid fa-fan"></i></div><div class="pn">Chartreuse Spinner</div></div>
+            <div class="pill"><div class="pthumb" style="background:radial-gradient(120% 100% at 30% 20%, #24331d, #0f130c)"><i class="fa-solid fa-worm"></i></div><div class="pn">Ned Rig (green)</div></div>
+            <div class="pill"><div class="pthumb" style="background:radial-gradient(120% 100% at 30% 20%, #313a17, #13160b)"><i class="fa-solid fa-fish-fins"></i></div><div class="pn">Firetiger Crank</div></div>
+          </div>
+
+          <div class="manage"><i class="fa-solid fa-toolbox"></i>Manage Tackle Box
+            <i class="fa-solid fa-chevron-right"></i></div>
+
+          <div style="opacity:.5;pointer-events:none;margin-top:22px">
+            <label class="label">Rod &amp; reel</label>
+            <div class="field"><input placeholder="7'2&quot; MH · Curado 200"></div>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bar">
+        <button class="btn"><i class="fa-solid fa-check"></i>Save Catch</button>
+      </div>
+    </div></div>
+    <div class="frame-cap"><b>Picking it while logging.</b> The Lure field becomes a picker from your
+      Tackle Box — tap to select, swipe for more, or add a new one inline.</div>
+  </div>
+
+</div>
+</body>
+</html>

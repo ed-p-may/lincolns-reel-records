@@ -45,6 +45,13 @@ _As an angler, I want to fix or remove a catch so my logbook stays accurate._
 - I can delete a catch with a confirmation step.
 - _Note: the prototype has no edit/delete — this is a required v1 addition._
 
+**A7 · Pick the lure from my Tackle Box (P1)**
+_As an angler, I want to choose the lure/bait from my saved gear so my logs are consistent and analyzable._
+- In Add Catch, the lure field is a **Tackle Box picker** (see Epic F): select a saved item, or add a
+  new one **inline** without leaving the form.
+- A one-off can still be entered as **free text** (`lureText`) when it's not worth cataloging.
+- The selected item shows on the catch card and Catch Detail; tapping it opens its Tackle Box entry.
+
 ## Epic B — Browsing & finding catches
 
 **B1 · Browse the logbook (P0)**
@@ -115,15 +122,20 @@ _As an angler, I want to go from a catch to its place on the map._
 ## Epic E — Account, data & settings
 
 **E1 · Get into the app (P0)**
-_As an angler, I want to open my logbook without friction._
-- Welcome → Get Started leads into the app.
-- Auth model TBD (real account vs. local/passcode — PRD §9 / decisions.md). Acceptance criteria
-  finalize once decided.
+_As an angler, I want an account so my logbook is mine and follows me._
+- Welcome → Create Account (username + email + password) or Log In.
+- New accounts land in a **"pending approval"** state; an **email notifies** the admin (Ed/Lincoln).
+- Once **approved**, the user can log in and use the app. Real accounts via Supabase Auth (decided Q1).
+
+**E1b · Approve new users (P0, admin)**
+_As an admin, I want to approve or decline new signups so only invited people get in._
+- Admin receives an email on each signup and can flip a user's `approved` flag.
+- Un-approved users see the pending state and cannot access data.
 
 **E2 · Keep my data safe (P0)**
 _As an angler, I never want to lose my catches._
-- Catches persist locally across app restarts.
-- _(P1)_ Backup/sync so a lost phone doesn't mean a lost logbook (iCloud/CloudKit — decisions.md).
+- Catches persist to the **Supabase** backend (decided Q2) and to a local cache for offline use.
+- Data is recoverable on a new device by logging back in.
 
 **E3 · Set preferences (P1)**
 _As an angler, I want to control units and notifications._
@@ -139,9 +151,34 @@ _As an angler, I want to export my whole logbook so I have a keepsake._
 **E5 · Work offline (P0)**
 _As an angler, I want to log on the water without signal._
 - All logging, browsing, and viewing work fully offline.
-- Any sync/weather features degrade gracefully when offline.
+- Weather auto-fill and sync degrade gracefully offline (manual entry; sync when back online).
+
+## Epic F — Tackle Box (structured lures & bait)
+
+**F1 · Build my Tackle Box (P1)**
+_As an angler, I want to catalog my lures & bait so I can reuse them and keep clean records._
+- I can add an item with **name, type, size, color, optional brand, and a photo**.
+- Type is a **structured picker** (Soft Plastic, Crankbait, Spinnerbait, Jig, Topwater, Spoon, Fly,
+  Live Bait, Other).
+- Items are private to me (RLS-scoped).
+
+**F2 · Browse & find tackle (P1)**
+_As an angler, I want to search and filter my Tackle Box so I can grab the right lure fast._
+- Catalog grid shows photo, type, color swatch, name, size · brand.
+- **Search** by name; **filter** by type.
+
+**F3 · Edit / retire an item (P1)**
+_As an angler, I want to fix or retire tackle without losing history._
+- I can edit any field.
+- I can **archive** an item (hidden from pickers) without deleting catches that reference it.
+
+**F4 · See what's working (P2)**
+_As an angler, I want to see how productive each lure is so I fish smarter._
+- Each item shows a **catch count**; later, best species/size landed on it.
+
+_(Selecting a Tackle Box item while logging is story **A7**, in Epic A.)_
 
 ## Not in scope (v1)
 
-Followers / public feed / likes / comments; multi-user; AI species ID; live weather API; regulations
-or license tracking. (See PRD §4.)
+Followers / public feed / likes / comments; multi-user; AI species ID; catch-photo species recognition;
+regulations or license tracking. Sharing tackle between anglers. (See PRD §4.)

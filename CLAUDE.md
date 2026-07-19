@@ -51,6 +51,8 @@ The 9 open PRD questions are resolved. Key stack decisions:
 - **Map:** MapKit + real GPS capture (manual fallback). **Photos:** multiple per catch (Supabase
   Storage). **Conditions:** Open-Meteo auto-fill + structured pickers, manual offline. **Units:**
   imperial only (v1).
+- **Tackle Box:** a per-user catalog of lures/bait (`TackleItem`); the catch lure field is a picker
+  from it (free-text fallback). New pushed screen (tab bar is full). Mockup: `mockups/tacklebox.html`.
 
 ## Conventions (to apply once code begins)
 

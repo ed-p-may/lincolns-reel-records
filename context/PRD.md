@@ -53,7 +53,8 @@ Every feature orbits one entity. Fields below come directly from the prototype's
 | `skyCondition` | enum | structured picker; drives weather icon; API-suggested, overridable | optional |
 | `waterTempF` | number (°F) | manual (no reliable API source) | optional |
 | `waterClarity` | enum | Clear / Stained / Muddy (manual) | optional |
-| `lure` | string | lure / bait used | optional |
+| `tackleItemId` | ref → TackleItem | selected from the **Tackle Box** (§5.1); nullable | optional |
+| `lureText` | string | free-text fallback when no Tackle Box item is picked (one-offs) | optional |
 | `rodReel` | string | rod & reel setup | optional |
 | `notes` | string (long) | field notes / story | optional |
 | `photos` | ordered list of images | **multiple** per catch; first = hero. In Supabase Storage | recommended |
@@ -64,6 +65,28 @@ Bluegill, Channel Catfish, Rainbow Trout. Editable/extendable; allow "Other → 
 
 **Units:** imperial (lb · in). A metric toggle is shown in Settings — treat as display preference over
 stored canonical units. Confirm whether v1 ships the toggle or just imperial (see §9).
+
+## 5.1 Second object: a TackleItem (Tackle Box)
+
+A per-user catalog of lures & bait, built once and reused. Replaces the prototype's free-text `lure`
+field with structured, selectable, analyzable data. Mockup: `mockups/tacklebox.html`.
+
+| Field | Type | Notes | Required |
+|-------|------|-------|----------|
+| `id` | id | stable unique id | yes (system) |
+| `ownerId` | ref → User | each angler has their own Tackle Box (RLS-scoped) | yes (system) |
+| `name` | string | e.g. "Green Pumpkin Senko" | yes |
+| `type` | enum | Soft Plastic, Crankbait, Spinnerbait, Jig, Topwater, Spoon, Fly, Live Bait, Other | yes |
+| `size` | string | free text — length or weight ("5\"", "1/2 oz") | optional |
+| `color` | string | color name (e.g. "Green Pumpkin") | optional |
+| `brand` | string | optional maker (e.g. "Yamamoto") | optional |
+| `photo` | image | one photo, Supabase Storage | optional |
+| `archived` | bool | hide retired items without deleting history | optional |
+
+- **Relationship:** a Catch references one TackleItem via `tackleItemId` (nullable); `lureText` is the
+  free-text fallback for a one-off not worth cataloging. A TackleItem's **catch count** is derived
+  (how many catches reference it) — shown on its card.
+- **Ownership:** private to each user, like catches. Not shared between anglers in v1.
 
 ## 6. Features / screens
 
@@ -108,19 +131,34 @@ stored canonical units. Confirm whether v1 ships the toggle or just imperial (se
 - Stat row: total catches / personal best / species count.
 - **Signature species** highlight.
 - **Species breakdown** bars (count per species).
+- **My Tackle Box** row → opens the Tackle Box (§6.8).
 - **Settings:** Units (lb · in), Notifications, **Export logbook** (full-export deferred → "coming
   soon"; per-catch share image ships in v1 via the catch share action).
 - Sign out.
 
 ### 6.6 Add Catch (overlay)
-- Bottom-sheet form: photo, species chips, weight, length, date (default today), location, weather,
-  water, lure/bait, rod & reel, notes → **Save Catch**.
+- Bottom-sheet form: photo(s), species chips, weight, length, date (default today), location, weather,
+  water, **lure (Tackle Box picker)**, rod & reel, released toggle, notes → **Save Catch**.
+- **Lure picker:** select from the Tackle Box (currently-picked item shown as a card; a horizontal row
+  of other items; **+ New lure** adds one inline; **Manage Tackle Box** opens §6.8). Free-text fallback
+  (`lureText`) for a one-off. See `mockups/tacklebox.html`, frame 3.
 - Optimized for speed: sensible defaults, big tap targets, minimal required fields (species + date).
+
+### 6.8 Tackle Box
+- A per-user catalog of lures & bait (see §5.1). Mockup: `mockups/tacklebox.html`.
+- **Catalog:** header + count, **search**, **type filter** chips, 2-col grid of item cards (photo, type
+  badge, color swatch, name, size · brand, **catch count**). Tap a card → edit.
+- **Add / Edit item** (bottom sheet): photo, name, type chips, size, color (+ swatch), optional brand →
+  Save.
+- **Entry points:** from Profile ("My Tackle Box") and inline from the Add-Catch lure picker.
+- **Navigation note:** the bottom tab bar is already full (Home / Log / + / Map / You), so Tackle Box is
+  a **pushed screen**, not a 6th tab. Revisit if it deserves top-level status later.
 
 ### 6.7 Catch Detail (overlay)
 - Full-bleed hero photo; bookmark + share actions.
 - Hero stats: weight + length.
-- **Conditions & gear** grid: weather, water, lure/bait, rod & reel.
+- **Conditions & gear** grid: weather, water, **lure/bait** (the Tackle Box item — photo/name/type, tap
+  → its Tackle Box entry), rod & reel.
 - **Field notes** block.
 - **"Where it happened"** mini-map → jumps to Map.
 
