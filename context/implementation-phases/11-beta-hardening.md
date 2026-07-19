@@ -85,8 +85,8 @@ notifications; full-logbook export; first-class Spots; post-v1 analytics.
 
 - Release candidate/TestFlight build: _TBD_
 - External tester group: `Reel Records Friends & Family` was created early during Phase 01. Build
-  `0.1.0 (3)` is in TestFlight App Review, and `fisher.lincoln@gmail.com` has been added by email; the
-  tester has no build until Apple approves it.
+  `0.1.0 (3)` is in TestFlight App Review, and Lincoln Fisher has been added by email; the tester has no
+  build until Apple approves it. Exact tester addresses remain authoritative in App Store Connect.
 - Acceptance matrix: _TBD_
 - Security/privacy evidence: _TBD_
 - Known limitations: _TBD_

@@ -82,8 +82,9 @@ Box; profile editing; production-ready generalized conflict resolution; visual c
 
 - TestFlight build: `0.1.0 (3)` is signed and uploaded. It is available to the internal group
   `Reel Records Internal`; `ed.p.may@gmail.com` installed the beta on the named test phone. The external
-  group `Reel Records Friends & Family` contains `fisher.lincoln@gmail.com`; build `3` is awaiting
-  TestFlight App Review, so the external tester currently shows `No Builds Available`.
+  group `Reel Records Friends & Family` contains Lincoln Fisher; build `3` is awaiting TestFlight App
+  Review, so the external tester currently shows `No Builds Available`. Exact operational identifiers
+  and account roles are recorded in `../environments-and-accounts.md`.
 - Test phone / iOS: iPhone 16 Pro / iOS 18.6
 - Supabase migration: `supabase/migrations/20260719184719_create_phase_01_schema.sql`; hosted migration
   ledger version `20260719191234` (`create_phase_01_schema`) on project `ptoqkqisgyzypfpjvmvx`.

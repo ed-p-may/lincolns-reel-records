@@ -38,6 +38,8 @@ doc before building the corresponding feature; keep these docs current as decisi
   the Codex Design prototype.
 - `context/decisions.md` — running log of architecture/tech decisions (ADR-style); the 9 PRD questions
   are resolved, with a short remaining "Open decisions" list for implementation-time details.
+- `context/environments-and-accounts.md` — operational source of truth for Apple, TestFlight, Supabase,
+  build-environment mapping, and login-account roles; never add passwords or privileged keys.
 - `mockups/` — static HTML mockups in the app design language (e.g. `tacklebox.html`).
 
 ## Decided architecture (see `context/decisions.md`, 2026-07-19)

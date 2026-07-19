@@ -1,3 +1,5 @@
 #include "Base.xcconfig"
 
+// Phase 01 shortcut: Debug currently uses hosted beta. Override here when a dev backend is created.
+
 SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG

@@ -90,8 +90,10 @@ editing and deletion. Phase 1 may implement the smallest creation-only form of t
   least two users.
 - The iOS client contains only the Supabase project URL and publishable client key. A service-role key
   is never included in the app.
-- Debug builds target a local/development Supabase environment. TestFlight targets a hosted beta
-  environment. A separate production environment can wait until public release is contemplated.
+- Target architecture: Debug builds use a local/separate development Supabase environment and
+  TestFlight uses hosted beta. During the Phase 01 tracer bullet, Debug and Beta intentionally inherit
+  the same hosted beta endpoint from `Config/Base.xcconfig`; split them before destructive development
+  or broader beta work. A separate production environment can wait until public release is contemplated.
 - Configuration is build-setting based and excluded from business logic.
 
 ## 3. Vertical-slice definition of done

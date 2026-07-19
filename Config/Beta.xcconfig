@@ -1,3 +1,5 @@
 #include "Base.xcconfig"
 
+// TestFlight beta intentionally uses the hosted project declared in Base.xcconfig.
+
 SWIFT_COMPILATION_MODE = wholemodule

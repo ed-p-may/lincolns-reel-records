@@ -21,8 +21,10 @@ made; keep the "Open" list current. Newest entries at the top.
     Team ID **`JPJ3AJ5U8A`**. The internal TestFlight tester is **`ed.p.may@gmail.com`**.
   - Create a new hosted Supabase beta project in the `bldgtyp` organization: project
     **`lincolns-reel-records`**, reference **`ptoqkqisgyzypfpjvmvx`**, in **`us-east-1`**. Debug and
-    TestFlight configurations use separate build-setting keys; Phase 01 may point both at this hosted
-    project while local Supabase remains optional. No service-role or secret key is stored in the app.
+    TestFlight use separate Xcode configurations; during Phase 01 both inherit this hosted project's
+    public host/key from `Config/Base.xcconfig` while local Supabase remains optional. No service-role or
+    secret key is stored in the app. Operational identifiers and account roles are maintained in
+    `environments-and-accounts.md`.
   - Disable Supabase signup email confirmation for the email-invite-only beta so signup enters the app
     immediately. First signup/login requires a network connection.
   - After a successful login, a cached authenticated session may reopen its account-scoped SwiftData
