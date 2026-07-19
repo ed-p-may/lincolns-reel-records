@@ -56,6 +56,11 @@ final class AppRouter {
     }
 }
 
+private struct SyncRequest: Equatable {
+    let ownerID: UUID
+    let isOffline: Bool
+}
+
 struct AppShellView: View {
     @Environment(SyncCoordinator.self) private var syncCoordinator
     @State private var router = AppRouter()
@@ -92,7 +97,8 @@ struct AppShellView: View {
                 }
             }
         }
-        .task(id: account.ownerID) {
+        .task(id: SyncRequest(ownerID: account.ownerID, isOffline: account.isOffline)) {
+            guard !account.isOffline else { return }
             await syncCoordinator.sync(ownerID: account.ownerID)
         }
     }
