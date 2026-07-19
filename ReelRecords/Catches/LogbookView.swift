@@ -9,6 +9,7 @@ struct LogbookView: View {
     let ownerID: UUID
     let refreshToken: Int
     let onAddCatch: () -> Void
+    let onOpenCatch: (CatchItem) -> Void
 
     var body: some View {
         Group {
@@ -26,9 +27,14 @@ struct LogbookView: View {
                 }
             } else {
                 List(catches) { catchItem in
-                    CatchRow(catchItem: catchItem)
-                        .listRowBackground(ReelTheme.surface)
-                        .listRowSeparatorTint(ReelTheme.border)
+                    Button {
+                        onOpenCatch(catchItem)
+                    } label: {
+                        CatchRow(catchItem: catchItem)
+                    }
+                    .buttonStyle(.plain)
+                    .listRowBackground(ReelTheme.surface)
+                    .listRowSeparatorTint(ReelTheme.border)
                 }
                 .scrollContentBackground(.hidden)
                 .accessibilityIdentifier("log.catch-list")
@@ -47,7 +53,7 @@ struct LogbookView: View {
                     ProgressView().tint(ReelTheme.accent)
                 } else {
                     Button {
-                        Task { await syncCoordinator.sync(ownerID: ownerID) }
+                        Task { await syncCoordinator.sync(ownerID: ownerID, confirmingConflicts: true) }
                     } label: {
                         Image(systemName: "arrow.triangle.2.circlepath")
                     }
@@ -107,6 +113,10 @@ private struct CatchRow: View {
                 Text(catchItem.caughtAt.formatted(date: .abbreviated, time: .shortened))
                     .font(ReelFont.metadata(.caption))
                     .foregroundStyle(ReelTheme.secondaryText)
+                Text(catchItem.summary)
+                    .font(ReelFont.metadata(.caption2))
+                    .foregroundStyle(ReelTheme.secondaryText)
+                    .lineLimit(1)
             }
             Spacer()
             SyncBadge(state: catchItem.syncState)
@@ -121,36 +131,32 @@ private struct SyncBadge: View {
     let state: CatchSyncState
 
     var body: some View {
-        Label(title, systemImage: systemImage)
+        Label(state.label, systemImage: state.systemImage)
             .labelStyle(.iconOnly)
             .font(.caption)
             .foregroundStyle(color)
-            .accessibilityLabel(title)
-    }
-
-    private var title: String {
-        switch state {
-        case .pending: "Pending sync"
-        case .syncing: "Syncing"
-        case .synced: "Synced"
-        case .failed: "Sync failed"
-        }
-    }
-
-    private var systemImage: String {
-        switch state {
-        case .pending: "clock"
-        case .syncing: "arrow.triangle.2.circlepath"
-        case .synced: "checkmark.circle.fill"
-        case .failed: "exclamationmark.triangle.fill"
-        }
+            .accessibilityLabel(state.label)
     }
 
     private var color: Color {
         switch state {
         case .pending, .syncing: ReelTheme.secondaryText
         case .synced: ReelTheme.accent
-        case .failed: ReelTheme.danger
+        case .failed, .conflict: ReelTheme.danger
         }
+    }
+}
+
+private extension CatchItem {
+    var summary: String {
+        [
+            weight.map(CatchFormatting.weight),
+            length.map(CatchFormatting.length),
+            location,
+            lureText,
+            released ? "Released" : "Kept"
+        ]
+        .compactMap(\.self)
+        .joined(separator: " · ")
     }
 }

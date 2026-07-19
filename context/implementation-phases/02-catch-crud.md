@@ -1,6 +1,6 @@
 # Phase 02 — Core Catch CRUD
 
-**Status:** Planned  
+**Status:** Complete
 **Depends on:** Phase 01 complete  
 **Primary stories:** A1, A3, A6, E2, E5
 
@@ -71,7 +71,18 @@ logbook search/filter/sort; final Catch Detail composition.
 
 ## Closeout record
 
-- TestFlight build: _TBD_
-- Migrations: _TBD_
-- Automated checks: _TBD_
-- Manual acceptance evidence: _TBD_
+- TestFlight build: no Phase 02 upload; signed build `0.1.0 (3)` remains the hosted Phase 01 build.
+  Hosted migration, signed TestFlight, and physical-device acceptance are consolidated in Phase 11
+  under the development-loop policy in `../implementation-plan.md`.
+- Migrations: `20260719220500_phase_02_catch_crud.sql`; local Supabase reset applied the Phase 01 and
+  Phase 02 migrations from zero, then 23 pgTAP checks passed (9 Phase 01 + 14 Phase 02).
+- Automated checks: 19 Swift unit/integration tests cover scalar values, normalization, validation,
+  on-disk relaunch, create/update/delete sync, idempotency, optional-field clearing, divergent edits,
+  explicit keep-mine retry, tombstones, owner scoping, and pending-data sign-out. The iPhone 17 Pro
+  Simulator UI test creates a measured Kept Catch, verifies Detail values, edits species, confirms
+  deletion, and returns to the empty Log.
+- Manual acceptance evidence: iPhone 17 Pro Simulator on iOS 26.5 streamed successfully into the
+  in-app browser; the empty Log and full Add Catch form rendered correctly at device size. A disk-backed
+  SwiftData test reopened a synced Catch, an offline edit, and an offline tombstone across separate
+  containers. Final hosted second-device recovery and physical airplane-mode acceptance remain Phase 11
+  gates and were not claimed here.

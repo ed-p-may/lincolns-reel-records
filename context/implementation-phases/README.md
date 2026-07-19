@@ -6,7 +6,7 @@ slices. Read the high-level plan and the relevant product/design documents befor
 | Phase | Plan | Status |
 |---|---|---|
 | 01 | [`01-tracer-bullet.md`](01-tracer-bullet.md) | Complete |
-| 02 | [`02-catch-crud.md`](02-catch-crud.md) | Planned |
+| 02 | [`02-catch-crud.md`](02-catch-crud.md) | Complete |
 | 03 | [`03-logbook-detail.md`](03-logbook-detail.md) | Planned |
 | 04 | [`04-photos.md`](04-photos.md) | Planned |
 | 05 | [`05-location-map.md`](05-location-map.md) | Planned |

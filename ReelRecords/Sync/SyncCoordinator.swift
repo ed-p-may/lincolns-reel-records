@@ -16,7 +16,7 @@ final class SyncCoordinator {
         self.remoteStore = remoteStore
     }
 
-    func sync(ownerID: UUID) async {
+    func sync(ownerID: UUID, confirmingConflicts: Bool = false) async {
         guard !isSyncing else { return }
         isSyncing = true
         statusMessage = nil
@@ -29,16 +29,24 @@ final class SyncCoordinator {
         }
 
         do {
-            let pendingCatches = try repository.pendingCreates(ownerID: ownerID)
-            if !pendingCatches.isEmpty {
+            let pendingMutations = try repository.pendingMutations(
+                ownerID: ownerID,
+                confirmingConflicts: confirmingConflicts
+            )
+            for mutation in pendingMutations {
                 do {
-                    try repository.markSyncing(pendingCatches)
-                    try await remoteStore.upsert(pendingCatches.map(\.catchItem))
-                    try repository.markSynced(pendingCatches)
+                    try repository.markSyncing(mutation)
+                    switch try await remoteStore.apply(mutation) {
+                    case let .applied(remote):
+                        try repository.markApplied(mutation, remote: remote)
+                    case let .conflict(remote):
+                        try repository.markConflict(mutation, remote: remote)
+                        statusMessage = "A catch changed elsewhere. Retry sync to keep this version."
+                    }
                     didChange = true
                 } catch {
-                    try? repository.markFailed(pendingCatches, error: error)
-                    statusMessage = "A catch is saved locally and will retry when connected."
+                    try? repository.markFailed(mutation, error: error)
+                    statusMessage = "A local change is safe and will retry when connected."
                     didChange = true
                 }
             }

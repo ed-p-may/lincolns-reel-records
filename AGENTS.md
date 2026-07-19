@@ -12,13 +12,13 @@ fishing catches; each keeps a **private logbook**. The feel is a **premium fishi
 with a **modern tracking app** (clean, tactile, image-forward). Multi-user backend, but **not** a public
 social network — no feed, following, or sharing between users.
 
-Status: **Phase 02 — Core Catch CRUD.** Phase 01 is complete: the reviewed design prototype is vendored under
-`Lincoln's Reel Records - Claude Design/`; the PRD / design system / user stories are written, and all
-9 open PRD questions are resolved (see `context/decisions.md`). The SwiftUI scaffold, minimum
-SwiftData/outbox flow, hosted Supabase schema/RLS, and automated tests exist. Signed TestFlight build
-`0.1.0 (3)` is available internally; the external friends-and-family build is in TestFlight App Review.
-Next up: implement the scalar Catch edit/delete and durable sync contract in
-`context/implementation-phases/02-catch-crud.md`.
+Status: **Phase 03 — Logbook and Catch Detail.** Phases 01–02 are complete. The SwiftUI app now has
+authenticated local-first scalar Catch create/edit/delete, a versioned outbox, explicit conflict
+handling, durable tombstones, owner-only Supabase RLS, and automated Swift/UI/pgTAP coverage. Signed
+TestFlight build `0.1.0 (3)` remains the latest hosted beta build; Phase 02 was closed on local database
+and iPhone Simulator evidence under the consolidated Phase 11 deployment/device gate. Next up:
+implement search/filter/sort and the polished Log/Catch Detail in
+`context/implementation-phases/03-logbook-detail.md`.
 
 ## Working agreement (read before writing any code)
 
@@ -54,8 +54,8 @@ The 9 open PRD questions are resolved. Key stack decisions:
 - **Distribution:** **TestFlight**, invited **by email** (Ed's existing Apple Developer account), not the
   public App Store and not a public link — the invite list is the access gate.
 - **Users:** small circle of friends & family — not just Lincoln, but **not** a public social network.
-- **Offline-first:** logging/browsing must work offline; local cache (likely **SwiftData**) syncs to
-  Supabase. Exact sync strategy still open.
+- **Offline-first:** SwiftData is the UI source of truth. An explicit versioned outbox synchronizes to
+  Supabase; conflicts preserve local work for explicit retry, and deletes use retained tombstones.
 - **Map:** MapKit + real GPS capture (manual fallback). **Photos:** multiple per catch (Supabase
   Storage). **Conditions:** Open-Meteo auto-fill + structured pickers, manual offline. **Units:**
   imperial only (v1).

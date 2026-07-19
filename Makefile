@@ -35,6 +35,7 @@ db-ci:
 	fi; \
 	cleanup() { if [ "$$started" -eq 1 ]; then $(SUPABASE_CLI) stop; fi; }; \
 	trap cleanup EXIT INT TERM; \
+	$(SUPABASE_CLI) db reset --local; \
 	$(SUPABASE_CLI) test db --local supabase/tests/database
 
 ci: lint test db-ci

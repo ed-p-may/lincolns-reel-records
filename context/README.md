@@ -14,7 +14,7 @@ Read the relevant doc before building a feature; keep docs current as decisions 
 | `implementation-phases/` | Standalone implementation plans for phases 01–11. |
 
 `PRD.md`, `user-stories.md`, and `design-system.md` are populated from the Claude Design prototype and
-the design decisions. All 9 open PRD questions are **resolved** in `decisions.md`; only implementation-
-time details remain open there (sync conflict/deletion/sign-out semantics).
+the design decisions. All 9 open PRD questions and the Phase 02 sync conflict/deletion/sign-out
+semantics are **resolved** in `decisions.md`; no decision currently blocks implementation.
 Static UI mockups live in `../mockups/`. Implementation is planned as deployable vertical slices;
 start with `implementation-plan.md`, then read the relevant file in `implementation-phases/`.

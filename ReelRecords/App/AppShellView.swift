@@ -33,11 +33,17 @@ enum AppTab: String, CaseIterable, Identifiable {
     }
 }
 
-enum AppSheet: String, Identifiable {
+enum AppSheet: Identifiable {
     case addCatch
+    case catchDetail(CatchItem)
 
     var id: String {
-        rawValue
+        switch self {
+        case .addCatch:
+            "add-catch"
+        case let .catchDetail(catchItem):
+            "catch-detail-\(catchItem.id.uuidString)"
+        }
     }
 }
 
@@ -80,7 +86,8 @@ struct AppShellView: View {
                 LogbookView(
                     ownerID: account.ownerID,
                     refreshToken: logRevision,
-                    onAddCatch: { router.presentedSheet = .addCatch }
+                    onAddCatch: { router.presentedSheet = .addCatch },
+                    onOpenCatch: { router.presentedSheet = .catchDetail($0) }
                 )
             }
             tab(.add) { Color.clear }
@@ -94,6 +101,10 @@ struct AppShellView: View {
                 AddCatchView(ownerID: account.ownerID) {
                     logRevision += 1
                     router.selectedTab = .log
+                }
+            case let .catchDetail(catchItem):
+                CatchDetailView(catchItem: catchItem) {
+                    logRevision += 1
                 }
             }
         }

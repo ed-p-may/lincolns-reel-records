@@ -27,7 +27,7 @@ struct ProfilePlaceholderView: View {
                 Task {
                     do {
                         let count = try repository.pendingCount(ownerID: account.ownerID)
-                        await authService.signOut(pendingCatchCount: count)
+                        await authService.signOut(pendingChangeCount: count)
                     } catch {
                         authService.blockSignOut(for: error)
                     }
@@ -63,7 +63,7 @@ struct ProfilePlaceholderView: View {
         ) {
             if authService.signOutFailure?.canRetrySync == true {
                 Button("Retry Sync") {
-                    Task { await syncCoordinator.sync(ownerID: account.ownerID) }
+                    Task { await syncCoordinator.sync(ownerID: account.ownerID, confirmingConflicts: true) }
                 }
             }
             Button("Cancel", role: .cancel) { authService.clearSignOutFailure() }

@@ -63,10 +63,10 @@ final class AuthService {
         }
     }
 
-    func signOut(pendingCatchCount: Int) async {
+    func signOut(pendingChangeCount: Int) async {
         signOutFailure = nil
-        guard pendingCatchCount == 0 else {
-            signOutFailure = .pendingCatches(pendingCatchCount)
+        guard pendingChangeCount == 0 else {
+            signOutFailure = .pendingChanges(pendingChangeCount)
             return
         }
 

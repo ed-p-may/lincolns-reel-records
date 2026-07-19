@@ -5,11 +5,27 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Open decisions
 
-- **Detailed sync semantics** — local-first SwiftData + an explicit outbox is decided. Before Phase 02,
-  fix conflict detection/resolution, remote tombstone retention, and the long-term pending-data sign-out
-  UX. Phase 01 uses the smallest creation-only form of this contract.
+- None currently blocking implementation.
 
 ## Decisions made
+
+## 2026-07-19 — Catch conflicts, tombstones, and pending-data sign-out
+- **Context:** Phase 02 adds offline edits and deletes. Creation-only upserts would silently overwrite
+  divergent edits or allow a deleted Catch to reappear on another device.
+- **Decision:**
+  - Each remote Catch has a monotonically increasing `version`. Updates and tombstones apply only when
+    the submitted base version matches the stored version.
+  - A version conflict preserves the local draft, records the newly observed server version, and stops
+    automatic retries for that operation. The visible Retry Sync action is the explicit “keep mine”
+    choice; it retries against the observed version. Another intervening change produces another
+    conflict rather than a silent overwrite.
+  - Delete is a `deleted_at` tombstone, not an immediate hard delete. Tombstones are retained for at
+    least 90 days; a hard-pruning job and recovery rehearsal belong to Phase 11.
+  - Sign-out remains blocked while any Catch create, edit, delete, failed mutation, or unresolved
+    conflict is queued. The user may retry without losing local work.
+- **Consequences:** Pulls include tombstones and the local Log hides them. Mutation delivery is
+  idempotent by Catch UUID, version, and payload. The sync boundary can later extend the same operation
+  contract to photos, Tackle Items, and profiles without bypassing local-first persistence.
 
 ## 2026-07-19 — Phase 01 identity, environment, session, and device contract
 - **Context:** The tracer bullet cannot be scaffolded until its Apple identity, Supabase environment,
@@ -33,8 +49,8 @@ made; keep the "Open" list current. Newest entries at the top.
     cached account and local logbook before awaiting network-backed profile/session validation, and an
     account restored as offline must not start automatic remote synchronization.
   - Phase 01 blocks sign-out while that account has pending or failed Catch creations, shows the pending
-    count, and offers retry. Phase 02 will revisit the broader policy when edit/delete outbox operations
-    exist.
+    count, and offers retry. The Phase 02 decision above extends that policy to every queued mutation and
+    unresolved conflict.
   - Initial device acceptance uses an **iPhone 16 Pro on iOS 18.6**.
 - **Consequences:** Phase 01 closeout requires migration evidence, an App Store Connect record, a signed
   TestFlight build, physical-device offline/reconnect results, and normally signed fresh-install hosted

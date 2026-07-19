@@ -71,17 +71,16 @@ flowchart LR
 ### 2.3 Local-first data contract
 
 - Record IDs are client-generated UUIDs so records can be created offline.
-- Local rows are scoped to the authenticated owner and have explicit sync state: pending, synced, or
-  failed. Failure preserves the local record and exposes a retry path.
+- Local rows are scoped to the authenticated owner and have explicit pending, syncing, synced, failed,
+  and conflict states. Failure preserves the local record and exposes a retry path.
 - The app UI reads local state; remote results are merged into local state.
 - An already-authenticated user can log and browse offline. First signup/login requires a network.
 - Account changes must never expose the previous account's local data.
 - Photo files are written locally first; their uploads are separate queued operations.
-- Remote deletions require tombstones or an equivalent durable change record so another device can
-  observe them. Silent loss from last-write-wins conflicts is not acceptable.
-
-Detailed conflict, tombstone-retention, and sign-out behavior must be fixed before Phase 2 expands
-editing and deletion. Phase 1 may implement the smallest creation-only form of this contract.
+- Remote deletions use retained `deleted_at` tombstones so another device can observe them. Catch
+  updates and tombstones use optimistic versions; divergent edits preserve the local draft and require
+  an explicit keep-mine retry. Sign-out is blocked while any mutation or conflict remains queued. See
+  the 2026-07-19 Phase 02 sync decision in `decisions.md`.
 
 ### 2.4 Backend and environments
 
@@ -110,6 +109,12 @@ A phase is complete only when all applicable checks pass:
 8. Accessibility labels, Dynamic Type behavior, and privacy permission text are checked where relevant.
 9. The build is deployable through TestFlight, and the phase plan records the build tested.
 10. Planning and decision docs reflect the actual result before the phase is closed.
+
+For the uninterrupted simulator-based development loop requested on 2026-07-19, Phases 02–10 may
+close after their local migration, persistence, sync, UI, and Simulator gates pass. Hosted migration,
+signed TestFlight, physical-device offline/reconnect, and final fresh-device recovery are consolidated
+in Phase 11 against the final included schema. A local phase closeout must state those deferred gates;
+it must not imply that a new hosted build or physical acceptance run occurred.
 
 ## 4. Phase sequence
 

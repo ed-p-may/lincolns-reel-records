@@ -25,21 +25,21 @@ enum AuthServiceError: LocalizedError {
 }
 
 enum SignOutFailure: Equatable {
-    case pendingCatches(Int)
+    case pendingChanges(Int)
     case localStore(String)
     case backend(String)
 
     var message: String {
         switch self {
-        case let .pendingCatches(count):
-            "Connect and sync \(count) pending catch\(count == 1 ? "" : "es") before signing out."
+        case let .pendingChanges(count):
+            "Connect and sync \(count) pending change\(count == 1 ? "" : "s") before signing out."
         case let .localStore(message), let .backend(message):
             message
         }
     }
 
     var canRetrySync: Bool {
-        if case .pendingCatches = self {
+        if case .pendingChanges = self {
             return true
         }
         return false

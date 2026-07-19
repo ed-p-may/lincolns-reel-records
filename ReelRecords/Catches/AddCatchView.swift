@@ -15,55 +15,60 @@ struct AddCatchView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(SwiftDataCatchRepository.self) private var repository
     @Environment(SyncCoordinator.self) private var syncCoordinator
-    @State private var selectedSpecies = ""
-    @State private var customSpecies = ""
-    @State private var caughtAt = Date.now
+    @State private var selectedSpecies: String
+    @State private var customSpecies: String
+    @State private var weight: String
+    @State private var length: String
+    @State private var caughtAt: Date
+    @State private var location: String
+    @State private var lureText: String
+    @State private var rodReel: String
+    @State private var notes: String
+    @State private var released: Bool
     @State private var errorMessage: String?
 
     let ownerID: UUID
+    let editItem: CatchItem?
     let onSaved: () -> Void
+
+    init(ownerID: UUID, editItem: CatchItem? = nil, onSaved: @escaping () -> Void) {
+        self.ownerID = ownerID
+        self.editItem = editItem
+        self.onSaved = onSaved
+
+        let values = editItem?.values
+        let species = values?.species ?? ""
+        _selectedSpecies = State(initialValue: Self.suggestedSpecies.contains(species) ? species : "")
+        _customSpecies = State(initialValue: Self.suggestedSpecies.contains(species) ? "" : species)
+        _weight = State(initialValue: CatchFormatting.input(values?.weight))
+        _length = State(initialValue: CatchFormatting.input(values?.length))
+        _caughtAt = State(initialValue: values?.caughtAt ?? .now)
+        _location = State(initialValue: values?.location ?? "")
+        _lureText = State(initialValue: values?.lureText ?? "")
+        _rodReel = State(initialValue: values?.rodReel ?? "")
+        _notes = State(initialValue: values?.notes ?? "")
+        _released = State(initialValue: values?.released ?? true)
+    }
 
     var body: some View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    fieldLabel("Species")
-                    LazyVGrid(columns: [GridItem(.adaptive(minimum: 132))], spacing: 10) {
-                        ForEach(Self.suggestedSpecies, id: \.self) { species in
-                            speciesButton(species)
-                        }
-                    }
+                    speciesSection
+                    measurementSection
+                    caughtSection
+                    textSection
+                    releaseSection
 
-                    TextField("Other species", text: $customSpecies)
-                        .textInputAutocapitalization(.words)
-                        .fieldInputStyle()
-                        .accessibilityIdentifier("add.species.custom")
-                        .onChange(of: customSpecies) {
-                            if !customSpecies.isEmpty {
-                                selectedSpecies = ""
-                            }
-                        }
-
-                    fieldLabel("Caught")
-                    DatePicker(
-                        "Date and time",
-                        selection: $caughtAt,
-                        displayedComponents: [.date, .hourAndMinute]
-                    )
-                    .datePickerStyle(.graphical)
-                    .tint(ReelTheme.accent)
-                    .padding(14)
-                    .background(ReelTheme.surface, in: RoundedRectangle(cornerRadius: 18))
-                    .accessibilityIdentifier("add.caught-at")
-
-                    Text("Species and caught date/time are the only required fields in this first build.")
+                    Text("Species and caught date/time are required. Everything else can be added later.")
                         .font(ReelFont.body(.footnote))
                         .foregroundStyle(ReelTheme.secondaryText)
                 }
                 .padding(20)
             }
+            .scrollDismissesKeyboard(.interactively)
             .background(ReelTheme.background)
-            .navigationTitle("Log a Catch")
+            .navigationTitle(editItem == nil ? "Log a Catch" : "Edit Catch")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -71,7 +76,10 @@ struct AddCatchView: View {
                 }
             }
             .safeAreaInset(edge: .bottom) {
-                PrimaryButton(title: "Save Catch", systemImage: "checkmark") {
+                PrimaryButton(
+                    title: editItem == nil ? "Save Catch" : "Save Changes",
+                    systemImage: "checkmark"
+                ) {
                     save()
                 }
                 .disabled(finalSpecies.isEmpty)
@@ -91,6 +99,84 @@ struct AddCatchView: View {
             Button("OK", role: .cancel) { errorMessage = nil }
         } message: {
             Text(errorMessage ?? "")
+        }
+    }
+
+    private var speciesSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            fieldLabel("Species")
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 132))], spacing: 10) {
+                ForEach(Self.suggestedSpecies, id: \.self) { species in
+                    speciesButton(species)
+                }
+            }
+
+            TextField("Other species", text: $customSpecies)
+                .textInputAutocapitalization(.words)
+                .fieldInputStyle()
+                .accessibilityIdentifier("add.species.custom")
+                .onChange(of: customSpecies) {
+                    if !customSpecies.isEmpty {
+                        selectedSpecies = ""
+                    }
+                }
+        }
+    }
+
+    private var measurementSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            fieldLabel("Measurements")
+            HStack(spacing: 12) {
+                measurementInput("Weight", unit: "lb", text: $weight, identifier: "add.weight")
+                measurementInput("Length", unit: "in", text: $length, identifier: "add.length")
+            }
+        }
+    }
+
+    private var caughtSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            fieldLabel("Caught")
+            DatePicker(
+                "Date and time",
+                selection: $caughtAt,
+                displayedComponents: [.date, .hourAndMinute]
+            )
+            .tint(ReelTheme.accent)
+            .padding(14)
+            .background(ReelTheme.surface, in: RoundedRectangle(cornerRadius: 18))
+            .accessibilityIdentifier("add.caught-at")
+        }
+    }
+
+    private var textSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            fieldLabel("Details")
+            TextField("Named spot", text: $location)
+                .textInputAutocapitalization(.words)
+                .fieldInputStyle()
+                .accessibilityIdentifier("add.location")
+            TextField("Lure or bait", text: $lureText)
+                .fieldInputStyle()
+                .accessibilityIdentifier("add.lure")
+            TextField("Rod and reel", text: $rodReel)
+                .fieldInputStyle()
+                .accessibilityIdentifier("add.rod-reel")
+            TextField("Field notes", text: $notes, axis: .vertical)
+                .lineLimit(4 ... 8)
+                .fieldInputStyle()
+                .accessibilityIdentifier("add.notes")
+        }
+    }
+
+    private var releaseSection: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            fieldLabel("Disposition")
+            Picker("Disposition", selection: $released) {
+                Text("Released").tag(true)
+                Text("Kept").tag(false)
+            }
+            .pickerStyle(.segmented)
+            .accessibilityIdentifier("add.released")
         }
     }
 
@@ -122,9 +208,41 @@ struct AddCatchView: View {
         .accessibilityIdentifier("add.species.\(species)")
     }
 
+    private func measurementInput(
+        _ title: String,
+        unit: String,
+        text: Binding<String>,
+        identifier: String
+    ) -> some View {
+        HStack(spacing: 8) {
+            TextField(title, text: text)
+                .keyboardType(.decimalPad)
+                .accessibilityIdentifier(identifier)
+            Text(unit)
+                .font(ReelFont.metadata(.caption))
+                .foregroundStyle(ReelTheme.secondaryText)
+        }
+        .fieldInputStyle()
+    }
+
     private func save() {
         do {
-            try repository.create(NewCatch(ownerID: ownerID, species: finalSpecies, caughtAt: caughtAt))
+            let values = try CatchValues(
+                species: finalSpecies,
+                weight: CatchFormatting.parseOptionalMeasurement(weight, field: .weight),
+                length: CatchFormatting.parseOptionalMeasurement(length, field: .length),
+                caughtAt: caughtAt,
+                location: location,
+                lureText: lureText,
+                rodReel: rodReel,
+                notes: notes,
+                released: released
+            )
+            if let editItem {
+                try repository.update(id: editItem.id, ownerID: ownerID, values: values)
+            } else {
+                try repository.create(NewCatch(ownerID: ownerID, values: values))
+            }
             onSaved()
             dismiss()
             Task { await syncCoordinator.sync(ownerID: ownerID) }

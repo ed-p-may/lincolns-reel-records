@@ -70,9 +70,9 @@ final class AuthServiceTests: XCTestCase {
         let service = AuthService(backend: backend)
         await service.restoreSession()
 
-        await service.signOut(pendingCatchCount: 2)
+        await service.signOut(pendingChangeCount: 2)
 
-        XCTAssertEqual(service.signOutFailure, .pendingCatches(2))
+        XCTAssertEqual(service.signOutFailure, .pendingChanges(2))
         XCTAssertEqual(service.signOutFailure?.canRetrySync, true)
         XCTAssertEqual(service.state, .authenticated(account))
     }
