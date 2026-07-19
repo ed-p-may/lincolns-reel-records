@@ -43,8 +43,9 @@ These are parked, not rejected — revisit post-v1.
 
 ## 5. Data model
 
-Three stored entities — **User**, **Catch**, **TackleItem** — plus derived **Spots** (§5.3). Every
-`ownerId` / `userId` is RLS-scoped so a user only ever sees their own rows.
+Four stored tables — **User**, **Catch**, **TackleItem**, and **CatchPhoto** (a catch's ordered photos,
+§5.3) — plus derived **Spots** (§5.3). Every `ownerId` / `userId` is RLS-scoped so a user only ever
+sees their own rows.
 
 ### 5.0 The core object: a Catch
 
@@ -57,7 +58,7 @@ Fields below come from the prototype's data model, updated by our decisions.
 | `species` | enum + custom | picked from a known list; allow custom entry | yes |
 | `weight` | decimal (lb) | 1 decimal shown | recommended |
 | `length` | decimal (in) | | recommended |
-| `date` | date | defaults to today | yes |
+| `caughtAt` | timestamptz | date **+ time** of the catch; defaults to **now**, editable. Form surfaces the date prominently, time auto-captured (needed for weather-by-time, "Clear Night", intra-day sort) | yes |
 | `location` | string | named spot (e.g. "Cedar Point Cove") | recommended |
 | `latitude` / `longitude` | double | real GPS captured at logging (or manual pin-drop); replaces prototype `mapX/mapY` | optional |
 | `airTempF` | number (°F) | auto from Open-Meteo (GPS+time) when online; manual offline | optional |
@@ -68,13 +69,21 @@ Fields below come from the prototype's data model, updated by our decisions.
 | `lureText` | string | free-text fallback when no Tackle Box item is picked (one-offs) | optional |
 | `rodReel` | string | rod & reel setup | optional |
 | `notes` | string (long) | field notes / story | optional |
-| `photos` | ordered list of images | **multiple** per catch; first = hero. In Supabase Storage | recommended |
+| `photos` | → CatchPhoto[] | **multiple**, ordered; first = hero. Rows in the `CatchPhoto` child table (§5.3); files in Supabase Storage | recommended |
 | `released` | bool | **Released (default) / Kept** (Q8) | recommended |
 | `bookmarked` | bool | user's saved/favorite flag (story B6) | optional |
 | `createdAt` / `updatedAt` | timestamp | system audit fields (sync/ordering) | yes (system) |
 
-**Species list (v1 seed):** Largemouth Bass, Smallmouth Bass, Northern Pike, Walleye, Crappie,
-Bluegill, Channel Catfish, Rainbow Trout. Editable/extendable; allow "Other → custom".
+**Stored types / enums (fixed for the schema):**
+- **`species`** — stored as **text**, not a DB enum (custom values allowed). The picker offers a **seed
+  suggestion list** (Largemouth Bass, Smallmouth Bass, Northern Pike, Walleye, Crappie, Bluegill,
+  Channel Catfish, Rainbow Trout) + "Other → type your own". Species-filter chips (B3) and species stats
+  derive from the distinct text values a user has logged.
+- **`skyCondition`** — closed enum, v1 values (each maps to one weather icon): `sunny` (fa-sun),
+  `partly_cloudy` (fa-cloud-sun), `overcast` (fa-cloud), `rain` (fa-cloud-rain), `fog` (fa-smog),
+  `clear_night` (fa-moon). Extensible later (e.g. snow). The Open-Meteo **WMO weather-code → value**
+  mapping is finalized at implementation.
+- **`waterClarity`** — closed enum: `clear`, `stained`, `muddy`.
 
 **Units:** imperial (lb · in) only in v1 (Q5). Store plain numeric values; the Settings "Units" row is a
 static placeholder (metric deferred, no data migration needed later).
@@ -93,8 +102,9 @@ field with structured, selectable, analyzable data. Mockup: `mockups/tacklebox.h
 | `size` | string | free text — length or weight ("5\"", "1/2 oz") | optional |
 | `color` | string | color name (e.g. "Green Pumpkin") | optional |
 | `brand` | string | optional maker (e.g. "Yamamoto") | optional |
-| `photo` | image | one photo, Supabase Storage | optional |
+| `photo` | image | one photo (Storage-path column), Supabase Storage | optional |
 | `archived` | bool | hide retired items without deleting history | optional |
+| `createdAt` / `updatedAt` | timestamp | audit/sync fields (offline sync, like Catch) | yes (system) |
 
 - **Relationship:** a Catch references one TackleItem via `tackleItemId` (nullable); `lureText` is the
   free-text fallback for a one-off not worth cataloging. A TackleItem's **catch count** is derived
@@ -110,15 +120,22 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). Central to 
 | `id` | id | matches the Supabase Auth user id | yes (system) |
 | `email` | string | login credential (managed by Supabase Auth) | yes |
 | `username` | string | display handle (e.g. "lincoln_reels") | yes |
-| `displayName` | string | full name shown on Profile ("Lincoln Reyes") | optional |
+| `displayName` | string | full name shown on Profile (e.g. "Lincoln Fisher"); dashboard greeting uses its first word, falling back to `username` | optional |
+| `homeWater` | string | home lake/spot shown on Profile ("· Home Lake"); free text | optional |
 | `role` | enum | `admin` (Ed/Lincoln — can approve) or `angler` | yes |
 | `approved` | bool | **false until an admin approves**; gates all access | yes |
 | `avatar` | image | profile photo, Supabase Storage | optional |
-| `anglerSince` | year/date | shown as "Angler since YYYY" | optional |
+| `anglerSince` | int (year) | shown as "Angler since YYYY" | optional |
 | `createdAt` | timestamp | signup time; drives the admin email | yes (system) |
 
-- **Approval flow:** signup → `approved=false` → **email to admin(s)** → admin flips `approved=true` →
-  user can log in and use the app. Un-approved users see a **pending** state.
+- **Approval flow:** signup → `approved=false` → **email to admin(s)** → admin approves → `approved=true`
+  → user can log in and use the app. Un-approved users see a **pending** state (a screen that says
+  "waiting for approval"; re-checks on app foreground / next login). **Decline** = the account simply
+  stays un-approved (an admin may later delete it); no separate "rejected" state in v1.
+- **Admin-approval surface:** see decisions.md — resolved separately (how an admin actually flips the
+  flag).
+- **Profile is edited in-app** (story E6): `displayName`, `homeWater`, `avatar`, `anglerSince` are set
+  after signup (signup itself collects only username + email + password).
 - **Security:** Supabase Auth handles credentials (hashed at rest); we never store passwords or card
   data. RLS ties every Catch/TackleItem to its `ownerId`.
 
@@ -126,10 +143,14 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). Central to 
 
 - **User 1—* Catch** (`Catch.ownerId`), **User 1—* TackleItem** (`TackleItem.ownerId`).
 - **Catch *—1 TackleItem** (`Catch.tackleItemId`, nullable; `lureText` is the free-text fallback).
-- **Catch 1—* Photo** (ordered; first = hero). **TackleItem 0..1 Photo.**
-- **Spots are derived, not stored (v1):** "favorite spots" come from grouping a user's catches by
-  `location` name (and/or proximity of `latitude`/`longitude`). A first-class **Spot** entity is a
-  post-v1 consideration (see §4, decisions.md).
+- **Catch 1—* CatchPhoto** (ordered; first = hero). **TackleItem 0..1 photo** (a single Storage-path
+  column on the row — no child table needed).
+- **`CatchPhoto` table:** `id`, `catchId` (→ Catch), `storagePath` (Supabase Storage), `position` (int,
+  for ordering/reorder), `createdAt`. RLS via the parent catch's `ownerId`.
+- **Spots are derived, not stored (v1):** "favorite spots" and the Map's "M spots" count come from
+  grouping a user's catches by **normalized `location` name** (trimmed, case-insensitive **exact**
+  match) — proximity clustering on lat/long is post-v1. A first-class **Spot** entity is deferred
+  (see §4, decisions.md).
 - **Catch counts / stats** (§7) are computed over a user's catches — not stored.
 
 ## 6. Features / screens
@@ -156,7 +177,7 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). Central to 
 ### 6.3 Log (the logbook)
 - Header with total ("N in your records").
 - **Search** across species, spot, lure (tackle item name / `lureText`), notes.
-- **Species filter** chips (All + one per logged species).
+- **Species filter** chips (All + one per logged species), plus a **Saved** filter (bookmarked catches).
 - **Sort**: Recent / Heaviest / Longest.
 - Rich catch cards: photo, weight + length badges, species, spot, date, lure, weather icon → Catch
   Detail.
@@ -185,6 +206,9 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). Central to 
 - **Lure picker:** select from the Tackle Box (currently-picked item shown as a card; a horizontal row
   of other items; **+ New lure** adds one inline; **Manage Tackle Box** opens §6.8). Free-text fallback
   (`lureText`) for a one-off. See `mockups/tacklebox.html`, frame 3.
+- **Scope note:** `lureText` is the always-available path and ships with core logging; the Tackle Box
+  picker (A7 / Epic F, P1) is the structured upgrade over it. If the Tackle Box slips, catches still
+  record a lure via `lureText`.
 - Optimized for speed: sensible defaults, big tap targets, minimal required fields (species + date).
 
 ### 6.7 Catch Detail (overlay)
@@ -205,6 +229,18 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). Central to 
 - **Entry points:** from Profile ("My Tackle Box") and inline from the Add-Catch lure picker.
 - **Navigation note:** the bottom tab bar is already full (Home / Log / + / Map / You), so Tackle Box is
   a **pushed screen**, not a 6th tab. Revisit if it deserves top-level status later.
+
+### 6.9 Screens still needing design (design debt)
+
+The Claude Design prototype predates our decisions, so these have **no mockup yet** and must be designed
+in the app's language (`design-system.md`) during implementation:
+- **Pending-approval** screen (post-signup, un-approved state) and signup **error** states.
+- **Edit Profile** (displayName, home water, avatar, angler-since) — story E6.
+- **Manual pin-drop / map-search** UI for location when GPS is unavailable (Q3).
+- **Photo carousel + reorder** in Add Catch / Catch Detail (multiple photos, Q4).
+- **Share-image composition** — the rendered per-catch image (Q6 / B6).
+- **Tackle Box** screens are covered by `mockups/tacklebox.html`; still need native build.
+- **Admin-approval surface** — only if we choose an in-app admin screen (see decisions.md).
 
 ## 7. Derived data / stats (computed, not stored)
 

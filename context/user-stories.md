@@ -86,7 +86,8 @@ _As an angler, I want a full detail view so I can see the whole story of a catch
 
 **B6 · Bookmark / share a catch (P1)**
 _As an angler, I want to save favorites and share a catch image so I can show a friend._
-- Bookmark toggles a saved flag on the catch.
+- Bookmark toggles a saved flag (`bookmarked`) on the catch.
+- Bookmarked catches are retrievable via the Log's **Saved filter** (PRD §6.3).
 - **Decided (Q6):** Share renders the catch to a **composed image** (photo + species + weight/length +
   spot/date) and hands it to the iOS **share sheet** — a personal picture, **not** a social post.
 
@@ -133,8 +134,11 @@ _As an angler, I want an account so my logbook is mine and follows me._
 
 **E1b · Approve new users (P0, admin)**
 _As an admin, I want to approve or decline new signups so only invited people get in._
-- Admin receives an email on each signup and can flip a user's `approved` flag.
-- Un-approved users see the pending state and cannot access data.
+- Admin receives an email on each signup and can set a user's `approved` flag to true.
+- **Decline** = the account stays un-approved (admin may later delete it); no separate "rejected" state.
+- Un-approved-but-authenticated users see the **pending** screen and cannot access any data (enforced by
+  RLS, not just UI).
+- _How_ the admin flips the flag (in-app screen vs. email link vs. Supabase Studio) — see decisions.md.
 
 **E2 · Keep my data safe (P0)**
 _As an angler, I never want to lose my catches._
@@ -154,8 +158,15 @@ _As an angler, I want to export my whole logbook so I have a keepsake._
 
 **E5 · Work offline (P0)**
 _As an angler, I want to log on the water without signal._
-- All logging, browsing, and viewing work fully offline.
+- All logging, browsing, and viewing work fully offline — including **adding/editing Tackle Box items**
+  and queuing **photo uploads** (they sync when back online).
 - Weather auto-fill and sync degrade gracefully offline (manual entry; sync when back online).
+
+**E6 · Edit my profile (P1)**
+_As an angler, I want to set my name, photo, home water, and angler-since so my Profile feels like mine._
+- An **Edit Profile** screen sets `displayName`, `homeWater`, `avatar`, and `anglerSince`.
+- Signup collects only username + email + password; these are added afterward (empty is fine — screens
+  fall back to `username`).
 
 ## Epic F — Tackle Box (structured lures & bait)
 

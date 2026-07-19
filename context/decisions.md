@@ -10,8 +10,33 @@ made; keep the "Open" list current. Newest entries at the top.
   Supabase**, vs. a lighter **write-through + outbox queue**. Drivers: offline-first, min iOS version.
 - **Transactional email provider** for the signup→approval notice (Resend / Postmark / Supabase SMTP).
 - **App architecture pattern** — _undecided_ (e.g. plain SwiftUI + Observation, MVVM).
+- **Admin-approval surface** — _needs Ed's input_: how an admin flips `approved` (in-app admin screen
+  vs. an "Approve" link in the notification email vs. Supabase Studio). Shapes whether we build admin UI.
+- **Notifications scope** (Profile Settings row) — undefined; likely opt-in reminders, post-v1. Cut the
+  row or spec it before build.
 
 ## Decisions made
+
+## 2026-07-19 — Schema details from the pre-implementation doc audit
+- **Context:** an independent audit flagged three schema-blocking ambiguities and several smaller gaps.
+- **Decisions:**
+  - **Catch photos → child table `CatchPhoto`** (`id`, `catchId`, `storagePath`, `position`, `createdAt`)
+    rather than an array column — needed for ordered, reorderable multi-photo. TackleItem keeps a single
+    Storage-path column (no child table). Data model is now **four tables**: User, Catch, TackleItem,
+    CatchPhoto (PRD §5.3).
+  - **Catch time = `caughtAt timestamptz`** (not date-only), default now, editable. Required by
+    weather-by-time, the `clear_night` sky value, and intra-day "Recent" sort (PRD §5.0).
+  - **`species` = text** (not a DB enum) with a seed suggestion list, since custom values are allowed.
+  - **Closed enums fixed:** `skyCondition` = {sunny, partly_cloudy, overcast, rain, fog, clear_night}
+    (→ the 6 weather icons); `waterClarity` = {clear, stained, muddy}. Open-Meteo WMO-code → skyCondition
+    mapping finalized at build time.
+  - **Spot derivation rule:** group by **normalized `location`** (trim + case-insensitive exact match)
+    for v1; proximity clustering is post-v1.
+  - **Profile editing** exists (story E6); added `homeWater` to User; `anglerSince` is an int year.
+  - **`bookmarked`** gets a retrieval surface: a **Saved filter** in the Log.
+  - **Offline scope** includes Tackle Box CRUD and queued photo uploads (not just catches).
+- **Consequences:** the schema and screen-by-screen plan can proceed once the **admin-approval surface**
+  (Open decisions) is picked.
 
 ## 2026-07-19 — UI conventions: dark-only + SF Symbols
 - **Context:** design-system flagged two conventions to confirm.
@@ -118,9 +143,10 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## 2026-07-19 — Backend: Supabase (Database & sync, PRD Q2)
 - **Context:** Q1 requires a hosted backend (accounts, per-user `approved` flag, photo storage, signup
-  emails, data shared across a few users). Ed already has a Supabase account.
+  emails, data stored for several separate users — each private). Ed already has a Supabase account.
 - **Decision:** Use **Supabase** — reuse Ed's existing account, add a project/section for this app.
-  - **Postgres** for relational data (users, catches, spots).
+  - **Postgres** for relational data (users, catches, tackle items, catch photos). Spots are *derived*,
+    not stored (PRD §5.3).
   - **Supabase Auth** for email/password login.
   - **Supabase Storage** for catch photos.
   - **Row-Level Security** so each angler sees their own catches; admins can approve users.
