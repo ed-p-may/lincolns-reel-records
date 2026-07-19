@@ -69,4 +69,63 @@ final class TracerBulletUITests: XCTestCase {
 
         XCTAssertTrue(app.buttons["log.empty.add"].waitForExistence(timeout: 5))
     }
+
+    func testLogDiscoveryControlsComposeAndSurviveDetail() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--ui-testing-logbook"]
+        app.launch()
+
+        let search = app.textFields["log.search"]
+        XCTAssertTrue(search.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["log.result-count"].label, "2 IN YOUR RECORDS")
+
+        app.buttons["log.sort.heaviest"].tap()
+        let trout = app.staticTexts["Rainbow Trout"]
+        let bass = app.staticTexts["Largemouth Bass With An Exceptionally Long Display Name"]
+        XCTAssertTrue(trout.waitForExistence(timeout: 3))
+        XCTAssertLessThan(trout.frame.minY, bass.frame.minY)
+
+        search.tap()
+        search.typeText("old dock")
+        XCTAssertTrue(trout.waitForExistence(timeout: 3))
+        XCTAssertFalse(bass.exists)
+        app.buttons["log.species.Largemouth Bass With An Exceptionally Long Display Name"].tap()
+        XCTAssertTrue(app.staticTexts["No matching catches"].waitForExistence(timeout: 3))
+        app.buttons["log.clear-filters"].tap()
+
+        search.tap()
+        search.typeText("bowl")
+        XCTAssertTrue(bass.waitForExistence(timeout: 3))
+        bass.tap()
+        XCTAssertTrue(app.navigationBars["Largemouth Bass With An Exceptionally Long Display Name"]
+            .waitForExistence(timeout: 3))
+        app.buttons["detail.done"].tap()
+
+        XCTAssertTrue(search.waitForExistence(timeout: 3))
+        XCTAssertEqual(search.value as? String, "bowl")
+        XCTAssertEqual(app.buttons["log.sort.heaviest"].value as? String, "Selected")
+    }
+
+    func testLogAndDetailRemainNavigableAtLargestAccessibilityText() {
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "--ui-testing",
+            "--ui-testing-logbook",
+            "-UIPreferredContentSizeCategoryName",
+            "UICTContentSizeCategoryAccessibilityExtraExtraExtraLarge"
+        ]
+        app.launch()
+
+        XCTAssertTrue(app.textFields["log.search"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["log.sort.recent"].isHittable)
+        let bass = app.staticTexts["Largemouth Bass With An Exceptionally Long Display Name"]
+        XCTAssertTrue(bass.waitForExistence(timeout: 3))
+        bass.tap()
+
+        XCTAssertTrue(app.navigationBars["Largemouth Bass With An Exceptionally Long Display Name"]
+            .waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["2.2 lb"].exists)
+        XCTAssertTrue(app.staticTexts["Field notes"].exists)
+        XCTAssertTrue(app.buttons["detail.done"].isHittable)
+    }
 }

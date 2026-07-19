@@ -193,18 +193,10 @@ struct AddCatchView: View {
     }
 
     private func speciesButton(_ species: String) -> some View {
-        Button(species) {
+        SelectionChip(title: species, isSelected: selectedSpecies == species, sizing: .fillWidth) {
             selectedSpecies = species
             customSpecies = ""
         }
-        .font(ReelFont.body(.subheadline, weight: .semibold))
-        .foregroundStyle(selectedSpecies == species ? ReelTheme.accentInk : ReelTheme.secondaryText)
-        .frame(maxWidth: .infinity, minHeight: 44)
-        .background(
-            selectedSpecies == species ? ReelTheme.accent : ReelTheme.raisedSurface,
-            in: Capsule()
-        )
-        .overlay { Capsule().stroke(selectedSpecies == species ? Color.clear : ReelTheme.border) }
         .accessibilityIdentifier("add.species.\(species)")
     }
 

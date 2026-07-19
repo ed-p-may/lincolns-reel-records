@@ -1,6 +1,6 @@
 # Phase 03 — Logbook and Catch Detail
 
-**Status:** Planned  
+**Status:** Complete
 **Depends on:** Phase 02 complete  
 **Primary stories:** B1/B5 foundation, B2, B3, B4
 
@@ -66,6 +66,19 @@ TackleItem cards; share image.
 
 ## Closeout record
 
-- TestFlight build: _TBD_
-- Automated checks: _TBD_
-- Accessibility/device evidence: _TBD_
+- TestFlight build: no Phase 03 upload; signed build `0.1.0 (3)` remains the hosted Phase 01 build.
+  Hosted deployment and final physical-device acceptance are consolidated in Phase 11.
+- Backend/index review: no migration was required. Phase 01 already indexes owner/newest-first pulls,
+  and Phase 02 adds owner/update and owner/tombstone indexes; discovery remains an offline local-cache
+  derivation as planned.
+- Automated checks: `make ci` passes with strict formatting/lint, 25 Swift tests, 3 iPhone 17 Pro
+  Simulator UI tests, and 23 local pgTAP assertions after a clean local database reset.
+- Discovery evidence: unit tests cover normalized search across every Phase 02 text field, distinct
+  case-insensitive species, composable predicates, nil-last measurement ordering, deterministic ties,
+  and a 1,000-record derivation averaging approximately 0.003 seconds. Simulator UI coverage combines
+  search/species/sort, exercises no-results clearing, and confirms query/sort state survives Detail.
+- Accessibility/Simulator evidence: the Log and Detail were visually inspected at standard and largest
+  accessibility text sizes on iPhone 17 Pro / iOS 26.5. The largest-size UI test navigates a deliberately
+  long species record and verifies its measurements, notes, and dismissal path without overlapping
+  content. Final VoiceOver, physical airplane-mode, reconnect, and fresh-device recovery remain in
+  Phase 11.
