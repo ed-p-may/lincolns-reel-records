@@ -14,6 +14,7 @@ struct AddCatchView: View {
 
     @Environment(\.dismiss) private var dismiss
     @Environment(SwiftDataCatchRepository.self) private var repository
+    @Environment(SwiftDataCatchPhotoRepository.self) private var photoRepository
     @Environment(SyncCoordinator.self) private var syncCoordinator
     @State private var selectedSpecies: String
     @State private var customSpecies: String
@@ -25,6 +26,12 @@ struct AddCatchView: View {
     @State private var rodReel: String
     @State private var notes: String
     @State private var released: Bool
+    @State private var photoSessionID = UUID()
+    @State private var photos: [EditableCatchPhoto] = []
+    @State private var didLoadPhotos = false
+    @State private var didCommitPhotos = false
+    @State private var didNotifySaved = false
+    @State private var persistedCatchID: UUID?
     @State private var errorMessage: String?
 
     let ownerID: UUID
@@ -54,6 +61,9 @@ struct AddCatchView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
+                    CatchPhotoEditor(photos: $photos, sessionID: photoSessionID) { message in
+                        errorMessage = message
+                    }
                     speciesSection
                     measurementSection
                     caughtSection
@@ -72,7 +82,7 @@ struct AddCatchView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Cancel") { dismiss() }
+                    Button("Cancel") { cancel() }
                 }
             }
             .safeAreaInset(edge: .bottom) {
@@ -88,7 +98,13 @@ struct AddCatchView: View {
                 .accessibilityIdentifier("add.save")
             }
         }
-        .alert("Catch not saved", isPresented: Binding(
+        .task { loadPhotos() }
+        .onDisappear {
+            if !didCommitPhotos {
+                try? photoRepository.discardDrafts(sessionID: photoSessionID)
+            }
+        }
+        .alert("Unable to finish save", isPresented: Binding(
             get: { errorMessage != nil },
             set: {
                 if !$0 {
@@ -230,16 +246,60 @@ struct AddCatchView: View {
                 notes: notes,
                 released: released
             )
-            if let editItem {
-                try repository.update(id: editItem.id, ownerID: ownerID, values: values)
+            let catchItem: CatchItem
+            if let catchID = editItem?.id ?? persistedCatchID {
+                catchItem = try repository.update(id: catchID, ownerID: ownerID, values: values)
             } else {
-                try repository.create(NewCatch(ownerID: ownerID, values: values))
+                catchItem = try repository.create(NewCatch(ownerID: ownerID, values: values))
+                persistedCatchID = catchItem.id
             }
-            onSaved()
+            do {
+                try photoRepository.saveOrder(
+                    catchID: catchItem.id,
+                    ownerID: ownerID,
+                    orderedIDs: photos.map(\.id),
+                    drafts: photos.compactMap(\.draft)
+                )
+                try photoRepository.discardDrafts(sessionID: photoSessionID)
+                didCommitPhotos = true
+            } catch {
+                notifySaved()
+                errorMessage = "The catch is saved locally, but its photos were not attached: "
+                    + error.localizedDescription
+                return
+            }
+            notifySaved()
             dismiss()
             Task { await syncCoordinator.sync(ownerID: ownerID) }
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    private func loadPhotos() {
+        guard !didLoadPhotos else { return }
+        didLoadPhotos = true
+        guard let editItem else { return }
+        do {
+            photos = try photoRepository.photos(catchID: editItem.id, ownerID: ownerID).map { photo in
+                EditableCatchPhoto(
+                    source: .existing(photo),
+                    fileURL: photoRepository.fileURL(for: photo)
+                )
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func notifySaved() {
+        guard !didNotifySaved else { return }
+        didNotifySaved = true
+        onSaved()
+    }
+
+    private func cancel() {
+        try? photoRepository.discardDrafts(sessionID: photoSessionID)
+        dismiss()
     }
 }

@@ -106,6 +106,31 @@ final class TracerBulletUITests: XCTestCase {
         XCTAssertEqual(app.buttons["log.sort.heaviest"].value as? String, "Selected")
     }
 
+    func testPhotoGalleryReorderAndRemovalPersistThroughEdit() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--ui-testing-logbook"]
+        app.launch()
+
+        let bass = app.staticTexts["Largemouth Bass With An Exceptionally Long Display Name"]
+        XCTAssertTrue(bass.waitForExistence(timeout: 5))
+        bass.tap()
+
+        XCTAssertTrue(app.staticTexts["detail.photo-count"].waitForExistence(timeout: 3))
+        XCTAssertEqual(app.staticTexts["detail.photo-count"].label, "2 PHOTOS")
+
+        app.buttons["detail.edit"].tap()
+        XCTAssertTrue(app.buttons["photo.later.0"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["photo.choose-library"].exists)
+        XCTAssertFalse(app.buttons["photo.take-camera"].isEnabled)
+
+        app.buttons["photo.later.0"].tap()
+        app.buttons["photo.remove.1"].tap()
+        app.buttons["add.save"].tap()
+
+        XCTAssertTrue(app.staticTexts["detail.photo-count"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["detail.photo-count"].label, "1 PHOTO")
+    }
+
     func testLogAndDetailRemainNavigableAtLargestAccessibilityText() {
         let app = XCUIApplication()
         app.launchArguments = [

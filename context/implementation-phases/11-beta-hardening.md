@@ -55,6 +55,22 @@ friends-and-family group without adding new product scope.
 - First validate the release candidate internally, then submit/add it to the email-invite-only external group.
 - Record known limitations and a rollback/stop-testing response.
 
+### Consolidated hosted and physical-device gate
+
+Phases 02–10 may close from local migrations, deterministic repository/sync tests, and Simulator
+evidence during the phone-free implementation loop. Before this phase closes:
+
+- apply every deferred Phase 02–10 migration to the hosted beta project, including private Storage
+  buckets/policies, then rerun cross-user RLS and object-isolation probes against hosted services;
+- produce one normally signed release-candidate TestFlight build containing the final included schema
+  and exercise upgrade from `0.1.0 (3)` as well as a clean install;
+- on physical iPhone hardware, exercise camera capture, full- and limited-library access, permission
+  denial/recovery, airplane-mode photo save and relaunch, reconnect/upload, and a low-storage failure;
+- verify a fresh physical install recovers every hosted Catch and photo with stable order/hero choice,
+  then audit the private bucket for orphan objects after replacement, photo removal, and Catch deletion;
+- repeat the physical offline/reconnect and fresh-device recovery gates for the final included feature
+  set rather than treating earlier Simulator or in-memory recovery evidence as hosted acceptance.
+
 ## Implementation sequence
 
 1. Freeze feature scope and assemble the acceptance/known-risk matrix.

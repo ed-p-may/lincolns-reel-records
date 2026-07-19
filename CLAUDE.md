@@ -12,13 +12,13 @@ fishing catches; each keeps a **private logbook**. The feel is a **premium fishi
 with a **modern tracking app** (clean, tactile, image-forward). Multi-user backend, but **not** a public
 social network — no feed, following, or sharing between users.
 
-Status: **Phase 04 — Catch Photos.** Phases 01–03 are complete. The SwiftUI app now has authenticated
-local-first scalar Catch CRUD, versioned conflict-aware sync/tombstones, and a polished offline Log and
-Catch Detail with composable search, species filtering, and deterministic sorting. Signed TestFlight
-build `0.1.0 (3)` remains the latest hosted beta build; Phases 02–03 were closed on local database and
-iPhone Simulator evidence under the consolidated Phase 11 deployment/device gate. Next up: implement
-local photo acquisition, durable files, ordering, queued upload, and recovery in
-`context/implementation-phases/04-photos.md`.
+Status: **Phase 05 — Location and Map ready.** Phases 01–04 are complete. The SwiftUI app now has
+ordered multi-photo Catch editing, local draft/committed files, private Storage metadata/policies,
+queued binary/metadata sync, hero Log images, a Detail gallery, and intentional no-photo fallbacks.
+Signed TestFlight build `0.1.0 (3)` remains the latest hosted beta build; hosted migration, physical
+camera/library/offline checks, and signed recovery are consolidated in Phase 11. Next up: implement
+GPS/manual coordinates, MapKit pins, and offline location behavior in
+`context/implementation-phases/05-location-map.md`.
 
 ## Working agreement (read before writing any code)
 

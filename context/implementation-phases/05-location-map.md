@@ -1,6 +1,6 @@
 # Phase 05 — Location and Map
 
-**Status:** Planned  
+**Status:** Ready
 **Depends on:** Phase 04 complete  
 **Primary stories:** A5, D1, D2, E5
 

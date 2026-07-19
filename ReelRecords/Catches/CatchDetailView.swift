@@ -4,8 +4,10 @@ struct CatchDetailView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(SwiftDataCatchRepository.self) private var repository
+    @Environment(SwiftDataCatchPhotoRepository.self) private var photoRepository
     @Environment(SyncCoordinator.self) private var syncCoordinator
     @State private var catchItem: CatchItem
+    @State private var photos: [CatchPhotoItem] = []
     @State private var isEditing = false
     @State private var isConfirmingDelete = false
     @State private var errorMessage: String?
@@ -56,11 +58,12 @@ struct CatchDetailView: View {
         } message: {
             Text(errorMessage ?? "")
         }
+        .task(id: syncCoordinator.revision) { reloadPhotos() }
     }
 
     private var hero: some View {
         ZStack(alignment: .bottomLeading) {
-            CatchPhotoPlaceholder(species: catchItem.species)
+            heroGallery
             LinearGradient(
                 colors: [ReelTheme.page.opacity(0.05), ReelTheme.background],
                 startPoint: .center,
@@ -90,6 +93,37 @@ struct CatchDetailView: View {
         }
         .frame(minHeight: 300)
         .clipped()
+    }
+
+    @ViewBuilder
+    private var heroGallery: some View {
+        if photos.isEmpty {
+            CatchPhotoPlaceholder(species: catchItem.species)
+        } else {
+            TabView {
+                ForEach(Array(photos.enumerated()), id: \.element.id) { index, photo in
+                    LocalPhotoImage(
+                        url: photoRepository.fileURL(for: photo),
+                        maximumPixelSize: 1600,
+                        contentMode: .fill,
+                        placeholder: CatchPhotoPlaceholder(species: catchItem.species)
+                    )
+                    .accessibilityLabel("Photo \(index + 1) of \(photos.count) for \(catchItem.species)")
+                    .accessibilityIdentifier("detail.photo.\(index)")
+                }
+            }
+            .tabViewStyle(.page(indexDisplayMode: photos.count > 1 ? .automatic : .never))
+            .accessibilityIdentifier("detail.photo-gallery")
+            .overlay(alignment: .topTrailing) {
+                Text("\(photos.count) PHOTO\(photos.count == 1 ? "" : "S")")
+                    .font(ReelFont.metadata(.caption2, weight: .bold))
+                    .padding(.horizontal, 9)
+                    .frame(minHeight: 28)
+                    .background(.ultraThinMaterial, in: Capsule())
+                    .padding(14)
+                    .accessibilityIdentifier("detail.photo-count")
+            }
+        }
     }
 
     private var measurementSummary: some View {
@@ -224,6 +258,7 @@ struct CatchDetailView: View {
             if let updated = try repository.item(id: catchItem.id, ownerID: catchItem.ownerID) {
                 catchItem = updated
             }
+            reloadPhotos()
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -231,10 +266,19 @@ struct CatchDetailView: View {
 
     private func deleteCatch() {
         do {
+            try photoRepository.deleteAll(catchID: catchItem.id, ownerID: catchItem.ownerID)
             try repository.delete(id: catchItem.id, ownerID: catchItem.ownerID)
             onChanged()
             dismiss()
             Task { await syncCoordinator.sync(ownerID: catchItem.ownerID) }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func reloadPhotos() {
+        do {
+            photos = try photoRepository.photos(catchID: catchItem.id, ownerID: catchItem.ownerID)
         } catch {
             errorMessage = error.localizedDescription
         }

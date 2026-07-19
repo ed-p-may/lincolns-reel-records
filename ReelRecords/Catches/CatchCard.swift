@@ -3,6 +3,7 @@ import SwiftUI
 struct CatchCard: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let catchItem: CatchItem
+    let heroPhotoURL: URL?
 
     var body: some View {
         Group {
@@ -27,7 +28,7 @@ struct CatchCard: View {
     private var regularLayout: some View {
         VStack(spacing: 0) {
             ZStack(alignment: .bottomLeading) {
-                CatchPhotoPlaceholder(species: catchItem.species)
+                heroPhoto
                 LinearGradient(
                     colors: [.clear, ReelTheme.page.opacity(0.92)],
                     startPoint: .center,
@@ -45,7 +46,7 @@ struct CatchCard: View {
 
     private var accessibilityLayout: some View {
         VStack(alignment: .leading, spacing: 14) {
-            CatchPhotoPlaceholder(species: catchItem.species)
+            heroPhoto
                 .frame(height: 150)
                 .clipped()
 
@@ -76,6 +77,16 @@ struct CatchCard: View {
             }
         }
         .padding(16)
+    }
+
+    private var heroPhoto: some View {
+        LocalPhotoImage(
+            url: heroPhotoURL,
+            maximumPixelSize: 900,
+            contentMode: .fill,
+            placeholder: CatchPhotoPlaceholder(species: catchItem.species)
+        )
+        .accessibilityHidden(true)
     }
 
     @ViewBuilder
@@ -148,6 +159,7 @@ struct CatchCard: View {
     private var accessibilitySummary: String {
         [
             catchItem.species,
+            heroPhotoURL == nil ? "No photo" : "Has photo",
             catchItem.weight.map(CatchFormatting.weight),
             catchItem.length.map(CatchFormatting.length),
             catchItem.location,

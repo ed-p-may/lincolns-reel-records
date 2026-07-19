@@ -1,6 +1,6 @@
 # Phase 04 — Catch Photos
 
-**Status:** Planned  
+**Status:** Complete
 **Depends on:** Phase 03 complete  
 **Primary stories:** A2, B1, B5, E2, E5
 
@@ -71,7 +71,17 @@ share-image composition.
 
 ## Closeout record
 
-- TestFlight build: _TBD_
-- Database/Storage migrations: _TBD_
-- Automated checks: _TBD_
-- Manual photo lifecycle evidence: _TBD_
+- TestFlight build: no Phase 04 upload; signed build `0.1.0 (3)` remains the hosted Phase 01 build.
+  Hosted deployment and final physical-device acceptance are consolidated in Phase 11.
+- Database/Storage migrations: `20260719233000_phase_04_catch_photos.sql` creates versioned photo
+  metadata, deterministic ordering, parent-owner RLS, the private `catch-photos` bucket, canonical
+  owner/Catch paths, JPEG/size limits, and owner-scoped object policies. It passes locally; applying
+  and auditing it in the hosted beta project is a Phase 11 gate.
+- Automated checks: `make ci` passes with strict formatting/lint, 31 Swift tests, 4 iPhone 17 Pro /
+  iOS 26.5 Simulator UI tests, and 39 local pgTAP assertions after a clean local database reset.
+- Manual photo lifecycle evidence: the seeded two-photo hero and intentional no-photo fallback were
+  visually inspected in the iPhone 17 Pro / iOS 26.5 Simulator. Automated coverage exercises
+  normalization/EXIF stripping, draft cancel, retry-safe commit, reorder/removal, failed upload,
+  tombstone/binary cleanup, and fresh local-store recovery from an in-memory remote. Physical camera,
+  limited-library permission, airplane/reconnect, low-storage, hosted recovery/order, and orphan
+  Storage audit remain explicit Phase 11 gates.

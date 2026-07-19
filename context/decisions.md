@@ -9,6 +9,29 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-07-19 — Catch-photo file, privacy, ordering, and cleanup contract
+- **Context:** Phase 04 must keep photos usable offline while coordinating local files, private Storage
+  objects, ordered metadata, cancellation, and retry without making Catch save depend on the network.
+- **Decision:**
+  - Normalize each selected image once to an orientation-corrected JPEG, maximum 2,048 pixels on its
+    longest edge at 0.82 quality. Re-rendering intentionally strips embedded EXIF/GPS metadata; Catch
+    coordinates are an explicit Phase 05 field rather than hidden photo metadata.
+  - The private Storage bucket is `catch-photos`. Every object path is
+    `<owner UUID>/<catch UUID>/<photo UUID>.jpg`; RLS checks both the authenticated owner segment and
+    ownership of the parent Catch.
+  - Draft files live separately from committed account/Catch files. Cancelling removes only that
+    sheet's draft directory; saving atomically moves its files into the committed tree before queuing
+    remote work. The local file is the UI source until a remote-only photo is downloaded and cached.
+  - A `catch_photos` row carries position, version, update timestamp, and a deletion tombstone. New
+    photos upload the idempotent binary before publishing metadata. Reorders update the complete local
+    order and queue versioned metadata mutations. Deletes publish a tombstone before removing the
+    object, so a failed cleanup remains retryable and cannot expose a broken live row.
+  - Catch deletion queues every child-photo deletion first. Phase 11 owns a hosted orphan audit and
+    repair rehearsal for abnormal client loss between Storage and metadata operations.
+- **Consequences:** Catch save/edit remains offline-first; failed binary or metadata work is visible and
+  retryable. Thumbnails must downsample at decode time rather than decoding the 2,048-pixel hero image
+  in each scrolling card.
+
 ## 2026-07-19 — Catch conflicts, tombstones, and pending-data sign-out
 - **Context:** Phase 02 adds offline edits and deletes. Creation-only upserts would silently overwrite
   divergent edits or allow a deleted Catch to reappear on another device.

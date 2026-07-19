@@ -3,8 +3,10 @@ import SwiftUI
 struct LogbookView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(SwiftDataCatchRepository.self) private var repository
+    @Environment(SwiftDataCatchPhotoRepository.self) private var photoRepository
     @Environment(SyncCoordinator.self) private var syncCoordinator
     @State private var catches: [CatchItem] = []
+    @State private var photosByCatch: [UUID: [CatchPhotoItem]] = [:]
     @State private var searchQuery = ""
     @State private var selectedSpecies: String?
     @State private var sort: CatchSort = .recent
@@ -73,7 +75,10 @@ struct LogbookView: View {
                         Button {
                             onOpenCatch(catchItem)
                         } label: {
-                            CatchCard(catchItem: catchItem)
+                            CatchCard(
+                                catchItem: catchItem,
+                                heroPhotoURL: heroPhotoURL(catchID: catchItem.id)
+                            )
                         }
                         .buttonStyle(.plain)
                         .accessibilityIdentifier("catch.\(catchItem.id.uuidString)")
@@ -202,6 +207,7 @@ struct LogbookView: View {
     private func reload() {
         do {
             catches = try repository.list(ownerID: ownerID)
+            photosByCatch = try photoRepository.photosByCatch(ownerID: ownerID)
             let availableSpecies = CatchDiscovery.species(in: catches)
             if let selectedSpecies, !availableSpecies.contains(selectedSpecies) {
                 self.selectedSpecies = nil
@@ -210,6 +216,10 @@ struct LogbookView: View {
         } catch {
             loadError = error.localizedDescription
         }
+    }
+
+    private func heroPhotoURL(catchID: UUID) -> URL? {
+        photosByCatch[catchID]?.first.flatMap(photoRepository.fileURL(for:))
     }
 }
 

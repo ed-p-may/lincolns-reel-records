@@ -3,6 +3,7 @@ import SwiftUI
 struct ProfilePlaceholderView: View {
     @Environment(AuthService.self) private var authService
     @Environment(SwiftDataCatchRepository.self) private var repository
+    @Environment(SwiftDataCatchPhotoRepository.self) private var photoRepository
     @Environment(SyncCoordinator.self) private var syncCoordinator
 
     let account: AccountSession
@@ -27,6 +28,7 @@ struct ProfilePlaceholderView: View {
                 Task {
                     do {
                         let count = try repository.pendingCount(ownerID: account.ownerID)
+                            + photoRepository.pendingCount(ownerID: account.ownerID)
                         await authService.signOut(pendingChangeCount: count)
                     } catch {
                         authService.blockSignOut(for: error)
