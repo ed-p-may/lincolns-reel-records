@@ -26,17 +26,21 @@ final class AuthService {
         guard !hasRestored else { return }
         hasRestored = true
 
+        let cachedAccount = cachedAccount()
+        if var cachedAccount {
+            cachedAccount.isOffline = true
+            state = .authenticated(cachedAccount)
+        }
+
         do {
             if let account = try await backend.restoreSession() {
                 authenticate(account)
             } else {
+                clearCachedAccount()
                 state = .signedOut
             }
         } catch where error.isConnectivityFailure {
-            if var cachedAccount = cachedAccount() {
-                cachedAccount.isOffline = true
-                state = .authenticated(cachedAccount)
-            } else {
+            if cachedAccount == nil {
                 state = .signedOut
                 errorMessage = "Connect to the internet to sign in for the first time."
             }
