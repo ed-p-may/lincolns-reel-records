@@ -28,9 +28,11 @@ _As an angler, I want to log weight and length so I can track personal bests._
 
 **A4 · Record conditions & gear (P1)**
 _As an angler, I want to note weather, water, lure, and rod/reel so I can spot patterns later._
-- Free-text fields for weather, water, lure/bait, rod & reel, and notes.
-- A weather icon is associated with the catch (auto from text or picked).
-- All optional.
+- **Decided (Q7):** air temp auto-fills from **Open-Meteo** (GPS + time) when online and stays editable;
+  **offline → manual** entry. **Sky condition** and **water clarity** are **structured pickers**; water
+  temp is manual. Sky condition drives the weather icon.
+- Free-text fields remain for **lure/bait, rod & reel, notes**.
+- All optional; conditions fetch never blocks a save.
 
 **A5 · Record the spot (P0)**
 _As an angler, I want to name where I caught it so I can find my productive spots._
@@ -74,8 +76,8 @@ _As an angler, I want a full detail view so I can see the whole story of a catch
 **B6 · Bookmark / share a catch (P1)**
 _As an angler, I want to save favorites and share a catch image so I can show a friend._
 - Bookmark toggles a saved flag on the catch.
-- Share exports a catch image/summary via the iOS share sheet (**not** a social post).
-- _Prototype shows the icons but no behavior; define scope in PRD §9._
+- **Decided (Q6):** Share renders the catch to a **composed image** (photo + species + weight/length +
+  spot/date) and hands it to the iOS **share sheet** — a personal picture, **not** a social post.
 
 ## Epic C — Dashboard & insight
 
@@ -128,9 +130,11 @@ _As an angler, I want to control units and notifications._
 - Units setting (lb·in; metric toggle TBD).
 - Notifications entry (scope TBD).
 
-**E4 · Export my logbook (P1/P2)**
-_As an angler, I want to export my logbook so I have a keepsake / backup._
-- Export produces a shareable artifact (PDF journal / CSV / per-catch image — format TBD, PRD §9).
+**E4 · Export my logbook (P2 — deferred)**
+_As an angler, I want to export my whole logbook so I have a keepsake._
+- Full-logbook export (PDF journal / CSV) is **deferred post-v1** (Q6). Backup is already covered by the
+  Supabase backend. Profile's "Export logbook" row shows "coming soon" in v1. Per-catch sharing ships
+  now via B6.
 
 **E5 · Work offline (P0)**
 _As an angler, I want to log on the water without signal._

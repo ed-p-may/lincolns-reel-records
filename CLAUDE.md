@@ -11,19 +11,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 The intended feel is a **premium fishing journal** crossed with a **modern social tracking app**
 (clean, tactile, image-forward; personal record-keeping, not a public social network).
 
-Status: **pre-code / setup phase.** No application source exists yet. The wireframe/mockup is being
-produced in Claude Design and has not yet been shared. Do not scaffold screens, models, or a database
-until the design and the PRD (`context/PRD.md`) are reviewed together.
+Status: **pre-code / planning done.** The Claude Design prototype has been reviewed (vendored under
+`Lincoln's Reel Records - Claude Design/`), the PRD / design system / user stories are written, and all
+9 open PRD questions are resolved (see `context/decisions.md`). Next up: project scaffolding and the
+Supabase schema. No application source exists yet.
 
 ## Working agreement (read before writing any code)
 
-- **No coding until the design is provided and the PRD is agreed.** This directory is deliberately
-  empty of source. Setup-only tasks (docs, config, project scaffolding) are fine; feature code is not.
-- **The database is an open decision.** Nothing is chosen yet (candidates to discuss: SwiftData,
-  Core Data, GRDB/SQLite, Realm, a sync backend like CloudKit/Supabase/Firebase). Do not assume or
-  hard-code a persistence layer. Record the decision in `context/decisions.md` once made.
-- Decisions of consequence (persistence, architecture pattern, min iOS version, third-party deps)
-  get logged in `context/decisions.md` before they land in code.
+- **Confirm the build plan before scaffolding.** The stack is decided (below); agree the first
+  implementation slice with Ed before generating an Xcode project or backend schema.
+- Decisions of consequence (architecture pattern, sync strategy, third-party deps) get logged in
+  `context/decisions.md` before they land in code.
 
 ## `context/` — source of truth for intent
 
@@ -37,11 +35,26 @@ doc before building the corresponding feature; keep these docs current as decisi
 - `context/decisions.md` — running log of architecture/tech decisions (ADR-style), including the
   pending database choice.
 
+## Decided architecture (see `context/decisions.md`, 2026-07-19)
+
+The 9 open PRD questions are resolved. Key stack decisions:
+
+- **Platform:** Swift + SwiftUI. Build on iOS 26; **minimum deployment target iOS 18** (keeps SwiftData
+  + modern APIs).
+- **Backend:** **Supabase** (Postgres + Auth + Storage + RLS + Edge Functions). Reuses Ed's account.
+- **Accounts:** real email/password login; **self-signup + manual admin approval** (Ed/Lincoln) with an
+  **email notice** on signup; roles = admin / angler. **No payments, no card data.**
+- **Distribution:** **TestFlight** (Ed's existing Apple Developer account), not the public App Store.
+- **Users:** small circle of friends & family — not just Lincoln, but **not** a public social network.
+- **Offline-first:** logging/browsing must work offline; local cache (likely **SwiftData**) syncs to
+  Supabase. Exact sync strategy still open.
+- **Map:** MapKit + real GPS capture (manual fallback). **Photos:** multiple per catch (Supabase
+  Storage). **Conditions:** Open-Meteo auto-fill + structured pickers, manual offline. **Units:**
+  imperial only (v1).
+
 ## Conventions (to apply once code begins)
 
-- **Language/UI:** Swift + SwiftUI, targeting current iOS. Confirm the minimum deployment target as a
-  logged decision before relying on newer APIs.
-- **Personal use:** single-user, on-device first. Treat any cloud sync / social feature as an explicit,
-  separately-decided addition — not a default.
+- **Language/UI:** Swift + SwiftUI. Encode design tokens once (see `design-system.md`), prefer SF
+  Symbols, dark-only.
 - Follow the goal-driven, surgical-change workflow: state a short plan for multi-step work, touch only
   what the task requires, and match established patterns once they exist.

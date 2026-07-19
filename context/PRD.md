@@ -48,14 +48,16 @@ Every feature orbits one entity. Fields below come directly from the prototype's
 | `length` | decimal (in) | | recommended |
 | `date` | date | defaults to today | yes |
 | `location` | string | named spot (e.g. "Cedar Point Cove") | recommended |
-| `coordinates` | lat/long | real GPS; prototype fakes this as `mapX/mapY` | optional |
-| `weather` | string | free text in v1 (e.g. "Overcast · 66°F") | optional |
-| `water` | string | free text (e.g. "Stained · 68°F") | optional |
+| `latitude` / `longitude` | double | real GPS captured at logging (or manual pin-drop); replaces prototype `mapX/mapY` | optional |
+| `airTempF` | number (°F) | auto from Open-Meteo (GPS+time) when online; manual offline | optional |
+| `skyCondition` | enum | structured picker; drives weather icon; API-suggested, overridable | optional |
+| `waterTempF` | number (°F) | manual (no reliable API source) | optional |
+| `waterClarity` | enum | Clear / Stained / Muddy (manual) | optional |
 | `lure` | string | lure / bait used | optional |
 | `rodReel` | string | rod & reel setup | optional |
 | `notes` | string (long) | field notes / story | optional |
-| `photo` | image | one photo in prototype; consider multiple | recommended |
-| `released` | bool | kept vs. released — *not in prototype, propose adding* | optional |
+| `photos` | ordered list of images | **multiple** per catch; first = hero. In Supabase Storage | recommended |
+| `released` | bool | **Released (default) / Kept.** ✅ added (Q8) | recommended |
 
 **Species list (v1 seed):** Largemouth Bass, Smallmouth Bass, Northern Pike, Walleye, Crappie,
 Bluegill, Channel Catfish, Rainbow Trout. Editable/extendable; allow "Other → custom".
@@ -69,8 +71,12 @@ stored canonical units. Confirm whether v1 ships the toggle or just imperial (se
 - Welcome: hero photo, brand mark, tagline "Track every catch. Remember every adventure.", Get Started
   / Log In / Create Account.
 - Login (email + password) and Signup (username + email + password).
-- **Open question:** for a single-user personal app, is real auth needed at all, or is this a local-only
-  passcode / "it's your phone" model? Drives infra. See `decisions.md`.
+- **Decided (Q1):** **real accounts** backed by a server. A handful of friends & family, not just
+  Lincoln. Self-registration + **manual admin approval** (Ed/Lincoln) before login; signup sends an
+  **email notice** to admin(s). **No payments / no card data.** New screen state: **"pending approval"**
+  after signup, before an admin approves. Roles: **admin** vs. **angler**.
+- **Distribution:** **TestFlight** (Apple Developer Program, $99/yr), not the public App Store. Install
+  = TestFlight invite; use = approved account. See `decisions.md`.
 
 ### 6.2 Home / Dashboard
 - Date + greeting ("Morning, Lincoln").
@@ -92,16 +98,18 @@ stored canonical units. Confirm whether v1 ships the toggle or just imperial (se
 - All catches as pins over a stylized "home lake" backdrop; selected pin enlarges + ripples.
 - Header: "N catches across M spots".
 - Selected-catch card at bottom → Catch Detail.
-- **Prototype uses fake `mapX/mapY` on an abstract canvas.** v1 decision: keep the stylized abstract
-  map, or adopt a real map (MapKit) with GPS-tagged catches? Real GPS is the bigger lift but the more
-  useful feature for "favorite spots." See `decisions.md`.
+- **Decided (Q3):** real **MapKit** map with **GPS coordinates** captured at logging (location
+  permission required). Dark-styled map; pins at true locations; **manual pin-drop / map-search
+  fallback** when GPS is unavailable. Free-text named spot retained alongside coordinates. See
+  `decisions.md`.
 
 ### 6.5 Profile / You
 - Avatar, name, @handle, "Angler since YYYY · Home Lake".
 - Stat row: total catches / personal best / species count.
 - **Signature species** highlight.
 - **Species breakdown** bars (count per species).
-- **Settings:** Units (lb · in), Notifications, **Export logbook**.
+- **Settings:** Units (lb · in), Notifications, **Export logbook** (full-export deferred → "coming
+  soon"; per-catch share image ships in v1 via the catch share action).
 - Sign out.
 
 ### 6.6 Add Catch (overlay)
@@ -131,14 +139,22 @@ Keep these as pure derivations over the stored catches.
 
 ## 9. Open questions (resolve before/with infra)
 
-1. **Auth model** — real accounts vs. local-only/passcode for a single-user app.
-2. **Storage & sync** — device-only vs. iCloud/CloudKit backup (protects against a lost phone).
-3. **Map** — stylized abstract map vs. real MapKit + GPS coordinates.
-4. **Photos** — single vs. multiple per catch; where images live (on-device, iCloud).
-5. **Units** — ship metric toggle in v1 or imperial-only.
-6. **Export logbook** — format (PDF journal? CSV? shareable image per catch?) and priority.
-7. **Weather/water** — free text (v1) vs. later auto-fill from a weather API + timestamp/location.
-8. **"released" flag** — add catch-and-release tracking to the model?
-9. **Min iOS version / device** — gates SwiftData and other APIs.
+1. ~~**Auth model**~~ — ✅ **Decided:** real accounts + manual approval + email notice; TestFlight
+   distribution; no payments. See `decisions.md` (2026-07-19).
+2. ~~**Storage & sync**~~ — ✅ **Decided:** **Supabase** backend (Postgres + Auth + Storage + RLS).
+   On-device offline-cache strategy still to be finalized. See `decisions.md` (2026-07-19).
+3. ~~**Map**~~ — ✅ **Decided:** real MapKit + GPS capture, manual fallback. See `decisions.md`.
+4. ~~**Photos**~~ — ✅ **Decided:** multiple per catch (first = hero), in Supabase Storage. See
+   `decisions.md`.
+5. ~~**Units**~~ — ✅ **Decided:** imperial-only (lb · in) in v1; metric deferred. See `decisions.md`.
+6. ~~**Export logbook**~~ — ✅ **Decided:** v1 = per-catch **share image** (fulfills B6); full-logbook
+   PDF/CSV export deferred. See `decisions.md`.
+7. ~~**Weather/water**~~ — ✅ **Decided:** layered — auto-fill air temp from Open-Meteo (GPS+time,
+   editable), manual offline; structured pickers for sky condition & water clarity; water temp manual.
+   See `decisions.md`.
+8. ~~**"released" flag**~~ — ✅ **Decided:** add Released/Kept toggle, default Released. See
+   `decisions.md`.
+9. ~~**Min iOS version**~~ — ✅ **Decided:** build on iOS 26, **minimum target iOS 18** (keeps
+   SwiftData + modern APIs). See `decisions.md`.
 
 All infra-flavored questions feed `decisions.md`; product-flavored ones update this PRD.
