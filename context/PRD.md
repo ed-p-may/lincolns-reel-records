@@ -15,11 +15,11 @@ between users.
 
 - **Instigator / first user:** Lincoln — 15, fishes lakes/ponds in western Massachusetts (Sheffield).
 - **Built & administered by:** Ed (his uncle).
-- **User base:** a **handful of friends & family** (not just Lincoln), invited via TestFlight and
-  **manually approved** by an admin (Ed/Lincoln) before their account works.
+- **User base:** a **handful of friends & family** (not just Lincoln), **invited by email via
+  TestFlight** — the invite list *is* the access gate (no separate in-app approval; see decisions.md).
 - **Implication:** real multi-user backend; each user's catches/tackle are **private to them** (no
-  cross-user visibility in v1), synced across their own devices. Still **not** social — no followers,
-  feed, or inter-user sharing. "Share" a catch = export/send an image, not post to a network.
+  cross-user visibility, enforced by RLS), synced across their own devices. Still **not** social — no
+  followers, feed, or inter-user sharing. "Share" a catch = export/send an image, not post to a network.
 
 ## 3. Product goals
 
@@ -113,7 +113,8 @@ field with structured, selectable, analyzable data. Mockup: `mockups/tacklebox.h
 
 ### 5.2 Third object: a User (account)
 
-Backed by Supabase Auth (credentials) + a `profiles` row (app data). Central to the approval workflow.
+Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval/role concept in v1 —
+**access is gated by the TestFlight invite list** (decisions.md).
 
 | Field | Type | Notes | Required |
 |-------|------|-------|----------|
@@ -122,22 +123,16 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). Central to 
 | `username` | string | display handle (e.g. "lincoln_reels") | yes |
 | `displayName` | string | full name shown on Profile (e.g. "Lincoln Fisher"); dashboard greeting uses its first word, falling back to `username` | optional |
 | `homeWater` | string | home lake/spot shown on Profile ("· Home Lake"); free text | optional |
-| `role` | enum | `admin` (Ed/Lincoln — can approve) or `angler` | yes |
-| `approved` | bool | **false until an admin approves**; gates all access | yes |
 | `avatar` | image | profile photo, Supabase Storage | optional |
 | `anglerSince` | int (year) | shown as "Angler since YYYY" | optional |
-| `createdAt` | timestamp | signup time; drives the admin email | yes (system) |
+| `createdAt` | timestamp | signup time | yes (system) |
 
-- **Approval flow:** signup → `approved=false` → **email to admin(s)** → admin approves → `approved=true`
-  → user can log in and use the app. Un-approved users see a **pending** state (a screen that says
-  "waiting for approval"; re-checks on app foreground / next login). **Decline** = the account simply
-  stays un-approved (an admin may later delete it); no separate "rejected" state in v1.
-- **Admin-approval surface:** see decisions.md — resolved separately (how an admin actually flips the
-  flag).
+- **Onboarding:** install (TestFlight invite) → sign up (username + email + password) → straight into the
+  app. No pending/approval state.
 - **Profile is edited in-app** (story E6): `displayName`, `homeWater`, `avatar`, `anglerSince` are set
-  after signup (signup itself collects only username + email + password).
+  after signup.
 - **Security:** Supabase Auth handles credentials (hashed at rest); we never store passwords or card
-  data. RLS ties every Catch/TackleItem to its `ownerId`.
+  data. RLS ties every Catch/TackleItem to its `ownerId` so users only see their own data.
 
 ### 5.3 Relationships & derived data
 
@@ -159,12 +154,11 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). Central to 
 - Welcome: hero photo, brand mark, tagline "Track every catch. Remember every adventure.", Get Started
   / Log In / Create Account.
 - Login (email + password) and Signup (username + email + password).
-- **Decided (Q1):** **real accounts** backed by a server. A handful of friends & family, not just
-  Lincoln. Self-registration + **manual admin approval** (Ed/Lincoln) before login; signup sends an
-  **email notice** to admin(s). **No payments / no card data.** New screen state: **"pending approval"**
-  after signup, before an admin approves. Roles: **admin** vs. **angler**.
-- **Distribution:** **TestFlight** (Apple Developer Program, $99/yr), not the public App Store. Install
-  = TestFlight invite; use = approved account. See `decisions.md`.
+- **Decided (Q1, revised):** **real accounts** backed by Supabase Auth. **No in-app approval** — the
+  **TestFlight email-invite list is the access gate** (drop the pending state / approval flow).
+  Sign up → straight into the app. **No payments / no card data.**
+- **Distribution:** **TestFlight** (Ed's Apple Developer account), invited **by email**, not the public
+  App Store and not a public link. See `decisions.md`.
 
 ### 6.2 Home / Dashboard
 - Date + greeting ("Morning, {first name}" — the logged-in user).
@@ -234,13 +228,12 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). Central to 
 
 The Claude Design prototype predates our decisions, so these have **no mockup yet** and must be designed
 in the app's language (`design-system.md`) during implementation:
-- **Pending-approval** screen (post-signup, un-approved state) and signup **error** states.
+- Signup / login **error & loading** states.
 - **Edit Profile** (displayName, home water, avatar, angler-since) — story E6.
 - **Manual pin-drop / map-search** UI for location when GPS is unavailable (Q3).
 - **Photo carousel + reorder** in Add Catch / Catch Detail (multiple photos, Q4).
 - **Share-image composition** — the rendered per-catch image (Q6 / B6).
 - **Tackle Box** screens are covered by `mockups/tacklebox.html`; still need native build.
-- **Admin-approval surface** — only if we choose an in-app admin screen (see decisions.md).
 
 ## 7. Derived data / stats (computed, not stored)
 
@@ -258,8 +251,8 @@ Keep these as pure derivations over the stored catches.
 
 ## 9. Open questions (resolve before/with infra)
 
-1. ~~**Auth model**~~ — ✅ **Decided:** real accounts + manual approval + email notice; TestFlight
-   distribution; no payments. See `decisions.md` (2026-07-19).
+1. ~~**Auth model**~~ — ✅ **Decided:** real accounts (Supabase Auth), **no in-app approval** (TestFlight
+   email-invite is the gate); no payments. See `decisions.md` (2026-07-19).
 2. ~~**Storage & sync**~~ — ✅ **Decided:** **Supabase** backend (Postgres + Auth + Storage + RLS).
    On-device offline-cache strategy still to be finalized. See `decisions.md` (2026-07-19).
 3. ~~**Map**~~ — ✅ **Decided:** real MapKit + GPS capture, manual fallback. See `decisions.md`.
@@ -278,5 +271,5 @@ Keep these as pure derivations over the stored catches.
 
 All nine are resolved. **Remaining open items are implementation-time details** (tracked in
 `decisions.md` → "Open decisions"), not product scope: (a) on-device persistence + offline-sync
-strategy, (b) transactional email provider for the approval notice, (c) app architecture pattern. These
-get decided as we build; they don't block the phase plan.
+strategy, (b) app architecture pattern, (c) Notifications scope. These get decided as we build; they
+don't block the phase plan.

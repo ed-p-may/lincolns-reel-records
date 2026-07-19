@@ -44,9 +44,10 @@ The 9 open PRD questions are resolved. Key stack decisions:
 - **Platform:** Swift + SwiftUI. Build on iOS 26; **minimum deployment target iOS 18** (keeps SwiftData
   + modern APIs).
 - **Backend:** **Supabase** (Postgres + Auth + Storage + RLS + Edge Functions). Reuses Ed's account.
-- **Accounts:** real email/password login; **self-signup + manual admin approval** (Ed/Lincoln) with an
-  **email notice** on signup; roles = admin / angler. **No payments, no card data.**
-- **Distribution:** **TestFlight** (Ed's existing Apple Developer account), not the public App Store.
+- **Accounts:** real email/password login via Supabase Auth; **self-signup → straight in** (no in-app
+  approval; access is gated by the TestFlight invite list). **No payments, no card data.**
+- **Distribution:** **TestFlight**, invited **by email** (Ed's existing Apple Developer account), not the
+  public App Store and not a public link — the invite list is the access gate.
 - **Users:** small circle of friends & family — not just Lincoln, but **not** a public social network.
 - **Offline-first:** logging/browsing must work offline; local cache (likely **SwiftData**) syncs to
   Supabase. Exact sync strategy still open.

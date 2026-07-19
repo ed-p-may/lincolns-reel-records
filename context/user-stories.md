@@ -1,7 +1,7 @@
 # Reel Records — User Stories
 
-> Derived from the PRD and the Claude Design prototype. Users: a small invite-only circle of anglers,
-> each with a private logbook (admins Ed/Lincoln also approve accounts).
+> Derived from the PRD and the Claude Design prototype. Users: a small circle of anglers invited by
+> email via TestFlight, each with a private logbook.
 > Format: _As an angler, I want [capability] so that [benefit]._ Acceptance criteria are testable.
 > Priority: **P0** = v1 core, **P1** = v1 if time, **P2** = post-v1.
 
@@ -128,17 +128,10 @@ _As an angler, I want to go from a catch to its place on the map._
 
 **E1 · Get into the app (P0)**
 _As an angler, I want an account so my logbook is mine and follows me._
-- Welcome → Create Account (username + email + password) or Log In.
-- New accounts land in a **"pending approval"** state; an **email notifies** the admin (Ed/Lincoln).
-- Once **approved**, the user can log in and use the app. Real accounts via Supabase Auth (decided Q1).
-
-**E1b · Approve new users (P0, admin)**
-_As an admin, I want to approve or decline new signups so only invited people get in._
-- Admin receives an email on each signup and can set a user's `approved` flag to true.
-- **Decline** = the account stays un-approved (admin may later delete it); no separate "rejected" state.
-- Un-approved-but-authenticated users see the **pending** screen and cannot access any data (enforced by
-  RLS, not just UI).
-- _How_ the admin flips the flag (in-app screen vs. email link vs. Supabase Studio) — see decisions.md.
+- Welcome → Create Account (username + email + password) or Log In → straight into the app.
+- Real accounts via Supabase Auth. **No approval step** — access is gated by the TestFlight email-invite
+  list (decided Q1, revised — decisions.md).
+- RLS ensures a logged-in user only ever sees their own data.
 
 **E2 · Keep my data safe (P0)**
 _As an angler, I never want to lose my catches._

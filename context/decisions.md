@@ -8,14 +8,24 @@ made; keep the "Open" list current. Newest entries at the top.
 - **On-device persistence + offline strategy** — backend is Supabase (decided), but how the iOS client
   caches locally for offline logging (PRD E5) is open: e.g. **SwiftData/Core Data local store synced to
   Supabase**, vs. a lighter **write-through + outbox queue**. Drivers: offline-first, min iOS version.
-- **Transactional email provider** for the signup→approval notice (Resend / Postmark / Supabase SMTP).
 - **App architecture pattern** — _undecided_ (e.g. plain SwiftUI + Observation, MVVM).
-- **Admin-approval surface** — _needs Ed's input_: how an admin flips `approved` (in-app admin screen
-  vs. an "Approve" link in the notification email vs. Supabase Studio). Shapes whether we build admin UI.
 - **Notifications scope** (Profile Settings row) — undefined; likely opt-in reminders, post-v1. Cut the
   row or spec it before build.
 
 ## Decisions made
+
+## 2026-07-19 — Drop in-app approval; TestFlight invite is the gate (supersedes part of Q1)
+- **Context:** The original Q1 decision added an in-app **manual approval** step. On review, TestFlight
+  distribution already gates access: if we **invite by email** (not a public link), only invited people
+  can install and reach signup — so an approval step is a redundant second gate.
+- **Decision:** **Remove in-app approval** for v1. **TestFlight email-invites are the access gate.**
+  Users sign up and go straight in. Accounts/login (Supabase Auth) stay; each logbook is private (RLS).
+- **Consequences:**
+  - **Removed:** `User.approved`, `User.role` (admin/angler), the pending-approval screen, the
+    signup→admin approval email, and the approve-link Edge Function. Story **E1b deleted**; E1 simplified.
+  - **Condition:** invite **by email**, not a public TestFlight link (a public link would reopen the gap).
+  - Reversible: approval can be added back later if we ever go public-link. Revocation for now = remove
+    the user from TestFlight (and/or delete their account).
 
 ## 2026-07-19 — Schema details from the pre-implementation doc audit
 - **Context:** an independent audit flagged three schema-blocking ambiguities and several smaller gaps.
@@ -35,8 +45,8 @@ made; keep the "Open" list current. Newest entries at the top.
   - **Profile editing** exists (story E6); added `homeWater` to User; `anglerSince` is an int year.
   - **`bookmarked`** gets a retrieval surface: a **Saved filter** in the Log.
   - **Offline scope** includes Tackle Box CRUD and queued photo uploads (not just catches).
-- **Consequences:** the schema and screen-by-screen plan can proceed once the **admin-approval surface**
-  (Open decisions) is picked.
+- **Consequences:** the schema and screen-by-screen plan can proceed (the admin-approval question was
+  resolved by dropping approval — see the entry above).
 
 ## 2026-07-19 — UI conventions: dark-only + SF Symbols
 - **Context:** design-system flagged two conventions to confirm.
@@ -142,25 +152,27 @@ made; keep the "Open" list current. Newest entries at the top.
     user's own data under RLS).
 
 ## 2026-07-19 — Backend: Supabase (Database & sync, PRD Q2)
-- **Context:** Q1 requires a hosted backend (accounts, per-user `approved` flag, photo storage, signup
-  emails, data stored for several separate users — each private). Ed already has a Supabase account.
+- **Context:** Q1 requires a hosted backend (accounts, photo storage, data stored for several separate
+  users — each private). Ed already has a Supabase account.
 - **Decision:** Use **Supabase** — reuse Ed's existing account, add a project/section for this app.
   - **Postgres** for relational data (users, catches, tackle items, catch photos). Spots are *derived*,
     not stored (PRD §5.3).
   - **Supabase Auth** for email/password login.
   - **Supabase Storage** for catch photos.
-  - **Row-Level Security** so each angler sees their own catches; admins can approve users.
-  - **Edge Function / DB webhook** to send the signup→admin approval email.
+  - **Row-Level Security** so each angler sees only their own rows.
 - **Alternatives considered:** Firebase (NoSQL, less natural for relational catches; Google lock-in);
   CloudKit (poor fit for multi-user + custom approval); custom server (overkill).
 - **Consequences / follow-ups:**
-  - Pick a transactional email provider for the approval notice (e.g. Resend/Postmark) — sub-decision.
+  - Auth emails (confirm-email / password-reset) use Supabase's built-in email; configure SMTP only if
+    deliverability needs it. (No custom approval email — approval was dropped.)
   - **Offline strategy** still open: catches must be loggable offline (PRD E5, P0). Likely a local
     cache on device that syncs to Supabase when online. Depth TBD with the persistence choice — see
     Open decisions.
   - iOS client talks to Supabase via the `supabase-swift` SDK.
 
-## 2026-07-19 — Real accounts with manual approval (Auth model, PRD Q1)
+## 2026-07-19 — Real accounts (Auth model, PRD Q1)
+> **Partially superseded** (same day): the **manual-approval** part was dropped — see "Drop in-app
+> approval; TestFlight invite is the gate" above. Real accounts + no payments still stand.
 - **Context:** Not just Lincoln — a handful of friends & family should be able to use the app.
 - **Decision:** Real login/accounts backed by a server. Users self-register in-app; each new account
   is **manually approved** by an admin (Ed or Lincoln) before it can log in. Signup triggers an
@@ -180,8 +192,8 @@ made; keep the "Open" list current. Newest entries at the top.
 - **Alternatives considered:** free-Apple-ID sideload (7-day expiry, cable+Xcode each time — no good
   for non-technical users); ad-hoc UDID / Enterprise (clunky / not permitted for this use).
 - **Consequences:**
-  - Two access gates: **TestFlight invite** (who can install) + **in-app account approval** (who can
-    log in). Both retained intentionally.
+  - The **TestFlight email-invite list is the access gate** (later decision dropped the separate in-app
+    approval — see "Drop in-app approval" above).
   - Builds expire ~**90 days** → periodic re-upload. First external build gets a light Apple beta review.
   - **Ed already has an Apple Developer Program account** — reuse it; no enrollment needed.
 
