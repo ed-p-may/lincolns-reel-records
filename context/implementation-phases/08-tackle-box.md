@@ -1,6 +1,6 @@
 # Phase 08 — Tackle Box
 
-**Status:** Ready
+**Status:** Complete
 **Depends on:** Phase 07 complete  
 **Primary stories:** A4 (gear subset), A7, F1, F2, F3, E5
 
@@ -73,7 +73,16 @@ analytics; multiple photos per TackleItem.
 
 ## Closeout record
 
-- TestFlight build: _TBD_
-- Schema/Storage migrations: _TBD_
-- Automated checks: _TBD_
-- Offline linked-record evidence: _TBD_
+- TestFlight build: no Phase 08 build; signed build `0.1.0 (3)` remains the latest hosted beta.
+  Hosted deployment, signed release, and final physical-device acceptance are consolidated in Phase 11.
+- Schema/Storage migrations: `20260720010000_phase_08_tackle_box.sql` adds the owner-scoped catalog,
+  ownership-safe Catch reference, and private `tackle-photos` bucket/policies. It passes locally; hosted
+  application and isolation probes are deferred to Phase 11.
+- Automated checks: `make ci` passes SwiftFormat and strict SwiftLint, 67 Swift unit tests, 11
+  Simulator UI tests, and 78 local pgTAP database/RLS assertions.
+- Offline linked-record evidence: deterministic tests cover item-before-Catch ordering, overlapping
+  requests, in-flight edits, create-conflict recovery, binary/metadata/cleanup retries, second-device
+  item-photo recovery, archive history, and free-text fallback. Simulator flows cover catalog
+  search/type filters, inline creation, linked-name Log search, archive/restore, and archived Catch
+  detail. Physical airplane-mode/reconnect, camera/library permissions, hosted recovery, and orphan
+  audit remain consolidated in Phase 11.

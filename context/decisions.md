@@ -9,6 +9,40 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-07-19 — Tackle Box history, ownership, and sync ordering contract
+- **Context:** Phase 08 adds an offline-created object that a Catch can reference, plus one private
+  photo. Archive/delete behavior and cross-object delivery order must be fixed before the schema and
+  outboxes can be safe.
+- **Decision:**
+  - **Archive is the only user-facing retirement action in v1.** Archived items disappear from new
+    Catch pickers and the normal catalog, remain available from an Archived catalog filter, and may be
+    restored. Existing catches continue to resolve the item's name/type/photo. No destructive item
+    deletion UI ships in Phase 08.
+  - A remote tombstone is retained locally and stays resolvable for history, but is unavailable for a
+    new selection. Editing a Catch that already references an archived/tombstoned item may preserve or
+    clear/replace it; it never silently converts the reference to `lureText`.
+  - `catches (tackle_item_id, owner_id)` has an ownership-safe composite foreign key to
+    `tackle_items (id, owner_id)`. Cross-owner references are rejected at the database boundary and a
+    referenced item cannot be hard-deleted. `lureText` remains independently optional and always
+    editable; selecting an item does not erase it, so an intentional one-off description is preserved.
+  - Tackle mutations synchronize before Catch mutations. A Catch referencing an item whose create is
+    still queued or failed waits locally; after the item row is accepted, the Catch may sync. Inline add
+    commits the TackleItem locally before assigning its UUID to the Catch draft.
+  - A sync request arriving during an active pass is coalesced into a guaranteed follow-up pass. A
+    remote TackleItem response replaces local values only when it still matches the mutation's local
+    `updatedAt` snapshot; otherwise it advances the queued operation's base version and preserves the
+    newer local values/photo stage for that follow-up pass.
+  - Once create metadata exists remotely, any retained photo-cleanup operation becomes an update so a
+    linked Catch is no longer blocked. Likewise, a create conflict against an existing remote UUID is
+    confirmed and retried as a versioned update rather than looping on another insert.
+  - The single item photo uses a canonical private Storage path
+    `owner-id/item-id/photo-id.jpg`. Replacement uploads a new immutable path, switches row metadata,
+    then removes obsolete objects; failures retain local bytes and retry state. Photo binaries are not
+    child rows and catch-count/productivity remains derived and out of Phase 08.
+- **Consequences:** Historical catches never lose their structured lure label because gear is retired;
+  offline item-plus-Catch creation cannot violate the hosted foreign key; Phase 11 owns final hosted,
+  physical airplane/reconnect, replacement-orphan, and fresh-device recovery evidence.
+
 ## 2026-07-19 — Dashboard derivation and calendar contract
 - **Context:** Phase 07 must produce stable, honest summaries from the local Catch cache across missing
   measurements, spelling/case variants, ties, back-entered records, future dates, and time-zone changes.

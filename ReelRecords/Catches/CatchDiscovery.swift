@@ -39,25 +39,32 @@ enum CatchDiscovery {
         in catches: [CatchItem],
         query: String,
         species: String?,
-        sort: CatchSort
+        sort: CatchSort,
+        tackleItemNames: [UUID: String] = [:]
     ) -> [CatchItem] {
         let query = normalized(query.trimmingCharacters(in: .whitespacesAndNewlines))
         let species = species.map(normalized)
 
         return catches
             .filter { catchItem in
-                matches(catchItem, query: query) && matches(catchItem, species: species)
+                matches(catchItem, query: query, tackleItemNames: tackleItemNames)
+                    && matches(catchItem, species: species)
             }
             .sorted { first, second in
                 precedes(first, second, sort: sort)
             }
     }
 
-    private static func matches(_ catchItem: CatchItem, query: String) -> Bool {
+    private static func matches(
+        _ catchItem: CatchItem,
+        query: String,
+        tackleItemNames: [UUID: String]
+    ) -> Bool {
         guard !query.isEmpty else { return true }
         let searchableText = [
             catchItem.species,
             catchItem.location,
+            catchItem.tackleItemID.flatMap { tackleItemNames[$0] },
             catchItem.lureText,
             catchItem.notes
         ]

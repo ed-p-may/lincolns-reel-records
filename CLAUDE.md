@@ -12,12 +12,12 @@ fishing catches; each keeps a **private logbook**. The feel is a **premium fishi
 with a **modern tracking app** (clean, tactile, image-forward). Multi-user backend, but **not** a public
 social network — no feed, following, or sharing between users.
 
-Status: **Phase 08 — Tackle Box ready.** Phases 01–07 are complete. Phase 07 derives dashboard totals,
-rankings, recent catches, and favorite spots entirely from the account-local Catch cache and wires Home
-actions into existing Add, Detail, Log, and Map routes. Signed TestFlight build `0.1.0 (3)` remains the
-latest hosted beta build; hosted migrations plus physical camera, GPS/permissions, live weather,
-Dashboard offline/date-boundary checks, reconnect, and signed recovery remain consolidated in Phase 11.
-Current plan: `context/implementation-phases/08-tackle-box.md`.
+Status: **Phases 01–08 complete; Phase 09 — Profile and Settings is next.** Phase 08 adds the private,
+offline-first Tackle Box, item photos, archive/history semantics, Catch linkage, and ordered outbox sync
+without weakening the one-off `lureText` path. Signed TestFlight build `0.1.0 (3)` remains the latest
+hosted beta build; hosted migrations plus physical camera, GPS/permissions, live weather, Dashboard and
+Tackle Box offline/reconnect checks, and signed recovery remain consolidated in Phase 11. Current plan:
+`context/implementation-phases/09-profile-settings.md`.
 
 ## Working agreement (read before writing any code)
 

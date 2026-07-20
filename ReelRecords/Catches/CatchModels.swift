@@ -30,6 +30,7 @@ final class CatchRecord {
     var skyConditionRaw: String?
     var waterTemperatureF: Double?
     var waterClarityRaw: String?
+    var tackleItemID: UUID?
     var lureText: String?
     var rodReel: String?
     var notes: String?
@@ -56,6 +57,7 @@ final class CatchRecord {
         location: String? = nil,
         coordinate: CatchCoordinate? = nil,
         conditions: CatchConditions = .empty,
+        tackleItemID: UUID? = nil,
         lureText: String? = nil,
         rodReel: String? = nil,
         notes: String? = nil,
@@ -80,6 +82,7 @@ final class CatchRecord {
         skyConditionRaw = conditions.skyCondition?.storageValue
         waterTemperatureF = conditions.waterTemperatureF
         waterClarityRaw = conditions.waterClarity?.storageValue
+        self.tackleItemID = tackleItemID
         self.lureText = lureText
         self.rodReel = rodReel
         self.notes = notes
@@ -144,6 +147,7 @@ struct CatchValues: Equatable, Sendable {
     let location: String?
     let coordinate: CatchCoordinate?
     let conditions: CatchConditions
+    let tackleItemID: UUID?
     let lureText: String?
     let rodReel: String?
     let notes: String?
@@ -157,6 +161,7 @@ struct CatchValues: Equatable, Sendable {
         location: String?,
         coordinate: CatchCoordinate? = nil,
         conditions: CatchConditions = .empty,
+        tackleItemID: UUID? = nil,
         lureText: String?,
         rodReel: String?,
         notes: String?,
@@ -169,6 +174,7 @@ struct CatchValues: Equatable, Sendable {
         self.location = location
         self.coordinate = coordinate
         self.conditions = conditions
+        self.tackleItemID = tackleItemID
         self.lureText = lureText
         self.rodReel = rodReel
         self.notes = notes
@@ -213,6 +219,10 @@ struct CatchItem: Identifiable, Equatable, Sendable {
 
     var conditions: CatchConditions {
         values.conditions
+    }
+
+    var tackleItemID: UUID? {
+        values.tackleItemID
     }
 
     var lureText: String? {
@@ -313,6 +323,7 @@ extension CatchRecord {
                 waterTemperatureF: waterTemperatureF,
                 waterClarity: waterClarityRaw.map(WaterClarity.init(storageValue:))
             ),
+            tackleItemID: tackleItemID,
             lureText: lureText,
             rodReel: rodReel,
             notes: notes,

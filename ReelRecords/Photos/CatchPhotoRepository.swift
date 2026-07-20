@@ -47,11 +47,7 @@ final class SwiftDataCatchPhotoRepository {
     }
 
     func stageAsync(data: Data, sessionID: UUID) async throws -> DraftPhoto {
-        let store = fileStore
-        return try await Task.detached(priority: .userInitiated) {
-            let normalized = try PhotoImageNormalizer.normalize(data)
-            return try store.stage(normalized.data, sessionID: sessionID)
-        }.value
+        try await fileStore.stageNormalizedAsync(data: data, sessionID: sessionID)
     }
 
     func discardDrafts(sessionID: UUID) throws {

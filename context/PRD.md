@@ -234,7 +234,7 @@ in the app's language (`design-system.md`) during implementation:
 - **Manual pin-drop / map-search** UI for location when GPS is unavailable (Q3).
 - **Photo carousel + reorder** in Add Catch / Catch Detail (multiple photos, Q4).
 - **Share-image composition** — the rendered per-catch image (Q6 / B6).
-- **Tackle Box** screens are covered by `mockups/tacklebox.html`; still need native build.
+- **Tackle Box** screens are implemented natively from `mockups/tacklebox.html` in Phase 08.
 
 ## 7. Derived data / stats (computed, not stored)
 

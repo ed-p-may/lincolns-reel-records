@@ -75,6 +75,10 @@ evidence during the phone-free implementation loop. Before this phase closes:
 - on physical iPhone hardware, verify Dashboard totals, calendar-derived week/year values, rankings,
   recent catches, and favorite spots from the offline local cache across airplane mode, relaunch,
   time-zone/date-boundary changes, reconnect, and hosted fresh-install recovery;
+- on physical iPhone hardware, exercise Tackle Box add/edit/archive/restore, optional camera and
+  library photos, inline item creation followed immediately by Catch save, free-text fallback, linked
+  Log search, and archived Catch history in airplane mode; then reconnect and verify item-before-Catch
+  ordering plus fresh-install recovery of item metadata/photos without cross-account or orphan objects;
 - verify a fresh physical install recovers every hosted Catch and photo with stable order/hero choice,
   including exact coordinate pairs and map focus, then audit the private bucket for orphan objects after
   replacement, photo removal, and Catch deletion;

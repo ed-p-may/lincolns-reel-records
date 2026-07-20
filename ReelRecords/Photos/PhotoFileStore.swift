@@ -95,6 +95,17 @@ final class PhotoFileStore: @unchecked Sendable {
         try fileManager.createDirectory(at: self.rootURL, withIntermediateDirectories: true)
     }
 
+    static func remoteStoragePath(ownerID: UUID, parentID: UUID, photoID: UUID) -> String {
+        "\(ownerID.uuidString.lowercased())/\(parentID.uuidString.lowercased())/\(photoID.uuidString.lowercased()).jpg"
+    }
+
+    func stageNormalizedAsync(data: Data, sessionID: UUID) async throws -> DraftPhoto {
+        try await Task.detached(priority: .userInitiated) { [self] in
+            let normalized = try PhotoImageNormalizer.normalize(data)
+            return try stage(normalized.data, sessionID: sessionID)
+        }.value
+    }
+
     func stage(_ data: Data, sessionID: UUID, photoID: UUID = UUID()) throws -> DraftPhoto {
         let relativePath = "Drafts/\(sessionID.uuidString.lowercased())/\(photoID.uuidString.lowercased()).jpg"
         let destination = url(for: relativePath)
@@ -104,8 +115,17 @@ final class PhotoFileStore: @unchecked Sendable {
     }
 
     func commit(_ draft: DraftPhoto, ownerID: UUID, catchID: UUID) throws -> CommittedDraft {
-        let source = url(for: draft.relativePath)
         let relativePath = committedRelativePath(ownerID: ownerID, catchID: catchID, photoID: draft.id)
+        return try commit(draft, to: relativePath)
+    }
+
+    func commitTackle(_ draft: DraftPhoto, ownerID: UUID, itemID: UUID) throws -> CommittedDraft {
+        let relativePath = tackleRelativePath(ownerID: ownerID, itemID: itemID, photoID: draft.id)
+        return try commit(draft, to: relativePath)
+    }
+
+    private func commit(_ draft: DraftPhoto, to relativePath: String) throws -> CommittedDraft {
+        let source = url(for: draft.relativePath)
         let destination = url(for: relativePath)
         if fileManager.fileExists(atPath: source.path) {
             try ensureParentDirectory(for: destination)
@@ -150,6 +170,15 @@ final class PhotoFileStore: @unchecked Sendable {
 
     func storeDownloaded(_ data: Data, ownerID: UUID, catchID: UUID, photoID: UUID) throws -> String {
         let relativePath = committedRelativePath(ownerID: ownerID, catchID: catchID, photoID: photoID)
+        return try storeDownloaded(data, relativePath: relativePath)
+    }
+
+    func storeDownloadedTackle(_ data: Data, ownerID: UUID, itemID: UUID, photoID: UUID) throws -> String {
+        let relativePath = tackleRelativePath(ownerID: ownerID, itemID: itemID, photoID: photoID)
+        return try storeDownloaded(data, relativePath: relativePath)
+    }
+
+    private func storeDownloaded(_ data: Data, relativePath: String) throws -> String {
         let destination = url(for: relativePath)
         try ensureParentDirectory(for: destination)
         try data.write(to: destination, options: .atomic)
@@ -190,6 +219,13 @@ final class PhotoFileStore: @unchecked Sendable {
         let catchComponent = catchID.uuidString.lowercased()
         let photo = photoID.uuidString.lowercased()
         return "Accounts/\(owner)/Catches/\(catchComponent)/\(photo).jpg"
+    }
+
+    private func tackleRelativePath(ownerID: UUID, itemID: UUID, photoID: UUID) -> String {
+        let owner = ownerID.uuidString.lowercased()
+        let item = itemID.uuidString.lowercased()
+        let photo = photoID.uuidString.lowercased()
+        return "Accounts/\(owner)/Tackle/\(item)/\(photo).jpg"
     }
 
     private func url(for relativePath: String) -> URL {

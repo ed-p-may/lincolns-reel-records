@@ -6,12 +6,24 @@ struct PhotoSyncDependencies {
     let remoteStore: any CatchPhotoRemoteStore
 }
 
+struct TackleSyncDependencies {
+    let repository: SwiftDataTackleRepository
+    let remoteStore: any TackleRemoteStore
+}
+
 @MainActor
 @Observable
 final class SyncCoordinator {
+    private struct SyncRequest {
+        let ownerID: UUID
+        let confirmingConflicts: Bool
+    }
+
     private let repository: SwiftDataCatchRepository
     private let remoteStore: any CatchRemoteStore
     private let photoSync: PhotoSyncDependencies?
+    private let tackleSync: TackleSyncDependencies?
+    @ObservationIgnored private var pendingSyncRequest: SyncRequest?
 
     private(set) var isSyncing = false
     private(set) var revision = 0
@@ -20,15 +32,20 @@ final class SyncCoordinator {
     init(
         repository: SwiftDataCatchRepository,
         remoteStore: any CatchRemoteStore,
-        photoSync: PhotoSyncDependencies? = nil
+        photoSync: PhotoSyncDependencies? = nil,
+        tackleSync: TackleSyncDependencies? = nil
     ) {
         self.repository = repository
         self.remoteStore = remoteStore
         self.photoSync = photoSync
+        self.tackleSync = tackleSync
     }
 
     func sync(ownerID: UUID, confirmingConflicts: Bool = false) async {
-        guard !isSyncing else { return }
+        guard !isSyncing else {
+            queueFollowUp(ownerID: ownerID, confirmingConflicts: confirmingConflicts)
+            return
+        }
         isSyncing = true
         statusMessage = nil
         var didChange = false
@@ -39,10 +56,31 @@ final class SyncCoordinator {
             }
         }
 
+        var request = SyncRequest(ownerID: ownerID, confirmingConflicts: confirmingConflicts)
+        while true {
+            pendingSyncRequest = nil
+            didChange = await performSync(request) || didChange
+            guard let followUp = pendingSyncRequest else { break }
+            request = followUp
+        }
+    }
+
+    private func performSync(_ request: SyncRequest) async -> Bool {
+        var didChange = false
         do {
+            var blockedTackleItemIDs: Set<UUID> = []
+            if let tackleSync {
+                didChange = await syncTackle(
+                    ownerID: request.ownerID,
+                    confirmingConflicts: request.confirmingConflicts,
+                    dependencies: tackleSync
+                ) || didChange
+                blockedTackleItemIDs = try tackleSync.repository.pendingCreateItemIDs(ownerID: request.ownerID)
+            }
             let pendingMutations = try repository.pendingMutations(
-                ownerID: ownerID,
-                confirmingConflicts: confirmingConflicts
+                ownerID: request.ownerID,
+                confirmingConflicts: request.confirmingConflicts,
+                blockedTackleItemIDs: blockedTackleItemIDs
             )
             for mutation in pendingMutations {
                 do {
@@ -62,17 +100,116 @@ final class SyncCoordinator {
                 }
             }
 
-            let remoteCatches = try await remoteStore.fetch(ownerID: ownerID)
-            didChange = try repository.merge(remoteCatches, ownerID: ownerID) || didChange
+            let remoteCatches = try await remoteStore.fetch(ownerID: request.ownerID)
+            didChange = try repository.merge(remoteCatches, ownerID: request.ownerID) || didChange
             if let photoSync {
                 didChange = await syncPhotos(
-                    ownerID: ownerID,
-                    confirmingConflicts: confirmingConflicts,
+                    ownerID: request.ownerID,
+                    confirmingConflicts: request.confirmingConflicts,
                     dependencies: photoSync
                 ) || didChange
             }
         } catch {
             statusMessage = "Sync unavailable. Your local logbook is safe."
+        }
+        return didChange
+    }
+
+    private func queueFollowUp(ownerID: UUID, confirmingConflicts: Bool) {
+        if let pendingSyncRequest, pendingSyncRequest.ownerID == ownerID {
+            self.pendingSyncRequest = SyncRequest(
+                ownerID: ownerID,
+                confirmingConflicts: pendingSyncRequest.confirmingConflicts || confirmingConflicts
+            )
+        } else {
+            pendingSyncRequest = SyncRequest(ownerID: ownerID, confirmingConflicts: confirmingConflicts)
+        }
+    }
+
+    private func syncTackle(
+        ownerID: UUID,
+        confirmingConflicts: Bool,
+        dependencies: TackleSyncDependencies
+    ) async -> Bool {
+        let repository = dependencies.repository
+        let remoteStore = dependencies.remoteStore
+        var didChange = false
+        do {
+            let pending = try repository.pendingMutations(
+                ownerID: ownerID,
+                confirmingConflicts: confirmingConflicts
+            )
+            for mutation in pending {
+                do {
+                    try await processTackleMutation(
+                        mutation,
+                        repository: repository,
+                        remoteStore: remoteStore
+                    )
+                    didChange = true
+                } catch {
+                    try? repository.markFailed(mutation, error: error)
+                    statusMessage = "A tackle change is safe on this device and will retry when connected."
+                    didChange = true
+                }
+            }
+
+            let remoteItems = try await remoteStore.fetch(ownerID: ownerID)
+            let missingPhotos = try repository.merge(remoteItems, ownerID: ownerID)
+            for item in missingPhotos {
+                guard let path = item.photoStoragePath else { continue }
+                do {
+                    let data = try await remoteStore.download(path: path)
+                    try await repository.markDownloaded(item, data: data)
+                    didChange = true
+                } catch {
+                    statusMessage = "A tackle photo will download when the connection is available."
+                }
+            }
+        } catch {
+            statusMessage = "Tackle Box sync unavailable. Local items are safe."
+        }
+        return didChange
+    }
+
+    private func processTackleMutation(
+        _ mutation: PendingTackleMutation,
+        repository: SwiftDataTackleRepository,
+        remoteStore: any TackleRemoteStore
+    ) async throws {
+        try repository.markSyncing(mutation)
+        switch mutation.stage {
+        case .uploadBinary:
+            guard let path = mutation.item.photoStoragePath else {
+                throw TackleRepositoryError.missingPhoto(mutation.item.id)
+            }
+            let data = try await repository.binaryDataAsync(for: mutation)
+            try await remoteStore.upload(data: data, path: path)
+            try repository.markBinaryUploaded(mutation)
+            try await applyTackleMetadata(mutation, repository: repository, remoteStore: remoteStore)
+        case .upsertMetadata:
+            try await applyTackleMetadata(mutation, repository: repository, remoteStore: remoteStore)
+        case .removeObsoleteBinaries:
+            try await remoteStore.remove(paths: mutation.obsoleteStoragePaths)
+            try repository.markObsoleteBinariesRemoved(mutation)
+        }
+    }
+
+    private func applyTackleMetadata(
+        _ mutation: PendingTackleMutation,
+        repository: SwiftDataTackleRepository,
+        remoteStore: any TackleRemoteStore
+    ) async throws {
+        switch try await remoteStore.apply(mutation) {
+        case let .applied(remote):
+            let appliedCurrentMutation = try repository.markMetadataApplied(mutation, remote: remote)
+            if appliedCurrentMutation, !mutation.obsoleteStoragePaths.isEmpty {
+                try await remoteStore.remove(paths: mutation.obsoleteStoragePaths)
+                try repository.markObsoleteBinariesRemoved(mutation)
+            }
+        case let .conflict(remote):
+            try repository.markConflict(mutation, remote: remote)
+            statusMessage = "A tackle item changed elsewhere. Retry sync to keep this version."
         }
     }
 

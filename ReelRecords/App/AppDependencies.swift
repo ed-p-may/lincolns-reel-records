@@ -7,6 +7,7 @@ private struct AppServices {
     let authBackend: any AuthBackend
     let catchRemoteStore: any CatchRemoteStore
     let photoRemoteStore: any CatchPhotoRemoteStore
+    let tackleRemoteStore: any TackleRemoteStore
 }
 
 @MainActor
@@ -16,6 +17,7 @@ final class AppDependencies {
     let authService: AuthService
     let catchRepository: SwiftDataCatchRepository
     let catchPhotoRepository: SwiftDataCatchPhotoRepository
+    let tackleRepository: SwiftDataTackleRepository
     let locationService: CatchLocationService
     let modelContainer: ModelContainer
     let syncCoordinator: SyncCoordinator
@@ -23,9 +25,7 @@ final class AppDependencies {
 
     init(isUITesting: Bool = AppDependencies.isRunningTests) {
         locationService = CatchLocationService()
-        weatherSuggestionProvider = isUITesting
-            ? UnavailableWeatherSuggestionProvider()
-            : OpenMeteoClient()
+        weatherSuggestionProvider = Self.makeWeatherSuggestionProvider(isUITesting: isUITesting)
         do {
             let modelConfiguration = ModelConfiguration(isStoredInMemoryOnly: isUITesting)
             let container = try ModelContainer(
@@ -33,23 +33,34 @@ final class AppDependencies {
                 OutboxOperation.self,
                 CatchPhotoRecord.self,
                 PhotoOutboxOperation.self,
+                TackleItemRecord.self,
+                TackleOutboxOperation.self,
                 configurations: modelConfiguration
             )
             let repository = SwiftDataCatchRepository(modelContext: container.mainContext)
+            let photoFileStore = try Self.makePhotoFileStore(isUITesting: isUITesting)
             let photoRepository = try SwiftDataCatchPhotoRepository(
                 modelContext: container.mainContext,
-                fileStore: Self.makePhotoFileStore(isUITesting: isUITesting)
+                fileStore: photoFileStore
+            )
+            let tackleRepository = SwiftDataTackleRepository(
+                modelContext: container.mainContext,
+                fileStore: photoFileStore
             )
 
-            if isUITesting, ProcessInfo.processInfo.arguments.contains("--ui-testing-logbook") {
-                try Self.seedLogbook(repository: repository, photoRepository: photoRepository)
-            }
+            try Self.seedUITestLogbookIfNeeded(
+                isUITesting: isUITesting,
+                repository: repository,
+                photoRepository: photoRepository,
+                tackleRepository: tackleRepository
+            )
 
             let services = Self.makeServices(isUITesting: isUITesting)
 
             modelContainer = container
             catchRepository = repository
             catchPhotoRepository = photoRepository
+            self.tackleRepository = tackleRepository
             authService = AuthService(backend: services.authBackend)
             syncCoordinator = SyncCoordinator(
                 repository: repository,
@@ -57,6 +68,10 @@ final class AppDependencies {
                 photoSync: PhotoSyncDependencies(
                     repository: photoRepository,
                     remoteStore: services.photoRemoteStore
+                ),
+                tackleSync: TackleSyncDependencies(
+                    repository: tackleRepository,
+                    remoteStore: services.tackleRemoteStore
                 )
             )
         } catch {
@@ -77,6 +92,12 @@ final class AppDependencies {
         return try PhotoFileStore(rootURL: testRoot)
     }
 
+    private static func makeWeatherSuggestionProvider(
+        isUITesting: Bool
+    ) -> any WeatherSuggestionProviding {
+        isUITesting ? UnavailableWeatherSuggestionProvider() : OpenMeteoClient()
+    }
+
     private static func makeServices(isUITesting: Bool) -> AppServices {
         if isUITesting {
             let account = AccountSession(
@@ -88,7 +109,8 @@ final class AppDependencies {
             return AppServices(
                 authBackend: MockAuthBackend(account: account),
                 catchRemoteStore: InMemoryCatchRemoteStore(),
-                photoRemoteStore: InMemoryCatchPhotoRemoteStore()
+                photoRemoteStore: InMemoryCatchPhotoRemoteStore(),
+                tackleRemoteStore: InMemoryTackleRemoteStore()
             )
         }
         let configuration = AppConfiguration.live()
@@ -99,14 +121,33 @@ final class AppDependencies {
         return AppServices(
             authBackend: SupabaseAuthBackend(client: client),
             catchRemoteStore: SupabaseCatchRemoteStore(client: client),
-            photoRemoteStore: SupabaseCatchPhotoRemoteStore(client: client)
+            photoRemoteStore: SupabaseCatchPhotoRemoteStore(client: client),
+            tackleRemoteStore: SupabaseTackleRemoteStore(client: client)
+        )
+    }
+
+    private static func seedUITestLogbookIfNeeded(
+        isUITesting: Bool,
+        repository: SwiftDataCatchRepository,
+        photoRepository: SwiftDataCatchPhotoRepository,
+        tackleRepository: SwiftDataTackleRepository
+    ) throws {
+        guard isUITesting, ProcessInfo.processInfo.arguments.contains("--ui-testing-logbook") else {
+            return
+        }
+        try seedLogbook(
+            repository: repository,
+            photoRepository: photoRepository,
+            tackleRepository: tackleRepository
         )
     }
 
     private static func seedLogbook(
         repository: SwiftDataCatchRepository,
-        photoRepository: SwiftDataCatchPhotoRepository
+        photoRepository: SwiftDataCatchPhotoRepository,
+        tackleRepository: SwiftDataTackleRepository
     ) throws {
+        let senko = try seedTackle(repository: tackleRepository)
         let bass = try repository.create(NewCatch(
             ownerID: uiTestOwnerID,
             values: CatchValues(
@@ -122,6 +163,7 @@ final class AppDependencies {
                     waterTemperatureF: 65,
                     waterClarity: .stained
                 ),
+                tackleItemID: senko.id,
                 lureText: "Green pumpkin jig",
                 rodReel: "7-foot medium spinning rod",
                 notes: "Calm morning with a long field note to verify that the complete story remains readable.",
@@ -150,6 +192,32 @@ final class AppDependencies {
             )
         ))
         try seedPhotos(catchID: bass.id, repository: photoRepository)
+    }
+
+    private static func seedTackle(repository: SwiftDataTackleRepository) throws -> TackleItem {
+        let senko = try repository.create(NewTackleItem(
+            ownerID: uiTestOwnerID,
+            values: TackleValues(
+                name: "Green Pumpkin Senko",
+                type: .softPlastic,
+                size: "5\"",
+                color: "Green Pumpkin",
+                brand: "Yamamoto",
+                archived: false
+            )
+        ))
+        _ = try repository.create(NewTackleItem(
+            ownerID: uiTestOwnerID,
+            values: TackleValues(
+                name: "Chartreuse Spinner",
+                type: .spinnerbait,
+                size: "3/8 oz",
+                color: "Chartreuse",
+                brand: nil,
+                archived: false
+            )
+        ))
+        return senko
     }
 
     private static func seedPhotos(catchID: UUID, repository: SwiftDataCatchPhotoRepository) throws {

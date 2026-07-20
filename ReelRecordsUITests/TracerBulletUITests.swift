@@ -100,6 +100,12 @@ final class TracerBulletUITests: XCTestCase {
         XCTAssertTrue(search.waitForExistence(timeout: 3))
         XCTAssertEqual(search.value as? String, "bowl")
         XCTAssertEqual(app.buttons["log.sort.heaviest"].value as? String, "Selected")
+
+        app.buttons["Clear search"].tap()
+        search.tap()
+        search.typeText("senko")
+        XCTAssertTrue(bass.waitForExistence(timeout: 3))
+        XCTAssertFalse(trout.exists)
     }
 
     func testPhotoGalleryReorderAndRemovalPersistThroughEdit() {

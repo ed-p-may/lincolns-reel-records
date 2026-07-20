@@ -58,6 +58,7 @@ final class SwiftDataCatchRepository {
             location: values.location,
             coordinate: values.coordinate,
             conditions: values.conditions,
+            tackleItemID: values.tackleItemID,
             lureText: values.lureText,
             rodReel: values.rodReel,
             notes: values.notes,
@@ -146,7 +147,11 @@ final class SwiftDataCatchRepository {
         return try modelContext.fetchCount(descriptor)
     }
 
-    func pendingMutations(ownerID: UUID, confirmingConflicts: Bool = false) throws -> [PendingCatchMutation] {
+    func pendingMutations(
+        ownerID: UUID,
+        confirmingConflicts: Bool = false,
+        blockedTackleItemIDs: Set<UUID> = []
+    ) throws -> [PendingCatchMutation] {
         let operations = try outboxOperations(ownerID: ownerID).filter {
             confirmingConflicts || !$0.requiresUserConfirmation
         }
@@ -154,9 +159,13 @@ final class SwiftDataCatchRepository {
         let recordsByID = try Dictionary(uniqueKeysWithValues: catchRecords(ownerID: ownerID).map { ($0.id, $0) })
 
         var didConfirmConflict = false
-        let mutations = try operations.map { operation in
+        var mutations: [PendingCatchMutation] = []
+        for operation in operations {
             guard let record = recordsByID[operation.catchID] else {
                 throw CatchRepositoryError.missingCatch(operation.catchID)
+            }
+            if let tackleItemID = record.tackleItemID, blockedTackleItemIDs.contains(tackleItemID) {
+                continue
             }
             if operation.requiresUserConfirmation {
                 operation.requiresUserConfirmation = false
@@ -167,12 +176,12 @@ final class SwiftDataCatchRepository {
                 didConfirmConflict = true
             }
             let version = operation.mutationKind == .create ? 1 : operation.baseVersion + 1
-            return PendingCatchMutation(
+            mutations.append(PendingCatchMutation(
                 operationID: operation.id,
                 kind: operation.mutationKind,
                 expectedVersion: operation.baseVersion,
                 catchItem: record.remoteValue(version: version)
-            )
+            ))
         }
         if didConfirmConflict {
             try modelContext.save()
@@ -274,6 +283,7 @@ private extension SwiftDataCatchRepository {
             location: normalized(proposedValues.location),
             coordinate: proposedValues.coordinate,
             conditions: proposedValues.conditions,
+            tackleItemID: proposedValues.tackleItemID,
             lureText: normalized(proposedValues.lureText),
             rodReel: normalized(proposedValues.rodReel),
             notes: normalized(proposedValues.notes),
@@ -298,6 +308,7 @@ private extension SwiftDataCatchRepository {
         record.skyConditionRaw = values.conditions.skyCondition?.storageValue
         record.waterTemperatureF = values.conditions.waterTemperatureF
         record.waterClarityRaw = values.conditions.waterClarity?.storageValue
+        record.tackleItemID = values.tackleItemID
         record.lureText = values.lureText
         record.rodReel = values.rodReel
         record.notes = values.notes

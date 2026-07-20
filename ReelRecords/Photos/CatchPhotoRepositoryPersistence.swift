@@ -10,7 +10,7 @@ struct CatchPhotoOrderPlan {
 
 extension SwiftDataCatchPhotoRepository {
     static func storagePath(ownerID: UUID, catchID: UUID, photoID: UUID) -> String {
-        "\(ownerID.uuidString.lowercased())/\(catchID.uuidString.lowercased())/\(photoID.uuidString.lowercased()).jpg"
+        PhotoFileStore.remoteStoragePath(ownerID: ownerID, parentID: catchID, photoID: photoID)
     }
 
     func makeOrderPlan(

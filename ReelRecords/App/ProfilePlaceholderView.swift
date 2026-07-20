@@ -4,6 +4,7 @@ struct ProfilePlaceholderView: View {
     @Environment(AuthService.self) private var authService
     @Environment(SwiftDataCatchRepository.self) private var repository
     @Environment(SwiftDataCatchPhotoRepository.self) private var photoRepository
+    @Environment(SwiftDataTackleRepository.self) private var tackleRepository
     @Environment(SyncCoordinator.self) private var syncCoordinator
 
     let account: AccountSession
@@ -24,11 +25,37 @@ struct ProfilePlaceholderView: View {
                     .foregroundStyle(ReelTheme.secondaryText)
             }
 
+            NavigationLink {
+                TackleBoxView(ownerID: account.ownerID)
+            } label: {
+                HStack(spacing: 12) {
+                    Image(systemName: "shippingbox.fill")
+                        .foregroundStyle(ReelTheme.accentHighlight)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("My Tackle Box")
+                            .font(ReelFont.body(.body, weight: .semibold))
+                            .foregroundStyle(ReelTheme.primaryText)
+                        Text("Lures, bait, and gear")
+                            .font(ReelFont.body(.caption))
+                            .foregroundStyle(ReelTheme.secondaryText)
+                    }
+                    Spacer()
+                    Image(systemName: "chevron.right")
+                        .foregroundStyle(ReelTheme.tertiaryText)
+                }
+                .padding(15)
+                .background(ReelTheme.surface, in: RoundedRectangle(cornerRadius: 16))
+                .overlay { RoundedRectangle(cornerRadius: 16).stroke(ReelTheme.border) }
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("profile.tackle-box")
+
             Button("Sign Out", role: .destructive) {
                 Task {
                     do {
                         let count = try repository.pendingCount(ownerID: account.ownerID)
                             + photoRepository.pendingCount(ownerID: account.ownerID)
+                            + tackleRepository.pendingCount(ownerID: account.ownerID)
                         await authService.signOut(pendingChangeCount: count)
                     } catch {
                         authService.blockSignOut(for: error)

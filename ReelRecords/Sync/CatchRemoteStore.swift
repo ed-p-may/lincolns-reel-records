@@ -20,6 +20,7 @@ private struct CatchDTO: Codable, Sendable {
     let skyCondition: String?
     let waterTemperatureF: Double?
     let waterClarity: String?
+    let tackleItemID: UUID?
     let lureText: String?
     let rodReel: String?
     let notes: String?
@@ -43,6 +44,7 @@ private struct CatchDTO: Codable, Sendable {
         case skyCondition = "sky_condition"
         case waterTemperatureF = "water_temp_f"
         case waterClarity = "water_clarity"
+        case tackleItemID = "tackle_item_id"
         case lureText = "lure_text"
         case rodReel = "rod_reel"
         case notes
@@ -67,6 +69,7 @@ private struct CatchDTO: Codable, Sendable {
         skyCondition = catchItem.values.conditions.skyCondition?.storageValue
         waterTemperatureF = catchItem.values.conditions.waterTemperatureF
         waterClarity = catchItem.values.conditions.waterClarity?.storageValue
+        tackleItemID = catchItem.values.tackleItemID
         lureText = catchItem.values.lureText
         rodReel = catchItem.values.rodReel
         notes = catchItem.values.notes
@@ -94,6 +97,7 @@ private struct CatchDTO: Codable, Sendable {
                     waterTemperatureF: waterTemperatureF,
                     waterClarity: waterClarity.map(WaterClarity.init(storageValue:))
                 ),
+                tackleItemID: tackleItemID,
                 lureText: lureText,
                 rodReel: rodReel,
                 notes: notes,
@@ -125,6 +129,7 @@ struct CatchUpdateDTO: Encodable, Sendable {
         case skyCondition = "sky_condition"
         case waterTemperatureF = "water_temp_f"
         case waterClarity = "water_clarity"
+        case tackleItemID = "tackle_item_id"
         case lureText = "lure_text"
         case rodReel = "rod_reel"
         case notes
@@ -154,6 +159,7 @@ struct CatchUpdateDTO: Encodable, Sendable {
         try container.encode(values.conditions.skyCondition?.storageValue, forKey: .skyCondition)
         try container.encode(values.conditions.waterTemperatureF, forKey: .waterTemperatureF)
         try container.encode(values.conditions.waterClarity?.storageValue, forKey: .waterClarity)
+        try container.encode(values.tackleItemID, forKey: .tackleItemID)
         try container.encode(values.lureText, forKey: .lureText)
         try container.encode(values.rodReel, forKey: .rodReel)
         try container.encode(values.notes, forKey: .notes)
@@ -301,6 +307,7 @@ private extension CatchValues {
             && location == other.location
             && coordinate == other.coordinate
             && conditions == other.conditions
+            && tackleItemID == other.tackleItemID
             && lureText == other.lureText
             && rodReel == other.rodReel
             && notes == other.notes

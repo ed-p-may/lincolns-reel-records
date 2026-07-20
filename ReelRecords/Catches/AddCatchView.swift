@@ -15,6 +15,7 @@ struct AddCatchView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(SwiftDataCatchRepository.self) private var repository
     @Environment(SwiftDataCatchPhotoRepository.self) private var photoRepository
+    @Environment(SwiftDataTackleRepository.self) private var tackleRepository
     @Environment(CatchLocationService.self) private var locationService
     @Environment(SyncCoordinator.self) private var syncCoordinator
     @Environment(\.weatherSuggestionProvider) private var weatherSuggestionProvider
@@ -33,6 +34,10 @@ struct AddCatchView: View {
     @State private var completedWeatherKeys: [WeatherRequestKey] = []
     @State private var fetchingWeatherKey: WeatherRequestKey?
     @State private var weatherSuggestionMessage: String?
+    @State private var tackleItems: [TackleItem] = []
+    @State private var selectedTackleItemID: UUID?
+    @State private var isAddingTackle = false
+    @State private var isManagingTackle = false
     @State private var lureText: String
     @State private var rodReel: String
     @State private var notes: String
@@ -70,6 +75,7 @@ struct AddCatchView: View {
         _waterTemperature = State(initialValue: CatchFormatting.input(conditions.waterTemperatureF))
         _waterClarity = State(initialValue: conditions.waterClarity)
         _conditionDraft = State(initialValue: ConditionEnrichmentDraft(conditions: conditions))
+        _selectedTackleItemID = State(initialValue: values?.tackleItemID)
         _lureText = State(initialValue: values?.lureText ?? "")
         _rodReel = State(initialValue: values?.rodReel ?? "")
         _notes = State(initialValue: values?.notes ?? "")
@@ -92,6 +98,13 @@ struct AddCatchView: View {
                         isChoosingLocation: $isChoosingLocation
                     )
                     conditionsSection
+                    CatchTackleSection(
+                        items: tackleItems,
+                        selectedItemID: $selectedTackleItemID,
+                        lureText: $lureText,
+                        onAdd: { isAddingTackle = true },
+                        onManage: { isManagingTackle = true }
+                    )
                     textSection
                     releaseSection
 
@@ -126,6 +139,7 @@ struct AddCatchView: View {
         .task {
             locationService.reset()
             loadPhotos()
+            loadTackleItems()
         }
         .task(id: weatherRequestKey) {
             await suggestWeatherIfNeeded()
@@ -139,6 +153,25 @@ struct AddCatchView: View {
             ManualLocationPicker(initialCoordinate: coordinate) { selected in
                 locationService.reset()
                 coordinate = selected
+            }
+        }
+        .sheet(isPresented: $isAddingTackle) {
+            TackleItemEditor(ownerID: ownerID) { item in
+                loadTackleItems()
+                selectedTackleItemID = item.id
+            }
+        }
+        .fullScreenCover(isPresented: $isManagingTackle) {
+            NavigationStack {
+                TackleBoxView(ownerID: ownerID)
+                    .toolbar {
+                        ToolbarItem(placement: .cancellationAction) {
+                            Button("Done") {
+                                loadTackleItems()
+                                isManagingTackle = false
+                            }
+                        }
+                    }
             }
         }
         .onDisappear {
@@ -210,9 +243,6 @@ struct AddCatchView: View {
     private var textSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             fieldLabel("Details")
-            TextField("Lure or bait", text: $lureText)
-                .fieldInputStyle()
-                .accessibilityIdentifier("add.lure")
             TextField("Rod and reel", text: $rodReel)
                 .fieldInputStyle()
                 .accessibilityIdentifier("add.rod-reel")
@@ -307,6 +337,7 @@ private extension AddCatchView {
                     waterTemperatureF: CatchFormatting.parseOptionalTemperature(waterTemperature),
                     waterClarity: waterClarity
                 ),
+                tackleItemID: selectedTackleItemID,
                 lureText: lureText,
                 rodReel: rodReel,
                 notes: notes,
@@ -353,6 +384,21 @@ private extension AddCatchView {
                     fileURL: photoRepository.fileURL(for: photo)
                 )
             }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func loadTackleItems() {
+        do {
+            var loaded = try tackleRepository.items(ownerID: ownerID)
+            let historical = try selectedTackleItemID.flatMap {
+                try tackleRepository.item(id: $0, ownerID: ownerID)
+            }
+            if let historical, !loaded.contains(where: { $0.id == historical.id }) {
+                loaded.append(historical)
+            }
+            tackleItems = loaded
         } catch {
             errorMessage = error.localizedDescription
         }

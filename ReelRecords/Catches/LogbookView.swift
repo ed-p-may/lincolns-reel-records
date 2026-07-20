@@ -4,9 +4,11 @@ struct LogbookView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(SwiftDataCatchRepository.self) private var repository
     @Environment(SwiftDataCatchPhotoRepository.self) private var photoRepository
+    @Environment(SwiftDataTackleRepository.self) private var tackleRepository
     @Environment(SyncCoordinator.self) private var syncCoordinator
     @State private var catches: [CatchItem] = []
     @State private var photosByCatch: [UUID: [CatchPhotoItem]] = [:]
+    @State private var tackleItemNames: [UUID: String] = [:]
     @State private var searchQuery = ""
     @State private var selectedSpecies: String?
     @State private var sort: CatchSort = .recent
@@ -22,7 +24,8 @@ struct LogbookView: View {
             in: catches,
             query: searchQuery,
             species: selectedSpecies,
-            sort: sort
+            sort: sort,
+            tackleItemNames: tackleItemNames
         )
         let availableSpecies = CatchDiscovery.species(in: catches)
 
@@ -77,7 +80,8 @@ struct LogbookView: View {
                         } label: {
                             CatchCard(
                                 catchItem: catchItem,
-                                heroPhotoURL: heroPhotoURL(catchID: catchItem.id)
+                                heroPhotoURL: heroPhotoURL(catchID: catchItem.id),
+                                tackleItemName: catchItem.tackleItemID.flatMap { tackleItemNames[$0] }
                             )
                         }
                         .buttonStyle(.plain)
@@ -208,6 +212,7 @@ struct LogbookView: View {
         do {
             catches = try repository.list(ownerID: ownerID)
             photosByCatch = try photoRepository.photosByCatch(ownerID: ownerID)
+            tackleItemNames = try resolveTackleItemNames()
             let availableSpecies = CatchDiscovery.species(in: catches)
             if let selectedSpecies, !availableSpecies.contains(selectedSpecies) {
                 self.selectedSpecies = nil
@@ -220,6 +225,13 @@ struct LogbookView: View {
 
     private func heroPhotoURL(catchID: UUID) -> URL? {
         photosByCatch[catchID]?.first.flatMap(photoRepository.fileURL(for:))
+    }
+
+    private func resolveTackleItemNames() throws -> [UUID: String] {
+        try tackleRepository.itemNames(
+            ownerID: ownerID,
+            referencedIDs: Set(catches.compactMap(\.tackleItemID))
+        )
     }
 }
 

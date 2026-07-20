@@ -12,7 +12,7 @@ slices. Read the high-level plan and the relevant product/design documents befor
 | 05 | [`05-location-map.md`](05-location-map.md) | Complete |
 | 06 | [`06-conditions.md`](06-conditions.md) | Complete |
 | 07 | [`07-dashboard.md`](07-dashboard.md) | Complete |
-| 08 | [`08-tackle-box.md`](08-tackle-box.md) | Ready |
+| 08 | [`08-tackle-box.md`](08-tackle-box.md) | Complete |
 | 09 | [`09-profile-settings.md`](09-profile-settings.md) | Planned |
 | 10 | [`10-bookmark-share.md`](10-bookmark-share.md) | Planned |
 | 11 | [`11-beta-hardening.md`](11-beta-hardening.md) | Planned |

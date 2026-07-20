@@ -316,7 +316,7 @@ private struct PhotoEditorTile: View {
     }
 }
 
-private struct CameraImagePicker: UIViewControllerRepresentable {
+struct CameraImagePicker: UIViewControllerRepresentable {
     let onImage: (Data?) -> Void
     let onCancel: () -> Void
 

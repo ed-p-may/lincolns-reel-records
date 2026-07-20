@@ -25,11 +25,11 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>Add a catch photo while logging on the water.</string>
+	<string>Photograph a catch or an item in your private Tackle Box.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Save the location of a catch when you choose to capture it.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
-	<string>Choose catch photos for your private fishing logbook.</string>
+	<string>Choose photos for your private fishing logbook and Tackle Box.</string>
 	<key>SUPABASE_PROJECT_HOST</key>
 	<string>$(SUPABASE_PROJECT_HOST)</string>
 	<key>SUPABASE_PUBLISHABLE_KEY</key>

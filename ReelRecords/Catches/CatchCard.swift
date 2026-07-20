@@ -4,6 +4,7 @@ struct CatchCard: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     let catchItem: CatchItem
     let heroPhotoURL: URL?
+    var tackleItemName: String?
 
     var body: some View {
         Group {
@@ -65,7 +66,7 @@ struct CatchCard: View {
                     catchItem.caughtAt.formatted(date: .abbreviated, time: .shortened),
                     systemImage: "calendar"
                 )
-                Label(catchItem.lureText ?? "Lure not recorded", systemImage: "fish.fill")
+                Label(lureDisplayName, systemImage: "fish.fill")
                 if let conditionSummary {
                     Label(conditionSummary, systemImage: conditionSystemImage)
                 }
@@ -148,7 +149,7 @@ struct CatchCard: View {
         HStack(spacing: 9) {
             Image(systemName: "fish.fill")
                 .foregroundStyle(ReelTheme.accentHighlight)
-            Text(catchItem.lureText ?? "Lure not recorded")
+            Text(lureDisplayName)
                 .font(ReelFont.body(.caption))
                 .foregroundStyle(ReelTheme.secondaryText)
                 .lineLimit(1)
@@ -174,13 +175,17 @@ struct CatchCard: View {
             catchItem.length.map(CatchFormatting.length),
             catchItem.location,
             catchItem.caughtAt.formatted(date: .long, time: .shortened),
-            catchItem.lureText,
+            tackleItemName ?? catchItem.lureText,
             conditionSummary,
             catchItem.released ? "Released" : "Kept",
             catchItem.syncState.label
         ]
         .compactMap(\.self)
         .joined(separator: ", ")
+    }
+
+    private var lureDisplayName: String {
+        tackleItemName ?? catchItem.lureText ?? "Lure not recorded"
     }
 
     private var conditionSummary: String? {

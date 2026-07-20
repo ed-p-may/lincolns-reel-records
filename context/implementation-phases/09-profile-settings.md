@@ -1,7 +1,7 @@
 # Phase 09 — Profile and Settings
 
 **Status:** Planned  
-**Depends on:** Phase 07 complete; integrate Phase 08 only if Tackle Box is included  
+**Depends on:** Phase 08 complete
 **Primary stories:** C4, E3, E6
 
 ## Goal
@@ -17,7 +17,7 @@ the intentionally limited v1 settings surface.
 - Profile edits and avatar changes work offline and synchronize later.
 - Units clearly shows fixed `lb · in` behavior.
 - Full-logbook export is disabled and labeled Coming Soon.
-- Tackle Box remains reachable from Profile when Phase 08 is included.
+- Tackle Box remains reachable from Profile.
 - Sign out safely handles pending local work and reveals no prior account data afterward.
 
 ## Backend slice

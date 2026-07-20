@@ -6,10 +6,13 @@ struct CatchDetailView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @Environment(SwiftDataCatchRepository.self) private var repository
     @Environment(SwiftDataCatchPhotoRepository.self) private var photoRepository
+    @Environment(SwiftDataTackleRepository.self) private var tackleRepository
     @Environment(SyncCoordinator.self) private var syncCoordinator
     @State private var catchItem: CatchItem
     @State private var photos: [CatchPhotoItem] = []
+    @State private var tackleItem: TackleItem?
     @State private var isEditing = false
+    @State private var isShowingTackleItem = false
     @State private var isConfirmingDelete = false
     @State private var errorMessage: String?
 
@@ -51,6 +54,14 @@ struct CatchDetailView: View {
                     onChanged()
                 }
             }
+            .sheet(isPresented: $isShowingTackleItem) {
+                if let tackleItem {
+                    TackleItemEditor(ownerID: catchItem.ownerID, editItem: tackleItem) { updated in
+                        self.tackleItem = updated
+                        onChanged()
+                    }
+                }
+            }
             .confirmationDialog(
                 "Delete this catch?",
                 isPresented: $isConfirmingDelete,
@@ -67,7 +78,7 @@ struct CatchDetailView: View {
         } message: {
             Text(errorMessage ?? "")
         }
-        .task(id: syncCoordinator.revision) { reloadPhotos() }
+        .task(id: syncCoordinator.revision) { reload() }
     }
 
     private var hero: some View {
@@ -161,27 +172,47 @@ struct CatchDetailView: View {
 
     private var catchDetails: some View {
         DetailSection(title: "Catch details") {
-            LazyVGrid(columns: detailColumns, spacing: 11) {
-                DetailTile(
-                    label: "Lure / bait",
-                    value: catchItem.lureText,
-                    systemImage: "fish.fill"
-                )
-                DetailTile(
-                    label: "Rod & reel",
-                    value: catchItem.rodReel,
-                    systemImage: "wrench.and.screwdriver.fill"
-                )
-                DetailTile(
-                    label: "Disposition",
-                    value: catchItem.released ? "Released" : "Kept",
-                    systemImage: catchItem.released ? "arrow.uturn.backward" : "checkmark.circle.fill"
-                )
-                DetailTile(
-                    label: "Caught",
-                    value: catchItem.caughtAt.formatted(date: .long, time: .shortened),
-                    systemImage: "calendar"
-                )
+            VStack(spacing: 11) {
+                if let tackleItem {
+                    Button { isShowingTackleItem = true } label: {
+                        TackleItemRow(item: tackleItem)
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityHint("Opens this Tackle Box item")
+                    .accessibilityIdentifier("detail.tackle-item")
+                } else if catchItem.tackleItemID != nil {
+                    DetailTile(
+                        label: "Saved tackle",
+                        value: "Unavailable",
+                        systemImage: "shippingbox"
+                    )
+                    .accessibilityIdentifier("detail.tackle-unavailable")
+                }
+
+                LazyVGrid(columns: detailColumns, spacing: 11) {
+                    if catchItem.tackleItemID == nil || catchItem.lureText != nil {
+                        DetailTile(
+                            label: catchItem.tackleItemID == nil ? "Lure / bait" : "One-off note",
+                            value: catchItem.lureText,
+                            systemImage: "fish.fill"
+                        )
+                    }
+                    DetailTile(
+                        label: "Rod & reel",
+                        value: catchItem.rodReel,
+                        systemImage: "wrench.and.screwdriver.fill"
+                    )
+                    DetailTile(
+                        label: "Disposition",
+                        value: catchItem.released ? "Released" : "Kept",
+                        systemImage: catchItem.released ? "arrow.uturn.backward" : "checkmark.circle.fill"
+                    )
+                    DetailTile(
+                        label: "Caught",
+                        value: catchItem.caughtAt.formatted(date: .long, time: .shortened),
+                        systemImage: "calendar"
+                    )
+                }
             }
         }
     }
@@ -244,7 +275,9 @@ struct CatchDetailView: View {
         .padding(.horizontal, 20)
         .accessibilityIdentifier("detail.delete")
     }
+}
 
+private extension CatchDetailView {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItem(placement: .cancellationAction) {
@@ -274,6 +307,7 @@ struct CatchDetailView: View {
                 catchItem = updated
             }
             reloadPhotos()
+            reloadTackleItem()
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -294,6 +328,16 @@ struct CatchDetailView: View {
     private func reloadPhotos() {
         do {
             photos = try photoRepository.photos(catchID: catchItem.id, ownerID: catchItem.ownerID)
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func reloadTackleItem() {
+        do {
+            tackleItem = try catchItem.tackleItemID.flatMap {
+                try tackleRepository.item(id: $0, ownerID: catchItem.ownerID)
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -386,74 +430,5 @@ private struct DetailCatchLocationMap: View {
         .frame(minHeight: 52)
         .padding(12)
         .background(.ultraThinMaterial)
-    }
-}
-
-private struct DetailMetricCard: View {
-    let label: String
-    let value: String?
-    let systemImage: String
-    let prominent: Bool
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            Label(label.uppercased(), systemImage: systemImage)
-                .font(ReelFont.metadata(.caption2, weight: .bold))
-                .foregroundStyle(prominent ? ReelTheme.accentHighlight : ReelTheme.secondaryText)
-            Text(value ?? "Not recorded")
-                .font(ReelFont.display(value == nil ? 15 : 25, weight: .heavy))
-                .foregroundStyle(value == nil ? ReelTheme.tertiaryText : textColor)
-                .minimumScaleFactor(0.72)
-                .lineLimit(2)
-        }
-        .frame(maxWidth: .infinity, minHeight: 92, alignment: .leading)
-        .padding(16)
-        .background(prominent ? ReelTheme.accent.opacity(0.13) : ReelTheme.surface)
-        .clipShape(RoundedRectangle(cornerRadius: 18))
-        .overlay {
-            RoundedRectangle(cornerRadius: 18)
-                .stroke(prominent ? ReelTheme.accent.opacity(0.25) : ReelTheme.border)
-        }
-    }
-
-    private var textColor: Color {
-        prominent ? .white : ReelTheme.primaryText
-    }
-}
-
-private struct DetailTile: View {
-    let label: String
-    let value: String?
-    let systemImage: String
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 7) {
-            Label(label, systemImage: systemImage)
-                .font(ReelFont.body(.caption, weight: .semibold))
-                .foregroundStyle(ReelTheme.tertiaryText)
-            Text(value ?? "Not recorded")
-                .font(ReelFont.body(.subheadline, weight: .semibold))
-                .foregroundStyle(value == nil ? ReelTheme.tertiaryText : ReelTheme.primaryText)
-                .lineLimit(4)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-        .frame(maxWidth: .infinity, minHeight: 84, alignment: .topLeading)
-        .padding(13)
-        .background(ReelTheme.surface, in: RoundedRectangle(cornerRadius: 15))
-    }
-}
-
-private struct DetailSection<Content: View>: View {
-    let title: String
-    @ViewBuilder let content: Content
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text(title)
-                .font(ReelFont.display(17))
-                .foregroundStyle(ReelTheme.primaryText)
-            content
-        }
-        .padding(.horizontal, 20)
     }
 }
