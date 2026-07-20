@@ -69,6 +69,9 @@ evidence during the phone-free implementation loop. Before this phase closes:
 - on physical iPhone hardware, exercise explicit foreground GPS capture outdoors, all location
   permission states and Settings recovery, accuracy/timeout behavior, manual correction after denial,
   airplane-mode coordinate save/relaunch, and reconnect synchronization;
+- on physical iPhone hardware, exercise a live Open-Meteo suggestion from GPS/time, provider
+  timeout/error handling, manual condition entry and clearing in airplane mode, reconnect without
+  overwriting manual edits, and exact hosted recovery of all four values plus the expected weather icon;
 - verify a fresh physical install recovers every hosted Catch and photo with stable order/hero choice,
   including exact coordinate pairs and map focus, then audit the private bucket for orphan objects after
   replacement, photo removal, and Catch deletion;

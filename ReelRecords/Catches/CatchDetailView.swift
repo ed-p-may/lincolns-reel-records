@@ -33,6 +33,7 @@ struct CatchDetailView: View {
                     hero
                     measurementSummary
                     catchDetails
+                    conditionsDetails
                     fieldNotes
                     locationMap
                     recordStatus
@@ -295,6 +296,39 @@ struct CatchDetailView: View {
             photos = try photoRepository.photos(catchID: catchItem.id, ownerID: catchItem.ownerID)
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+}
+
+private extension CatchDetailView {
+    private var conditionsDetails: some View {
+        DetailSection(title: "Conditions") {
+            LazyVGrid(columns: detailColumns, spacing: 11) {
+                DetailTile(
+                    label: "Air temperature",
+                    value: catchItem.conditions.airTemperatureF.map(CatchFormatting.temperature),
+                    systemImage: catchItem.conditions.skyCondition?.systemImage ?? "thermometer.medium"
+                )
+                .accessibilityIdentifier("detail.air-temperature")
+                DetailTile(
+                    label: "Sky",
+                    value: catchItem.conditions.skyCondition?.label,
+                    systemImage: catchItem.conditions.skyCondition?.systemImage ?? "cloud"
+                )
+                .accessibilityIdentifier("detail.sky-condition")
+                DetailTile(
+                    label: "Water temperature",
+                    value: catchItem.conditions.waterTemperatureF.map(CatchFormatting.temperature),
+                    systemImage: "water.waves.and.thermometer"
+                )
+                .accessibilityIdentifier("detail.water-temperature")
+                DetailTile(
+                    label: "Water clarity",
+                    value: catchItem.conditions.waterClarity?.label,
+                    systemImage: "drop.fill"
+                )
+                .accessibilityIdentifier("detail.water-clarity")
+            }
         }
     }
 }

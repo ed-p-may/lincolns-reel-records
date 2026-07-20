@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		01022AC90A7B0924A16D1172 /* CatchPhotoModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F36043304E7F65970C20AFA1 /* CatchPhotoModels.swift */; };
+		017C331EBFC6AFB73CD2A6D6 /* ConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CFFBDC9C3F7088E5E0F75E8 /* ConditionTests.swift */; };
 		07355BB0CD4FBE7DA51314B9 /* CatchFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9364A178D385938DBE2CFDAB /* CatchFormatting.swift */; };
 		19A329CE8CAC89CDFF976321 /* ProfilePlaceholderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 90EB0B98DE3DA57383F40F23 /* ProfilePlaceholderView.swift */; };
 		1E292BF35DC0CC215EE3E268 /* CatchRemoteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 443D168C66E5CA508B55F834 /* CatchRemoteStore.swift */; };
@@ -27,11 +28,14 @@
 		78DE675A590584F984CB33E6 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32F3AE12ADFCAAAE2AF35E22 /* AppDependencies.swift */; };
 		7DFB8CE29178AE46D91B274F /* AuthBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DDAE86ED1D2AE8E06A0B91 /* AuthBackend.swift */; };
 		879092C5467F9A7E4D17F1AD /* CatchDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798FBE5458AC3FD926D9B6DD /* CatchDetailView.swift */; };
+		87EA90297E973C0C9206F77A /* ConditionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B93E885658057151862F91 /* ConditionModels.swift */; };
 		87EE0A2FC0F8C4FA8675504A /* AddCatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AFC314FBBE0A2EBEFF1D2A /* AddCatchView.swift */; };
 		8AB00FBB94EDE94BE97CA242 /* LocationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6A7479E66DA33689CF35AB /* LocationModels.swift */; };
 		8B13A2B9A3DBB681C8875B67 /* CatchPhotoViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D65117E1FE60166150F1BC /* CatchPhotoViews.swift */; };
+		8C41C09FBBF83C179FCCB12E /* OpenMeteoClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F154528CB461BE96AC18928D /* OpenMeteoClient.swift */; };
 		92E0F55AAA42F17F2AFED640 /* TracerBulletUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E9438AE2DE1AE57573856 /* TracerBulletUITests.swift */; };
 		9949AC8FB26861F08331ABB4 /* LocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BAE2D9BDF1C599368E859D /* LocationTests.swift */; };
+		A4C1A9297F6CD8422EC3B729 /* CatchConditionsEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C91064C704B8FB6367D49F /* CatchConditionsEditor.swift */; };
 		B29B50BE600BB6CA4B133492 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6BBC96B2E6E83C521FB85DB /* SyncCoordinator.swift */; };
 		B3E3A5298830AF25B7BEAEDA /* ReelTheme.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5ACC97BB77452D61D9A8FE7C /* ReelTheme.swift */; };
 		B5D9DBE44925056F44AD4B45 /* CatchMapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5C717D6B75ECD636AB8B2AA3 /* CatchMapView.swift */; };
@@ -43,6 +47,8 @@
 		D1C96280086F2D82E732781E /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13C431D11FE05755CB3D633 /* RootView.swift */; };
 		D54836A1A443C5B8318AA700 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 2330B6A10F0EDCDE0088F482 /* Supabase */; };
 		D74682B77578FF1C21879C28 /* AppShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987E097BF08486AC4CDAEB69 /* AppShellView.swift */; };
+		DFC644268D2E1EEA2DAC5617 /* UnitInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AF68293C10C2A4E188E97B5 /* UnitInput.swift */; };
+		E068CD122765A8CAB9949980 /* CatchLocationEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75A0561228AEF7D6A1A099E /* CatchLocationEditor.swift */; };
 		E9335A4D7E97026DC2B194E8 /* AuthenticationFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2513386627DC7050E07AB13 /* AuthenticationFlowView.swift */; };
 		F02ECA92CFDF582F23AF3B86 /* CatchPhotoRemoteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 688A166004E7F64DFB359A65 /* CatchPhotoRemoteStore.swift */; };
 		F0664340C243646F9D9B2CA1 /* SelectionChip.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2728A9C584315ED3C913E70B /* SelectionChip.swift */; };
@@ -80,6 +86,8 @@
 		3F73760CFFF73B490EF880D6 /* LogbookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogbookView.swift; sourceTree = "<group>"; };
 		4346541BB12F23B2D341FADF /* PhotoFileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoFileStore.swift; sourceTree = "<group>"; };
 		443D168C66E5CA508B55F834 /* CatchRemoteStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchRemoteStore.swift; sourceTree = "<group>"; };
+		44C91064C704B8FB6367D49F /* CatchConditionsEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchConditionsEditor.swift; sourceTree = "<group>"; };
+		4AF68293C10C2A4E188E97B5 /* UnitInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UnitInput.swift; sourceTree = "<group>"; };
 		4DCBB3E17A57CB9503994594 /* CatchCard.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchCard.swift; sourceTree = "<group>"; };
 		4E421F41A4DE520309B1A7EE /* CatchPhotoRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoRepository.swift; sourceTree = "<group>"; };
 		5ACC97BB77452D61D9A8FE7C /* ReelTheme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ReelTheme.swift; sourceTree = "<group>"; };
@@ -89,6 +97,7 @@
 		62165F3A6543C726A57EFC48 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		67F8F41A0512371ECC18F6AB /* CatchLocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchLocationService.swift; sourceTree = "<group>"; };
 		688A166004E7F64DFB359A65 /* CatchPhotoRemoteStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoRemoteStore.swift; sourceTree = "<group>"; };
+		6CFFBDC9C3F7088E5E0F75E8 /* ConditionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionTests.swift; sourceTree = "<group>"; };
 		73AFC314FBBE0A2EBEFF1D2A /* AddCatchView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddCatchView.swift; sourceTree = "<group>"; };
 		77B5146A10D33E56581E1C53 /* FieldInputStyle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FieldInputStyle.swift; sourceTree = "<group>"; };
 		798FBE5458AC3FD926D9B6DD /* CatchDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchDetailView.swift; sourceTree = "<group>"; };
@@ -106,13 +115,16 @@
 		AB172ADDBD5EB7D3BEBC20EE /* CatchRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchRepository.swift; sourceTree = "<group>"; };
 		B8DDAE86ED1D2AE8E06A0B91 /* AuthBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthBackend.swift; sourceTree = "<group>"; };
 		BB1D66212FEC995C64FA8427 /* CatchPhotoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoTests.swift; sourceTree = "<group>"; };
+		C4B93E885658057151862F91 /* ConditionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionModels.swift; sourceTree = "<group>"; };
 		C6BBC96B2E6E83C521FB85DB /* SyncCoordinator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncCoordinator.swift; sourceTree = "<group>"; };
 		D13C431D11FE05755CB3D633 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		D2AF2DE72796313BAF55A618 /* AuthServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthServiceTests.swift; sourceTree = "<group>"; };
 		D8D65117E1FE60166150F1BC /* CatchPhotoViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoViews.swift; sourceTree = "<group>"; };
 		DD98D5A388B178A2654ADF8E /* CatchSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchSyncTests.swift; sourceTree = "<group>"; };
 		E2513386627DC7050E07AB13 /* AuthenticationFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationFlowView.swift; sourceTree = "<group>"; };
+		E75A0561228AEF7D6A1A099E /* CatchLocationEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchLocationEditor.swift; sourceTree = "<group>"; };
 		EC094B2EE2E9355950DFBBD5 /* CatchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchModels.swift; sourceTree = "<group>"; };
+		F154528CB461BE96AC18928D /* OpenMeteoClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoClient.swift; sourceTree = "<group>"; };
 		F36043304E7F65970C20AFA1 /* CatchPhotoModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoModels.swift; sourceTree = "<group>"; };
 		F4883D943E8D04916E34F942 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F92A896402809E48A4E52EC9 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
@@ -135,6 +147,7 @@
 		028B62131CB07B63328C7294 /* Location */ = {
 			isa = PBXGroup;
 			children = (
+				E75A0561228AEF7D6A1A099E /* CatchLocationEditor.swift */,
 				67F8F41A0512371ECC18F6AB /* CatchLocationService.swift */,
 				5C717D6B75ECD636AB8B2AA3 /* CatchMapView.swift */,
 				0D6A7479E66DA33689CF35AB /* LocationModels.swift */,
@@ -199,6 +212,16 @@
 			path = ReelRecordsUITests;
 			sourceTree = "<group>";
 		};
+		513C17425D349837F55FCA1B /* Conditions */ = {
+			isa = PBXGroup;
+			children = (
+				44C91064C704B8FB6367D49F /* CatchConditionsEditor.swift */,
+				C4B93E885658057151862F91 /* ConditionModels.swift */,
+				F154528CB461BE96AC18928D /* OpenMeteoClient.swift */,
+			);
+			path = Conditions;
+			sourceTree = "<group>";
+		};
 		5902024FFE7CAD44BEA3677E /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -233,6 +256,7 @@
 				170B519A46EBAD8CCDCEDF35 /* App */,
 				1B4E50EF8CD3CE40E4EF3DAE /* Authentication */,
 				35ACC28D4B754B2AAFDA9FDD /* Catches */,
+				513C17425D349837F55FCA1B /* Conditions */,
 				E2078527CD57D29999CE85E3 /* DesignSystem */,
 				028B62131CB07B63328C7294 /* Location */,
 				C17E9258A65E2DC5DE4E4D29 /* Photos */,
@@ -263,6 +287,7 @@
 				BB1D66212FEC995C64FA8427 /* CatchPhotoTests.swift */,
 				05AA0ADC77F4E1A1922BD9FF /* CatchRepositoryTests.swift */,
 				DD98D5A388B178A2654ADF8E /* CatchSyncTests.swift */,
+				6CFFBDC9C3F7088E5E0F75E8 /* ConditionTests.swift */,
 				24BAE2D9BDF1C599368E859D /* LocationTests.swift */,
 			);
 			path = ReelRecordsTests;
@@ -286,6 +311,7 @@
 				7DE47DECA45D73AF0EB4E7FF /* PrimaryButton.swift */,
 				5ACC97BB77452D61D9A8FE7C /* ReelTheme.swift */,
 				2728A9C584315ED3C913E70B /* SelectionChip.swift */,
+				4AF68293C10C2A4E188E97B5 /* UnitInput.swift */,
 			);
 			path = DesignSystem;
 			sourceTree = "<group>";
@@ -416,6 +442,7 @@
 				1F71CDCE453DC30D0B520DE5 /* CatchPhotoTests.swift in Sources */,
 				7824E4378024C26E3362EA93 /* CatchRepositoryTests.swift in Sources */,
 				D0684D2587D43AD3BEBC1462 /* CatchSyncTests.swift in Sources */,
+				017C331EBFC6AFB73CD2A6D6 /* ConditionTests.swift in Sources */,
 				9949AC8FB26861F08331ABB4 /* LocationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -441,9 +468,11 @@
 				F2B6C3B96207EDAC50534778 /* AuthService.swift in Sources */,
 				E9335A4D7E97026DC2B194E8 /* AuthenticationFlowView.swift in Sources */,
 				F38C272C989382EB938B8EC8 /* CatchCard.swift in Sources */,
+				A4C1A9297F6CD8422EC3B729 /* CatchConditionsEditor.swift in Sources */,
 				879092C5467F9A7E4D17F1AD /* CatchDetailView.swift in Sources */,
 				FC89B928978FE70B0D8CF16E /* CatchDiscovery.swift in Sources */,
 				07355BB0CD4FBE7DA51314B9 /* CatchFormatting.swift in Sources */,
+				E068CD122765A8CAB9949980 /* CatchLocationEditor.swift in Sources */,
 				443EA186E7EC7BBA32D195F2 /* CatchLocationService.swift in Sources */,
 				B5D9DBE44925056F44AD4B45 /* CatchMapView.swift in Sources */,
 				C40F8E55C085EF85840F90D0 /* CatchModels.swift in Sources */,
@@ -454,11 +483,13 @@
 				8B13A2B9A3DBB681C8875B67 /* CatchPhotoViews.swift in Sources */,
 				1E292BF35DC0CC215EE3E268 /* CatchRemoteStore.swift in Sources */,
 				68CD66FCBEEF95A0A60D9355 /* CatchRepository.swift in Sources */,
+				87EA90297E973C0C9206F77A /* ConditionModels.swift in Sources */,
 				C6D64A58791A3E614FE85BBD /* FieldInputStyle.swift in Sources */,
 				6E82789F6E3F64C3D68CC25F /* LincolnsReelRecordsApp.swift in Sources */,
 				8AB00FBB94EDE94BE97CA242 /* LocationModels.swift in Sources */,
 				BA1BA35E4C645886A25504DF /* LogbookView.swift in Sources */,
 				22E49FFE50893956E2268ABC /* ManualLocationPicker.swift in Sources */,
+				8C41C09FBBF83C179FCCB12E /* OpenMeteoClient.swift in Sources */,
 				2C3905B0F0A24E451E7E67AD /* PhotoFileStore.swift in Sources */,
 				536BF1612E2BB57A9498C9C8 /* PrimaryButton.swift in Sources */,
 				19A329CE8CAC89CDFF976321 /* ProfilePlaceholderView.swift in Sources */,
@@ -466,6 +497,7 @@
 				D1C96280086F2D82E732781E /* RootView.swift in Sources */,
 				F0664340C243646F9D9B2CA1 /* SelectionChip.swift in Sources */,
 				B29B50BE600BB6CA4B133492 /* SyncCoordinator.swift in Sources */,
+				DFC644268D2E1EEA2DAC5617 /* UnitInput.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

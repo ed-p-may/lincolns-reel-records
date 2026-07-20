@@ -186,6 +186,46 @@ final class TracerBulletUITests: XCTestCase {
         XCTAssertFalse(app.buttons["add.save"].isEnabled)
     }
 
+    func testManualConditionsSaveWithoutWeatherService() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing"]
+        app.launch()
+
+        XCTAssertTrue(app.buttons["log.empty.add"].waitForExistence(timeout: 5))
+        app.buttons["log.empty.add"].tap()
+        app.buttons["add.species.Smallmouth Bass"].tap()
+
+        let form = app.scrollViews.firstMatch
+        form.swipeUp()
+        let airTemperature = app.textFields["add.air-temperature"]
+        XCTAssertTrue(airTemperature.waitForExistence(timeout: 3))
+        airTemperature.tap()
+        airTemperature.typeText("72.5")
+        form.swipeDown()
+        let waterTemperature = app.textFields["add.water-temperature"]
+        waterTemperature.tap()
+        waterTemperature.typeText("64")
+        form.swipeUp()
+
+        let rain = app.buttons["add.sky.rain"]
+        XCTAssertTrue(rain.waitForExistence(timeout: 3))
+        rain.tap()
+        let stained = app.buttons["add.clarity.stained"]
+        XCTAssertTrue(stained.waitForExistence(timeout: 3))
+        stained.tap()
+        app.buttons["add.save"].tap()
+
+        let species = app.staticTexts["Smallmouth Bass"]
+        XCTAssertTrue(species.waitForExistence(timeout: 5))
+        species.tap()
+        let detail = app.scrollViews.firstMatch
+        detail.swipeUp()
+        XCTAssertTrue(app.staticTexts["72.5°F"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Rain"].exists)
+        XCTAssertTrue(app.staticTexts["64°F"].exists)
+        XCTAssertTrue(app.staticTexts["Stained"].exists)
+    }
+
     func testLogAndDetailRemainNavigableAtLargestAccessibilityText() {
         let app = XCUIApplication()
         app.launchArguments = [

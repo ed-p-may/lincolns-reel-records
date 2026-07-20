@@ -19,9 +19,13 @@ final class AppDependencies {
     let locationService: CatchLocationService
     let modelContainer: ModelContainer
     let syncCoordinator: SyncCoordinator
+    let weatherSuggestionProvider: any WeatherSuggestionProviding
 
     init(isUITesting: Bool = AppDependencies.isRunningTests) {
         locationService = CatchLocationService()
+        weatherSuggestionProvider = isUITesting
+            ? UnavailableWeatherSuggestionProvider()
+            : OpenMeteoClient()
         do {
             let modelConfiguration = ModelConfiguration(isStoredInMemoryOnly: isUITesting)
             let container = try ModelContainer(
@@ -112,6 +116,12 @@ final class AppDependencies {
                 caughtAt: Date(timeIntervalSince1970: 1_753_000_000),
                 location: "Stockbridge Bowl North Shore By The Old Stone Landing",
                 coordinate: CatchCoordinate(latitude: 42.3169, longitude: -73.3226),
+                conditions: CatchConditions(
+                    airTemperatureF: 72,
+                    skyCondition: .partlyCloudy,
+                    waterTemperatureF: 65,
+                    waterClarity: .stained
+                ),
                 lureText: "Green pumpkin jig",
                 rodReel: "7-foot medium spinning rod",
                 notes: "Calm morning with a long field note to verify that the complete story remains readable.",
@@ -127,6 +137,12 @@ final class AppDependencies {
                 caughtAt: Date(timeIntervalSince1970: 1_752_000_000),
                 location: "Lake Mansfield",
                 coordinate: CatchCoordinate(latitude: 42.1951, longitude: -73.3544),
+                conditions: CatchConditions(
+                    airTemperatureF: 61,
+                    skyCondition: .overcast,
+                    waterTemperatureF: 58,
+                    waterClarity: .clear
+                ),
                 lureText: "Café spoon",
                 rodReel: nil,
                 notes: "Caught beside the old dock.",

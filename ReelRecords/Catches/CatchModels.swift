@@ -26,6 +26,10 @@ final class CatchRecord {
     var location: String?
     var latitude: Double?
     var longitude: Double?
+    var airTemperatureF: Double?
+    var skyConditionRaw: String?
+    var waterTemperatureF: Double?
+    var waterClarityRaw: String?
     var lureText: String?
     var rodReel: String?
     var notes: String?
@@ -51,6 +55,7 @@ final class CatchRecord {
         caughtAt: Date,
         location: String? = nil,
         coordinate: CatchCoordinate? = nil,
+        conditions: CatchConditions = .empty,
         lureText: String? = nil,
         rodReel: String? = nil,
         notes: String? = nil,
@@ -71,6 +76,10 @@ final class CatchRecord {
         self.location = location
         latitude = coordinate?.latitude
         longitude = coordinate?.longitude
+        airTemperatureF = conditions.airTemperatureF
+        skyConditionRaw = conditions.skyCondition?.storageValue
+        waterTemperatureF = conditions.waterTemperatureF
+        waterClarityRaw = conditions.waterClarity?.storageValue
         self.lureText = lureText
         self.rodReel = rodReel
         self.notes = notes
@@ -134,6 +143,7 @@ struct CatchValues: Equatable, Sendable {
     let caughtAt: Date
     let location: String?
     let coordinate: CatchCoordinate?
+    let conditions: CatchConditions
     let lureText: String?
     let rodReel: String?
     let notes: String?
@@ -146,6 +156,7 @@ struct CatchValues: Equatable, Sendable {
         caughtAt: Date,
         location: String?,
         coordinate: CatchCoordinate? = nil,
+        conditions: CatchConditions = .empty,
         lureText: String?,
         rodReel: String?,
         notes: String?,
@@ -157,6 +168,7 @@ struct CatchValues: Equatable, Sendable {
         self.caughtAt = caughtAt
         self.location = location
         self.coordinate = coordinate
+        self.conditions = conditions
         self.lureText = lureText
         self.rodReel = rodReel
         self.notes = notes
@@ -197,6 +209,10 @@ struct CatchItem: Identifiable, Equatable, Sendable {
 
     var coordinate: CatchCoordinate? {
         values.coordinate
+    }
+
+    var conditions: CatchConditions {
+        values.conditions
     }
 
     var lureText: String? {
@@ -266,6 +282,7 @@ enum CatchValidationError: LocalizedError, Equatable {
     case speciesRequired
     case invalidWeight
     case invalidLength
+    case invalidTemperature
 
     var errorDescription: String? {
         switch self {
@@ -275,6 +292,8 @@ enum CatchValidationError: LocalizedError, Equatable {
             "Enter a valid weight of zero or more pounds."
         case .invalidLength:
             "Enter a valid length of zero or more inches."
+        case .invalidTemperature:
+            "Enter a valid temperature."
         }
     }
 }
@@ -288,6 +307,12 @@ extension CatchRecord {
             caughtAt: caughtAt,
             location: location,
             coordinate: CatchCoordinate(latitude: latitude, longitude: longitude),
+            conditions: CatchConditions(
+                airTemperatureF: airTemperatureF,
+                skyCondition: skyConditionRaw.map(SkyCondition.init(storageValue:)),
+                waterTemperatureF: waterTemperatureF,
+                waterClarity: waterClarityRaw.map(WaterClarity.init(storageValue:))
+            ),
             lureText: lureText,
             rodReel: rodReel,
             notes: notes,

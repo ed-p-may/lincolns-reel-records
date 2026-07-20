@@ -10,8 +10,8 @@ slices. Read the high-level plan and the relevant product/design documents befor
 | 03 | [`03-logbook-detail.md`](03-logbook-detail.md) | Complete |
 | 04 | [`04-photos.md`](04-photos.md) | Complete |
 | 05 | [`05-location-map.md`](05-location-map.md) | Complete |
-| 06 | [`06-conditions.md`](06-conditions.md) | Ready |
-| 07 | [`07-dashboard.md`](07-dashboard.md) | Planned |
+| 06 | [`06-conditions.md`](06-conditions.md) | Complete |
+| 07 | [`07-dashboard.md`](07-dashboard.md) | Ready |
 | 08 | [`08-tackle-box.md`](08-tackle-box.md) | Planned |
 | 09 | [`09-profile-settings.md`](09-profile-settings.md) | Planned |
 | 10 | [`10-bookmark-share.md`](10-bookmark-share.md) | Planned |

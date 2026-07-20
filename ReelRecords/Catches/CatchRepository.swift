@@ -57,6 +57,7 @@ final class SwiftDataCatchRepository {
             caughtAt: values.caughtAt,
             location: values.location,
             coordinate: values.coordinate,
+            conditions: values.conditions,
             lureText: values.lureText,
             rodReel: values.rodReel,
             notes: values.notes,
@@ -250,8 +251,10 @@ final class SwiftDataCatchRepository {
         }
         return didChange
     }
+}
 
-    private func validated(_ proposedValues: CatchValues) throws -> CatchValues {
+private extension SwiftDataCatchRepository {
+    func validated(_ proposedValues: CatchValues) throws -> CatchValues {
         let species = proposedValues.species.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !species.isEmpty else { throw CatchValidationError.speciesRequired }
         if let weight = proposedValues.weight, !weight.isFinite || weight < 0 {
@@ -260,6 +263,9 @@ final class SwiftDataCatchRepository {
         if let length = proposedValues.length, !length.isFinite || length < 0 {
             throw CatchValidationError.invalidLength
         }
+        guard proposedValues.conditions.airTemperatureF?.isFinite != false,
+              proposedValues.conditions.waterTemperatureF?.isFinite != false
+        else { throw CatchValidationError.invalidTemperature }
         return CatchValues(
             species: species,
             weight: proposedValues.weight,
@@ -267,6 +273,7 @@ final class SwiftDataCatchRepository {
             caughtAt: proposedValues.caughtAt,
             location: normalized(proposedValues.location),
             coordinate: proposedValues.coordinate,
+            conditions: proposedValues.conditions,
             lureText: normalized(proposedValues.lureText),
             rodReel: normalized(proposedValues.rodReel),
             notes: normalized(proposedValues.notes),
@@ -274,12 +281,12 @@ final class SwiftDataCatchRepository {
         )
     }
 
-    private func normalized(_ value: String?) -> String? {
+    func normalized(_ value: String?) -> String? {
         let trimmed = value?.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed?.isEmpty == false ? trimmed : nil
     }
 
-    private func apply(_ values: CatchValues, to record: CatchRecord) {
+    func apply(_ values: CatchValues, to record: CatchRecord) {
         record.species = values.species
         record.weight = values.weight
         record.length = values.length
@@ -287,13 +294,17 @@ final class SwiftDataCatchRepository {
         record.location = values.location
         record.latitude = values.coordinate?.latitude
         record.longitude = values.coordinate?.longitude
+        record.airTemperatureF = values.conditions.airTemperatureF
+        record.skyConditionRaw = values.conditions.skyCondition?.storageValue
+        record.waterTemperatureF = values.conditions.waterTemperatureF
+        record.waterClarityRaw = values.conditions.waterClarity?.storageValue
         record.lureText = values.lureText
         record.rodReel = values.rodReel
         record.notes = values.notes
         record.released = values.released
     }
 
-    private func apply(_ remote: RemoteCatch, to record: CatchRecord) {
+    func apply(_ remote: RemoteCatch, to record: CatchRecord) {
         apply(remote.values, to: record)
         record.createdAt = remote.createdAt
         record.updatedAt = remote.updatedAt
@@ -301,7 +312,7 @@ final class SwiftDataCatchRepository {
         record.remoteVersion = remote.version
     }
 
-    private func record(from remote: RemoteCatch) -> CatchRecord {
+    func record(from remote: RemoteCatch) -> CatchRecord {
         let record = CatchRecord(
             id: remote.id,
             ownerID: remote.ownerID,
@@ -313,35 +324,35 @@ final class SwiftDataCatchRepository {
         return record
     }
 
-    private func record(id: UUID, ownerID: UUID) throws -> CatchRecord? {
+    func record(id: UUID, ownerID: UUID) throws -> CatchRecord? {
         let descriptor = FetchDescriptor<CatchRecord>(
             predicate: #Predicate { $0.id == id && $0.ownerID == ownerID }
         )
         return try modelContext.fetch(descriptor).first
     }
 
-    private func operation(catchID: UUID, ownerID: UUID) throws -> OutboxOperation? {
+    func operation(catchID: UUID, ownerID: UUID) throws -> OutboxOperation? {
         let descriptor = FetchDescriptor<OutboxOperation>(
             predicate: #Predicate { $0.catchID == catchID && $0.ownerID == ownerID }
         )
         return try modelContext.fetch(descriptor).first
     }
 
-    private func operation(id: UUID, ownerID: UUID) throws -> OutboxOperation? {
+    func operation(id: UUID, ownerID: UUID) throws -> OutboxOperation? {
         let descriptor = FetchDescriptor<OutboxOperation>(
             predicate: #Predicate { $0.id == id && $0.ownerID == ownerID }
         )
         return try modelContext.fetch(descriptor).first
     }
 
-    private func catchRecords(ownerID: UUID) throws -> [CatchRecord] {
+    func catchRecords(ownerID: UUID) throws -> [CatchRecord] {
         let descriptor = FetchDescriptor<CatchRecord>(
             predicate: #Predicate { $0.ownerID == ownerID }
         )
         return try modelContext.fetch(descriptor)
     }
 
-    private func outboxOperations(ownerID: UUID) throws -> [OutboxOperation] {
+    func outboxOperations(ownerID: UUID) throws -> [OutboxOperation] {
         let descriptor = FetchDescriptor<OutboxOperation>(
             predicate: #Predicate { $0.ownerID == ownerID },
             sortBy: [SortDescriptor(\OutboxOperation.createdAt)]
@@ -349,7 +360,7 @@ final class SwiftDataCatchRepository {
         return try modelContext.fetch(descriptor)
     }
 
-    private func localState(for mutation: PendingCatchMutation) throws -> PendingLocalState {
+    func localState(for mutation: PendingCatchMutation) throws -> PendingLocalState {
         let ownerID = mutation.catchItem.ownerID
         guard let record = try record(id: mutation.catchItem.id, ownerID: ownerID) else {
             throw CatchRepositoryError.missingCatch(mutation.catchItem.id)

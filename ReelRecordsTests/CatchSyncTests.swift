@@ -10,9 +10,15 @@ final class CatchSyncTests: XCTestCase {
         let remoteStore = InMemoryCatchRemoteStore()
         let coordinator = SyncCoordinator(repository: store.repository, remoteStore: remoteStore)
         let coordinate = try XCTUnwrap(CatchCoordinate(latitude: 42.3169, longitude: -73.3226))
+        let conditions = CatchConditions(
+            airTemperatureF: 71,
+            skyCondition: .sunny,
+            waterTemperatureF: 64.5,
+            waterClarity: .clear
+        )
         let created = try store.repository.create(NewCatch(
             ownerID: ownerID,
-            values: values(species: "Rainbow Trout", coordinate: coordinate)
+            values: values(species: "Rainbow Trout", coordinate: coordinate, conditions: conditions)
         ))
 
         await coordinator.sync(ownerID: ownerID)
@@ -20,6 +26,7 @@ final class CatchSyncTests: XCTestCase {
         let synced = try XCTUnwrap(store.repository.item(id: created.id, ownerID: ownerID))
         XCTAssertEqual(synced.syncState, .synced)
         XCTAssertEqual(synced.coordinate, coordinate)
+        XCTAssertEqual(synced.conditions, conditions)
         XCTAssertEqual(synced.remoteVersion, 1)
         XCTAssertEqual(try store.repository.pendingCount(ownerID: ownerID), 0)
 
@@ -117,6 +124,7 @@ final class CatchSyncTests: XCTestCase {
                 caughtAt: created.caughtAt.addingTimeInterval(0.005),
                 location: created.location,
                 coordinate: created.coordinate,
+                conditions: created.conditions,
                 lureText: created.lureText,
                 rodReel: created.rodReel,
                 notes: created.notes,
@@ -169,6 +177,12 @@ final class CatchSyncTests: XCTestCase {
                 length: 19,
                 location: "Lake Mansfield",
                 coordinate: CatchCoordinate(latitude: 42.1965, longitude: -73.3526),
+                conditions: CatchConditions(
+                    airTemperatureF: 68,
+                    skyCondition: .overcast,
+                    waterTemperatureF: 62,
+                    waterClarity: .stained
+                ),
                 lureText: "Spinnerbait",
                 rodReel: "Medium casting",
                 notes: "Initial note",
@@ -187,6 +201,10 @@ final class CatchSyncTests: XCTestCase {
         XCTAssertEqual(reopened.length, 19)
         XCTAssertEqual(reopened.location, "Lake Mansfield")
         XCTAssertEqual(reopened.coordinate, CatchCoordinate(latitude: 42.1965, longitude: -73.3526))
+        XCTAssertEqual(reopened.conditions.airTemperatureF, 68)
+        XCTAssertEqual(reopened.conditions.skyCondition, .overcast)
+        XCTAssertEqual(reopened.conditions.waterTemperatureF, 62)
+        XCTAssertEqual(reopened.conditions.waterClarity, .stained)
         XCTAssertEqual(reopened.lureText, "Spinnerbait")
         XCTAssertEqual(reopened.rodReel, "Medium casting")
         XCTAssertEqual(reopened.notes, "Initial note")
@@ -240,6 +258,7 @@ final class CatchSyncTests: XCTestCase {
         caughtAt: Date = Date(timeIntervalSince1970: 1_700_000_000),
         location: String? = nil,
         coordinate: CatchCoordinate? = nil,
+        conditions: CatchConditions = .empty,
         lureText: String? = nil,
         rodReel: String? = nil,
         notes: String? = nil,
@@ -252,6 +271,7 @@ final class CatchSyncTests: XCTestCase {
             caughtAt: caughtAt,
             location: location,
             coordinate: coordinate,
+            conditions: conditions,
             lureText: lureText,
             rodReel: rodReel,
             notes: notes,

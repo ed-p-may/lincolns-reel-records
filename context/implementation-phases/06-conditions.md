@@ -1,6 +1,6 @@
 # Phase 06 — Weather and Water Conditions
 
-**Status:** Ready
+**Status:** Complete
 **Depends on:** Phase 05 complete  
 **Primary stories:** A4 (conditions subset), B1, B5, E5
 
@@ -67,7 +67,13 @@ refresh; storing raw provider payloads; A4's structured Tackle Box gear path (Ph
 
 ## Closeout record
 
-- TestFlight build: _TBD_
-- Schema/WMO decision references: _TBD_
-- Automated checks: _TBD_
-- Online/offline device evidence: _TBD_
+- TestFlight build: no Phase 06 build; signed build `0.1.0 (3)` remains current and the hosted
+  migration/signed release gate is deferred to Phase 11.
+- Schema/WMO decision references: `context/decisions.md` (2026-07-19, Phase 06 weather enrichment
+  policy) and `supabase/migrations/20260719235500_phase_06_catch_conditions.sql`.
+- Automated checks: `make ci` passes with SwiftFormat and strict SwiftLint clean, 50 Swift unit tests,
+  7 Simulator UI tests, and 59 local pgTAP assertions across 5 database test files.
+- Simulator evidence: all four values save manually while the provider is unavailable and recover on
+  Catch Detail with the expected labels and units.
+- Physical/live-provider evidence: online GPS/time suggestions, airplane-mode/reconnect, timeout/error,
+  manual-override, hosted sync, and fresh-device icon recovery are deferred to Phase 11.

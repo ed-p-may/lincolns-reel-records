@@ -66,6 +66,9 @@ struct CatchCard: View {
                     systemImage: "calendar"
                 )
                 Label(catchItem.lureText ?? "Lure not recorded", systemImage: "fish.fill")
+                if let conditionSummary {
+                    Label(conditionSummary, systemImage: conditionSystemImage)
+                }
             }
             .font(ReelFont.body(.subheadline))
             .foregroundStyle(ReelTheme.secondaryText)
@@ -150,6 +153,13 @@ struct CatchCard: View {
                 .foregroundStyle(ReelTheme.secondaryText)
                 .lineLimit(1)
             Spacer()
+            if let conditionSummary {
+                Label(conditionSummary, systemImage: conditionSystemImage)
+                    .labelStyle(.titleAndIcon)
+                    .font(ReelFont.body(.caption, weight: .semibold))
+                    .foregroundStyle(ReelTheme.accentHighlight)
+                    .lineLimit(1)
+            }
             DispositionBadge(released: catchItem.released)
         }
         .padding(.horizontal, 14)
@@ -165,11 +175,24 @@ struct CatchCard: View {
             catchItem.location,
             catchItem.caughtAt.formatted(date: .long, time: .shortened),
             catchItem.lureText,
+            conditionSummary,
             catchItem.released ? "Released" : "Kept",
             catchItem.syncState.label
         ]
         .compactMap(\.self)
         .joined(separator: ", ")
+    }
+
+    private var conditionSummary: String? {
+        let values = [
+            catchItem.conditions.skyCondition?.label,
+            catchItem.conditions.airTemperatureF.map(CatchFormatting.temperature)
+        ].compactMap(\.self)
+        return values.isEmpty ? nil : values.joined(separator: " · ")
+    }
+
+    private var conditionSystemImage: String {
+        catchItem.conditions.skyCondition?.systemImage ?? "thermometer.medium"
     }
 }
 

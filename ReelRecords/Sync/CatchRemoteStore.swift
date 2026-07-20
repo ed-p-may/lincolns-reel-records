@@ -16,6 +16,10 @@ private struct CatchDTO: Codable, Sendable {
     let location: String?
     let latitude: Double?
     let longitude: Double?
+    let airTemperatureF: Double?
+    let skyCondition: String?
+    let waterTemperatureF: Double?
+    let waterClarity: String?
     let lureText: String?
     let rodReel: String?
     let notes: String?
@@ -35,6 +39,10 @@ private struct CatchDTO: Codable, Sendable {
         case location
         case latitude
         case longitude
+        case airTemperatureF = "air_temp_f"
+        case skyCondition = "sky_condition"
+        case waterTemperatureF = "water_temp_f"
+        case waterClarity = "water_clarity"
         case lureText = "lure_text"
         case rodReel = "rod_reel"
         case notes
@@ -55,6 +63,10 @@ private struct CatchDTO: Codable, Sendable {
         location = catchItem.values.location
         latitude = catchItem.values.coordinate?.latitude
         longitude = catchItem.values.coordinate?.longitude
+        airTemperatureF = catchItem.values.conditions.airTemperatureF
+        skyCondition = catchItem.values.conditions.skyCondition?.storageValue
+        waterTemperatureF = catchItem.values.conditions.waterTemperatureF
+        waterClarity = catchItem.values.conditions.waterClarity?.storageValue
         lureText = catchItem.values.lureText
         rodReel = catchItem.values.rodReel
         notes = catchItem.values.notes
@@ -76,6 +88,12 @@ private struct CatchDTO: Codable, Sendable {
                 caughtAt: caughtAt,
                 location: location,
                 coordinate: CatchCoordinate(latitude: latitude, longitude: longitude),
+                conditions: CatchConditions(
+                    airTemperatureF: airTemperatureF,
+                    skyCondition: skyCondition.map(SkyCondition.init(storageValue:)),
+                    waterTemperatureF: waterTemperatureF,
+                    waterClarity: waterClarity.map(WaterClarity.init(storageValue:))
+                ),
                 lureText: lureText,
                 rodReel: rodReel,
                 notes: notes,
@@ -103,6 +121,10 @@ struct CatchUpdateDTO: Encodable, Sendable {
         case location
         case latitude
         case longitude
+        case airTemperatureF = "air_temp_f"
+        case skyCondition = "sky_condition"
+        case waterTemperatureF = "water_temp_f"
+        case waterClarity = "water_clarity"
         case lureText = "lure_text"
         case rodReel = "rod_reel"
         case notes
@@ -128,6 +150,10 @@ struct CatchUpdateDTO: Encodable, Sendable {
         try container.encode(values.location, forKey: .location)
         try container.encode(values.coordinate?.latitude, forKey: .latitude)
         try container.encode(values.coordinate?.longitude, forKey: .longitude)
+        try container.encode(values.conditions.airTemperatureF, forKey: .airTemperatureF)
+        try container.encode(values.conditions.skyCondition?.storageValue, forKey: .skyCondition)
+        try container.encode(values.conditions.waterTemperatureF, forKey: .waterTemperatureF)
+        try container.encode(values.conditions.waterClarity?.storageValue, forKey: .waterClarity)
         try container.encode(values.lureText, forKey: .lureText)
         try container.encode(values.rodReel, forKey: .rodReel)
         try container.encode(values.notes, forKey: .notes)
@@ -274,6 +300,7 @@ private extension CatchValues {
             && abs(caughtAt.timeIntervalSince(other.caughtAt)) < 0.01
             && location == other.location
             && coordinate == other.coordinate
+            && conditions == other.conditions
             && lureText == other.lureText
             && rodReel == other.rodReel
             && notes == other.notes

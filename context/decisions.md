@@ -9,6 +9,28 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-07-19 — Weather suggestion request, mapping, and draft precedence contract
+- **Context:** Phase 06 must enrich an offline-first Catch draft without turning hourly model data,
+  network latency, or a late response into authoritative user data. Open-Meteo exposes hourly
+  `temperature_2m`, WMO `weather_code`, and `is_day` values in Fahrenheit and Unix time.
+- **Decision:**
+  - Request one UTC three-day window around `caughtAt`, then choose the closest complete hourly sample
+    within 90 minutes. Use the Forecast API for catches from the prior five days through its 16-day
+    horizon and the Historical Weather API for older catches; dates beyond the forecast horizon receive
+    no suggestion. Both use `temperature_unit=fahrenheit`, `timeformat=unixtime`, and GMT.
+  - Debounce automatic requests by 400 ms. A request key rounds coordinates to four decimals and time
+    to the nearest hour; one form session caches completed keys and cancels an obsolete in-flight key.
+    Requests time out after five seconds and failures remain an inline, non-blocking state.
+  - Map WMO 0–1 to `sunny` by day and `clear_night` at night; 2 to `partly_cloudy`; 3 and snow codes
+    71–77/85–86 to `overcast`; 45/48 to `fog`; drizzle, freezing precipitation, rain, showers, and
+    thunderstorms to `rain`. Unknown future codes produce no sky suggestion rather than a false label.
+  - Air temperature and sky condition track provenance in the draft only. A response may fill an empty,
+    untouched field; any manual selection, entry, or clear permanently wins for that form session.
+    Persist only the resulting values, never provenance, request keys, WMO codes, or raw responses.
+- **Consequences:** Fixtures test request/decoding/mapping without live availability. Water temperature
+  and clarity remain fully manual. The physical online/offline and real-provider pass is consolidated in
+  Phase 11 with the final signed build.
+
 ## 2026-07-19 — Foreground location capture and manual MapKit fallback contract
 - **Context:** Phase 05 needs useful coordinates without making Catch save depend on permission,
   satellite availability, Apple search, or a network connection. The named spot must stay human-owned

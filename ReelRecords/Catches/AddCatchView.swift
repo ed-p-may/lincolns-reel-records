@@ -17,6 +17,7 @@ struct AddCatchView: View {
     @Environment(SwiftDataCatchPhotoRepository.self) private var photoRepository
     @Environment(CatchLocationService.self) private var locationService
     @Environment(SyncCoordinator.self) private var syncCoordinator
+    @Environment(\.weatherSuggestionProvider) private var weatherSuggestionProvider
     @State private var selectedSpecies: String
     @State private var customSpecies: String
     @State private var weight: String
@@ -24,6 +25,14 @@ struct AddCatchView: View {
     @State private var caughtAt: Date
     @State private var location: String
     @State private var coordinate: CatchCoordinate?
+    @State private var airTemperature: String
+    @State private var skyCondition: SkyCondition?
+    @State private var waterTemperature: String
+    @State private var waterClarity: WaterClarity?
+    @State private var conditionDraft: ConditionEnrichmentDraft
+    @State private var completedWeatherKeys: [WeatherRequestKey] = []
+    @State private var fetchingWeatherKey: WeatherRequestKey?
+    @State private var weatherSuggestionMessage: String?
     @State private var lureText: String
     @State private var rodReel: String
     @State private var notes: String
@@ -55,6 +64,12 @@ struct AddCatchView: View {
         _caughtAt = State(initialValue: values?.caughtAt ?? .now)
         _location = State(initialValue: values?.location ?? "")
         _coordinate = State(initialValue: values?.coordinate)
+        let conditions = values?.conditions ?? .empty
+        _airTemperature = State(initialValue: CatchFormatting.input(conditions.airTemperatureF))
+        _skyCondition = State(initialValue: conditions.skyCondition)
+        _waterTemperature = State(initialValue: CatchFormatting.input(conditions.waterTemperatureF))
+        _waterClarity = State(initialValue: conditions.waterClarity)
+        _conditionDraft = State(initialValue: ConditionEnrichmentDraft(conditions: conditions))
         _lureText = State(initialValue: values?.lureText ?? "")
         _rodReel = State(initialValue: values?.rodReel ?? "")
         _notes = State(initialValue: values?.notes ?? "")
@@ -76,6 +91,7 @@ struct AddCatchView: View {
                         coordinate: $coordinate,
                         isChoosingLocation: $isChoosingLocation
                     )
+                    conditionsSection
                     textSection
                     releaseSection
 
@@ -110,6 +126,9 @@ struct AddCatchView: View {
         .task {
             locationService.reset()
             loadPhotos()
+        }
+        .task(id: weatherRequestKey) {
+            await suggestWeatherIfNeeded()
         }
         .onChange(of: locationService.state) { _, state in
             if case let .captured(capturedCoordinate, _) = state {
@@ -204,6 +223,21 @@ struct AddCatchView: View {
         }
     }
 
+    private var conditionsSection: some View {
+        CatchConditionsEditor(
+            airTemperature: $airTemperature,
+            skyCondition: $skyCondition,
+            waterTemperature: $waterTemperature,
+            waterClarity: $waterClarity,
+            airIsSuggested: conditionDraft.airSource == .suggested,
+            skyIsSuggested: conditionDraft.skySource == .suggested,
+            isFetching: fetchingWeatherKey != nil,
+            message: weatherSuggestionMessage,
+            onAirEdited: { conditionDraft.markAirTemperatureManual() },
+            onSkyEdited: { conditionDraft.markSkyConditionManual() }
+        )
+    }
+
     private var releaseSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             fieldLabel("Disposition")
@@ -221,6 +255,10 @@ private extension AddCatchView {
     private var finalSpecies: String {
         let custom = customSpecies.trimmingCharacters(in: .whitespacesAndNewlines)
         return custom.isEmpty ? selectedSpecies : custom
+    }
+
+    private var weatherRequestKey: WeatherRequestKey? {
+        coordinate.map { WeatherRequestKey(coordinate: $0, caughtAt: caughtAt) }
     }
 
     private func fieldLabel(_ text: String) -> some View {
@@ -244,15 +282,13 @@ private extension AddCatchView {
         text: Binding<String>,
         identifier: String
     ) -> some View {
-        HStack(spacing: 8) {
-            TextField(title, text: text)
-                .keyboardType(.decimalPad)
-                .accessibilityIdentifier(identifier)
-            Text(unit)
-                .font(ReelFont.metadata(.caption))
-                .foregroundStyle(ReelTheme.secondaryText)
-        }
-        .fieldInputStyle()
+        UnitInput(
+            title,
+            unit: unit,
+            text: text,
+            keyboardType: .decimalPad,
+            identifier: identifier
+        )
     }
 
     private func save() {
@@ -265,6 +301,12 @@ private extension AddCatchView {
                 caughtAt: caughtAt,
                 location: location,
                 coordinate: coordinate,
+                conditions: CatchConditions(
+                    airTemperatureF: CatchFormatting.parseOptionalTemperature(airTemperature),
+                    skyCondition: skyCondition,
+                    waterTemperatureF: CatchFormatting.parseOptionalTemperature(waterTemperature),
+                    waterClarity: waterClarity
+                ),
                 lureText: lureText,
                 rodReel: rodReel,
                 notes: notes,
@@ -316,6 +358,58 @@ private extension AddCatchView {
         }
     }
 
+    @MainActor
+    private func suggestWeatherIfNeeded() async {
+        guard let coordinate, let key = weatherRequestKey,
+              conditionDraft.airSource == nil || conditionDraft.skySource == nil,
+              !completedWeatherKeys.contains(key)
+        else {
+            return
+        }
+
+        do {
+            try await Task.sleep(for: .milliseconds(400))
+            try Task.checkCancellation()
+            fetchingWeatherKey = key
+            weatherSuggestionMessage = nil
+            defer {
+                if fetchingWeatherKey == key {
+                    fetchingWeatherKey = nil
+                }
+            }
+            let suggestion = try await weatherSuggestionProvider.suggestion(
+                at: coordinate,
+                caughtAt: caughtAt
+            )
+            markWeatherRequestCompleted(key)
+            guard let suggestion, weatherRequestKey == key else {
+                return
+            }
+
+            let applied = conditionDraft.apply(suggestion)
+            if let airTemperatureF = applied.airTemperatureF {
+                airTemperature = CatchFormatting.input(airTemperatureF)
+            }
+            if let suggestedSky = applied.skyCondition {
+                skyCondition = suggestedSky
+            }
+        } catch is CancellationError {
+            return
+        } catch {
+            if weatherRequestKey == key {
+                weatherSuggestionMessage = "Weather suggestion unavailable. Enter conditions manually."
+            }
+        }
+    }
+
+    private func markWeatherRequestCompleted(_ key: WeatherRequestKey) {
+        completedWeatherKeys.removeAll { $0 == key }
+        completedWeatherKeys.append(key)
+        if completedWeatherKeys.count > 8 {
+            completedWeatherKeys.removeFirst(completedWeatherKeys.count - 8)
+        }
+    }
+
     private func notifySaved() {
         guard !didNotifySaved else { return }
         didNotifySaved = true
@@ -326,92 +420,5 @@ private extension AddCatchView {
         locationService.reset()
         try? photoRepository.discardDrafts(sessionID: photoSessionID)
         dismiss()
-    }
-}
-
-private struct CatchLocationEditor: View {
-    @Environment(CatchLocationService.self) private var locationService
-    @Binding var location: String
-    @Binding var coordinate: CatchCoordinate?
-    @Binding var isChoosingLocation: Bool
-
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("LOCATION")
-                .font(ReelFont.metadata(.caption2, weight: .bold))
-                .tracking(1)
-                .foregroundStyle(ReelTheme.tertiaryText)
-            TextField("Named spot", text: $location)
-                .textInputAutocapitalization(.words)
-                .fieldInputStyle()
-                .accessibilityIdentifier("add.location")
-            pinEditor
-        }
-    }
-
-    private var pinEditor: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            HStack(spacing: 10) {
-                Image(systemName: coordinate == nil ? "mappin.slash" : "mappin.and.ellipse")
-                    .font(.title3)
-                    .foregroundStyle(coordinate == nil ? ReelTheme.tertiaryText : ReelTheme.accent)
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(coordinate == nil ? "No coordinate pin" : "Catch pin saved")
-                        .font(ReelFont.body(.subheadline, weight: .bold))
-                        .foregroundStyle(ReelTheme.primaryText)
-                    Text(statusMessage)
-                        .font(ReelFont.body(.caption))
-                        .foregroundStyle(ReelTheme.secondaryText)
-                }
-                Spacer()
-            }
-            ViewThatFits(in: .horizontal) {
-                HStack(spacing: 10) { locationButtons }
-                VStack(spacing: 10) { locationButtons }
-            }
-            if coordinate != nil {
-                Button("Clear Pin", role: .destructive) {
-                    coordinate = nil
-                    locationService.reset()
-                }
-                .frame(minHeight: 44)
-                .accessibilityIdentifier("add.location.clear")
-            }
-        }
-        .padding(14)
-        .background(ReelTheme.surface, in: RoundedRectangle(cornerRadius: 18))
-        .overlay { RoundedRectangle(cornerRadius: 18).stroke(ReelTheme.border) }
-    }
-
-    @ViewBuilder
-    private var locationButtons: some View {
-        Button {
-            locationService.requestCurrentLocation()
-        } label: {
-            Label("Use Current", systemImage: "location.fill")
-                .frame(maxWidth: .infinity, minHeight: 44)
-        }
-        .buttonStyle(.bordered)
-        .tint(ReelTheme.accent)
-        .disabled(locationService.state == .requestingPermission || locationService.state == .locating)
-        .accessibilityIdentifier("add.location.current")
-
-        Button {
-            isChoosingLocation = true
-        } label: {
-            Label("Choose on Map", systemImage: "map.fill")
-                .frame(maxWidth: .infinity, minHeight: 44)
-        }
-        .buttonStyle(.bordered)
-        .tint(ReelTheme.accent)
-        .accessibilityIdentifier("add.location.manual")
-    }
-
-    private var statusMessage: String {
-        guard let coordinate else { return locationService.state.message }
-        if case let .captured(captured, _) = locationService.state, captured == coordinate {
-            return locationService.state.message
-        }
-        return coordinate.displayLabel
     }
 }

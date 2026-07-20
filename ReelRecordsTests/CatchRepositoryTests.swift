@@ -19,6 +19,12 @@ final class CatchRepositoryTests: XCTestCase {
                 caughtAt: caughtAt,
                 location: "  Stockbridge Bowl ",
                 coordinate: coordinate,
+                conditions: CatchConditions(
+                    airTemperatureF: 72.5,
+                    skyCondition: .partlyCloudy,
+                    waterTemperatureF: 66,
+                    waterClarity: .stained
+                ),
                 lureText: "  Green pumpkin jig ",
                 rodReel: "  7-foot medium / spinning ",
                 notes: "  Wind picked up after noon. ",
@@ -32,6 +38,10 @@ final class CatchRepositoryTests: XCTestCase {
         XCTAssertEqual(created.caughtAt, caughtAt)
         XCTAssertEqual(created.location, "Stockbridge Bowl")
         XCTAssertEqual(created.coordinate, coordinate)
+        XCTAssertEqual(created.conditions.airTemperatureF, 72.5)
+        XCTAssertEqual(created.conditions.skyCondition, .partlyCloudy)
+        XCTAssertEqual(created.conditions.waterTemperatureF, 66)
+        XCTAssertEqual(created.conditions.waterClarity, .stained)
         XCTAssertEqual(created.lureText, "Green pumpkin jig")
         XCTAssertEqual(created.rodReel, "7-foot medium / spinning")
         XCTAssertEqual(created.notes, "Wind picked up after noon.")
@@ -54,6 +64,7 @@ final class CatchRepositoryTests: XCTestCase {
         XCTAssertNil(item.length)
         XCTAssertNil(item.location)
         XCTAssertNil(item.coordinate)
+        XCTAssertEqual(item.conditions, .empty)
         XCTAssertNil(item.lureText)
         XCTAssertNil(item.rodReel)
         XCTAssertNil(item.notes)
@@ -109,6 +120,20 @@ final class CatchRepositoryTests: XCTestCase {
             values: values(species: "Perch", length: .infinity)
         ))) { error in
             XCTAssertEqual(error as? CatchValidationError, .invalidLength)
+        }
+        XCTAssertThrowsError(try store.repository.create(NewCatch(
+            ownerID: ownerID,
+            values: values(
+                species: "Perch",
+                conditions: CatchConditions(
+                    airTemperatureF: .nan,
+                    skyCondition: nil,
+                    waterTemperatureF: nil,
+                    waterClarity: nil
+                )
+            )
+        ))) { error in
+            XCTAssertEqual(error as? CatchValidationError, .invalidTemperature)
         }
     }
 
@@ -177,6 +202,7 @@ final class CatchRepositoryTests: XCTestCase {
         caughtAt: Date = Date(timeIntervalSince1970: 1_700_000_000),
         location: String? = nil,
         coordinate: CatchCoordinate? = nil,
+        conditions: CatchConditions = .empty,
         lureText: String? = nil,
         rodReel: String? = nil,
         notes: String? = nil,
@@ -189,6 +215,7 @@ final class CatchRepositoryTests: XCTestCase {
             caughtAt: caughtAt,
             location: location,
             coordinate: coordinate,
+            conditions: conditions,
             lureText: lureText,
             rodReel: rodReel,
             notes: notes,
@@ -218,6 +245,15 @@ final class CatchFormattingTests: XCTestCase {
     func testImperialDisplayFormatting() {
         XCTAssertEqual(CatchFormatting.weight(12.54), "12.5 lb")
         XCTAssertEqual(CatchFormatting.length(18.5), "18.5 in")
+        XCTAssertEqual(CatchFormatting.temperature(72.25), "72.2°F")
+    }
+
+    func testTemperatureParsingAllowsNegativeValuesAndRejectsNonNumericInput() throws {
+        XCTAssertEqual(try CatchFormatting.parseOptionalTemperature(" -4.5 "), -4.5)
+        XCTAssertNil(try CatchFormatting.parseOptionalTemperature("   "))
+        XCTAssertThrowsError(try CatchFormatting.parseOptionalTemperature("warm")) { error in
+            XCTAssertEqual(error as? CatchValidationError, .invalidTemperature)
+        }
     }
 }
 
@@ -232,6 +268,7 @@ final class CatchTransportTests: XCTestCase {
                 length: nil,
                 caughtAt: Date(timeIntervalSince1970: 1_700_000_000),
                 location: nil,
+                conditions: .empty,
                 lureText: nil,
                 rodReel: nil,
                 notes: nil,
@@ -250,8 +287,8 @@ final class CatchTransportTests: XCTestCase {
         XCTAssertNil(object["owner_id"])
         XCTAssertNil(object["created_at"])
         for key in [
-            "weight", "length", "location", "latitude", "longitude", "lure_text", "rod_reel", "notes",
-            "deleted_at"
+            "weight", "length", "location", "latitude", "longitude", "air_temp_f", "sky_condition",
+            "water_temp_f", "water_clarity", "lure_text", "rod_reel", "notes", "deleted_at"
         ] {
             XCTAssertTrue(object[key] is NSNull, "Expected explicit null for \(key)")
         }

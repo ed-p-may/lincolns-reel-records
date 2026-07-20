@@ -13,6 +13,7 @@ struct LincolnsReelRecordsApp: App {
                 .environment(dependencies.catchPhotoRepository)
                 .environment(dependencies.locationService)
                 .environment(dependencies.syncCoordinator)
+                .environment(\.weatherSuggestionProvider, dependencies.weatherSuggestionProvider)
                 .modelContainer(dependencies.modelContainer)
                 .preferredColorScheme(.dark)
         }
