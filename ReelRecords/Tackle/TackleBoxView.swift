@@ -109,7 +109,7 @@ struct TackleBoxView: View {
                     .tracking(1.1)
                     .foregroundStyle(ReelTheme.accentHighlight)
                 Text(showsArchived ? "Retired tackle" : "Ready for the water")
-                    .font(ReelFont.display(24, weight: .heavy))
+                    .reelDisplayFont(24, weight: .heavy)
                     .foregroundStyle(ReelTheme.primaryText)
                 Text("\(items.count) item\(items.count == 1 ? "" : "s")")
                     .font(ReelFont.body(.caption))

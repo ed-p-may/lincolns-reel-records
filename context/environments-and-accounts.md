@@ -52,6 +52,10 @@ Developer account. Do not copy them into this public repository.
 There is no public TestFlight link. Tester email addresses are authoritative in App Store Connect; the
 minor tester's address is intentionally not duplicated in this public repository.
 
+Build `0.1.0 (4)` is reserved in `project.yml` for the Phase 11 release candidate. It has passed an
+unsigned Beta Simulator build and bundle inspection, but it has not been normally signed, archived, or
+uploaded. Build `0.1.0 (3)` remains the only current TestFlight build.
+
 The Phase 01 physical device is an iPhone 16 Pro on iOS 18.6, registered to the developer team with
 Developer Mode enabled. Its serial number and UDID are authoritative in Apple Developer > Devices and
 Xcode > Devices and Simulators, not in Git.
@@ -80,6 +84,9 @@ password, or JWT signing secret must never appear in the app or Git.
 `supabase/config.toml` configures a possible local Supabase stack. Its
 `project_id = "lincolns_reel_records"` is a local CLI identifier, **not** the hosted project reference.
 The local stack is not currently the app's Debug backend, and no production Supabase project exists yet.
+On 2026-07-19, the database-only local stack used by `make ci` remained available, but a full local API
+stack could not start because Docker did not complete the PostgREST and Kong image pulls. Do not point
+Debug at a partially started local stack.
 
 ### Build configuration mapping
 
@@ -136,4 +143,3 @@ Connect Test Information update in the same maintenance action.
 | Signing assets, registered devices | Apple Developer and Xcode |
 | Build availability, tester emails, review credentials | App Store Connect |
 | Product/architecture rationale | `context/decisions.md` |
-

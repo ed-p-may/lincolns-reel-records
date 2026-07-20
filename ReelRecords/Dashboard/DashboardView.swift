@@ -158,7 +158,7 @@ private struct DashboardHeader: View {
                 .textCase(.uppercase)
                 .foregroundStyle(ReelTheme.accent)
             Text("\(greeting), \(greetingName ?? account.username)")
-                .font(ReelFont.display(26, weight: .heavy))
+                .reelDisplayFont(26, weight: .heavy)
                 .foregroundStyle(ReelTheme.primaryText)
                 .lineLimit(2)
                 .minimumScaleFactor(0.8)
@@ -190,6 +190,7 @@ private struct DashboardHero: View {
                 .font(.system(size: 140, weight: .black))
                 .foregroundStyle(ReelTheme.accent.opacity(0.07))
                 .offset(x: 34, y: 28)
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 0) {
                 Text("Total catches logged")
@@ -197,7 +198,7 @@ private struct DashboardHero: View {
                     .foregroundStyle(ReelTheme.secondaryText)
                 HStack(alignment: .lastTextBaseline, spacing: 12) {
                     Text(insights.totalCatches.formatted())
-                        .font(ReelFont.display(58, weight: .black))
+                        .reelDisplayFont(58, weight: .black)
                         .foregroundStyle(.white)
                         .accessibilityIdentifier("dashboard.total")
                     Text("+\(insights.catchesThisWeek) this week")
@@ -213,7 +214,7 @@ private struct DashboardHero: View {
                         .frame(maxWidth: .infinity, minHeight: 50)
                 }
                 .buttonStyle(.plain)
-                .font(ReelFont.display(15, weight: .heavy))
+                .reelDisplayFont(15, weight: .heavy)
                 .foregroundStyle(ReelTheme.accentInk)
                 .background(ReelTheme.accent, in: RoundedRectangle(cornerRadius: 15))
                 .padding(.top, 16)
@@ -227,6 +228,8 @@ private struct DashboardHero: View {
 }
 
 private struct DashboardStatGrid: View {
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
+
     let insights: DashboardInsights
 
     var body: some View {
@@ -256,7 +259,9 @@ private struct DashboardStatGrid: View {
     }
 
     private var columns: [GridItem] {
-        [GridItem(.flexible(), spacing: 12), GridItem(.flexible())]
+        dynamicTypeSize >= .xxxLarge
+            ? [GridItem(.flexible())]
+            : [GridItem(.flexible(), spacing: 12), GridItem(.flexible())]
     }
 }
 
@@ -273,14 +278,11 @@ private struct DashboardStatTile: View {
                 .frame(width: 34, height: 34)
                 .background(ReelTheme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
             Text(value)
-                .font(ReelFont.display(19, weight: .heavy))
+                .reelDisplayFont(19, weight: .heavy)
                 .foregroundStyle(ReelTheme.primaryText)
-                .lineLimit(2)
-                .minimumScaleFactor(0.75)
             Text(detail)
                 .font(ReelFont.body(.caption))
                 .foregroundStyle(ReelTheme.secondaryText)
-                .lineLimit(2)
         }
         .frame(maxWidth: .infinity, minHeight: 132, alignment: .topLeading)
         .padding(15)
@@ -298,13 +300,15 @@ private struct DashboardSectionHeader: View {
     var body: some View {
         HStack {
             Text(title)
-                .font(ReelFont.display(18))
+                .reelDisplayFont(18)
                 .foregroundStyle(ReelTheme.primaryText)
             Spacer()
             if let actionTitle, let action {
                 Button(actionTitle, action: action)
                     .font(ReelFont.body(.caption, weight: .bold))
                     .foregroundStyle(ReelTheme.accent)
+                    .frame(minWidth: 44, minHeight: 44)
+                    .contentShape(Rectangle())
                     .accessibilityIdentifier("dashboard.see-all")
             }
         }
@@ -332,7 +336,7 @@ private struct DashboardRecentCatchCard: View {
                         .foregroundStyle(.white)
                         .padding(.horizontal, 8)
                         .padding(.vertical, 5)
-                        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 8))
+                        .background(ReelTheme.page, in: RoundedRectangle(cornerRadius: 8))
                         .padding(8)
                 }
             }

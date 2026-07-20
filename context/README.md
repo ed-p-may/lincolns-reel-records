@@ -12,6 +12,7 @@ Read the relevant doc before building a feature; keep docs current as decisions 
 | `environments-and-accounts.md` | Operational runbook for Apple, TestFlight, Supabase, build environments, and login accounts. |
 | `implementation-plan.md` | High-level architecture, vertical-slice sequence, and shared completion gate. |
 | `implementation-phases/` | Standalone implementation plans for phases 01–11. |
+| `beta/` | Phase 11 acceptance, privacy, tester, release, and known-limitations packet. |
 
 `PRD.md`, `user-stories.md`, and `design-system.md` are populated from the Claude Design prototype and
 the design decisions. All 9 open PRD questions and the Phase 02 sync conflict/deletion/sign-out

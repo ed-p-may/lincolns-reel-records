@@ -1,7 +1,7 @@
 # Phase 11 — Beta Hardening and Broader TestFlight Release
 
-**Status:** Planned  
-**Depends on:** Phases 01–07 plus every P1 phase selected at the release-scope gate  
+**Status:** In progress — phone-free release preparation; hosted, signed, and physical gates remain
+**Depends on:** Phases 01–10
 **Primary stories:** Cross-cutting validation of all v1 stories
 
 ## Goal
@@ -123,11 +123,18 @@ notifications; full-logbook export; first-class Spots; post-v1 analytics.
 
 ## Closeout record
 
-- Release candidate/TestFlight build: _TBD_
+- Phone-free checkpoint: privacy manifest and disclosures inventoried; Beta bundle/version/purpose
+  strings and privileged-secret scan pass; iPhone 17e and iPhone 17 Pro Max Simulator coverage passes;
+  Dashboard, Log, and Profile pass the automated XCUI accessibility audit after large-text, contrast,
+  decorative-label, and touch-target fixes; icon/launch resources and placeholders are audited. Final
+  `make ci` passes with 0 formatting/lint violations across 75 Swift files, 82 unit tests, 15 UI tests,
+  and 99 pgTAP assertions across 8 database files.
+- Release candidate/TestFlight build: `0.1.0 (4)` is reserved in `project.yml`; the phone-free Beta
+  build passes, but no normally signed archive has been created or uploaded.
 - External tester group: `Reel Records Friends & Family` was created early during Phase 01. Build
   `0.1.0 (3)` is in TestFlight App Review, and Lincoln Fisher has been added by email; the tester has no
   build until Apple approves it. Exact tester addresses remain authoritative in App Store Connect.
-- Acceptance matrix: _TBD_
-- Security/privacy evidence: _TBD_
-- Known limitations: _TBD_
+- Acceptance matrix: [`../beta/acceptance-matrix.md`](../beta/acceptance-matrix.md)
+- Security/privacy evidence: [`../beta/privacy-inventory.md`](../beta/privacy-inventory.md)
+- Known limitations: [`../beta/known-limitations.md`](../beta/known-limitations.md)
 - Beta start date and owner: _TBD_

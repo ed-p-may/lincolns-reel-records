@@ -65,7 +65,7 @@ struct AuthenticationFlowView: View {
                 .foregroundStyle(ReelTheme.accentHighlight)
                 .accessibilityHidden(true)
             Text("LINCOLN'S\nREEL RECORDS")
-                .font(ReelFont.display(48, weight: .black))
+                .reelDisplayFont(48, weight: .black)
                 .tracking(-1)
                 .foregroundStyle(ReelTheme.primaryText)
                 .minimumScaleFactor(0.75)
@@ -83,7 +83,7 @@ struct AuthenticationFlowView: View {
             Button("Log In") {
                 mode = .signIn
             }
-            .font(ReelFont.display(17))
+            .reelDisplayFont(17)
             .foregroundStyle(ReelTheme.primaryText)
             .frame(maxWidth: .infinity, minHeight: 54)
             .background(Color.white.opacity(0.06), in: RoundedRectangle(cornerRadius: 16))
@@ -101,7 +101,7 @@ struct AuthenticationFlowView: View {
             .foregroundStyle(ReelTheme.secondaryText)
 
             Text(isSignUp ? "Create your logbook" : "Welcome back")
-                .font(ReelFont.display(28, weight: .heavy))
+                .reelDisplayFont(28, weight: .heavy)
 
             if isSignUp {
                 TextField("Username", text: $username)

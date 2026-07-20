@@ -54,6 +54,7 @@
 		9E27E19D64541F1A48C6376A /* ProfileRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 628C75146283C217F0D5AA70 /* ProfileRepository.swift */; };
 		A38BD16CC9802436C5E43AD4 /* CatchTackleSection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5D47DADE48AC19360E90B9AC /* CatchTackleSection.swift */; };
 		A4C1A9297F6CD8422EC3B729 /* CatchConditionsEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C91064C704B8FB6367D49F /* CatchConditionsEditor.swift */; };
+		A5313374265BB5E630B552A0 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = AC078EC1F6C14C5B8D164106 /* PrivacyInfo.xcprivacy */; };
 		A650AC8F032BE700F92EBE04 /* TackleItemViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 164548F21D10C427D983F0A5 /* TackleItemViews.swift */; };
 		AEBF5460D726474946C0F16A /* SyncCoordinatorSuspension.swift in Sources */ = {isa = PBXBuildFile; fileRef = E48A40CEF71C14DF4166D192 /* SyncCoordinatorSuspension.swift */; };
 		B29B50BE600BB6CA4B133492 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6BBC96B2E6E83C521FB85DB /* SyncCoordinator.swift */; };
@@ -82,6 +83,7 @@
 		F8C8AD9988A9023B9CCF7B6C /* CatchDetailComponents.swift in Sources */ = {isa = PBXBuildFile; fileRef = E399EDA0EA0554AC51D28008 /* CatchDetailComponents.swift */; };
 		FB2934F10F139E44F9C03DF3 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F0D86C837977BDEF393E34AA /* ProfileView.swift */; };
 		FC89B928978FE70B0D8CF16E /* CatchDiscovery.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF62BC89575F119DD50B7526 /* CatchDiscovery.swift */; };
+		FDDFF67E89A80F640BFEF163 /* BetaHardeningUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FB6CA342B81BA8E34A959167 /* BetaHardeningUITests.swift */; };
 		FE4F136FCFA1157A02D0FADB /* CatchPhotoRepositoryPersistence.swift in Sources */ = {isa = PBXBuildFile; fileRef = 610FDE46141F1D4F863B1E9F /* CatchPhotoRepositoryPersistence.swift */; };
 /* End PBXBuildFile section */
 
@@ -156,6 +158,7 @@
 		A2F96EABC8DC1C4D991C710E /* CatchDiscoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchDiscoveryTests.swift; sourceTree = "<group>"; };
 		A6F4D6EDAC04F93FD449CD07 /* TackleItemEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TackleItemEditor.swift; sourceTree = "<group>"; };
 		AB172ADDBD5EB7D3BEBC20EE /* CatchRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchRepository.swift; sourceTree = "<group>"; };
+		AC078EC1F6C14C5B8D164106 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		B6EE7F4CFAEC93D8C5C08D31 /* DashboardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardTests.swift; sourceTree = "<group>"; };
 		B8DDAE86ED1D2AE8E06A0B91 /* AuthBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthBackend.swift; sourceTree = "<group>"; };
 		BB1D66212FEC995C64FA8427 /* CatchPhotoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoTests.swift; sourceTree = "<group>"; };
@@ -182,6 +185,7 @@
 		F36043304E7F65970C20AFA1 /* CatchPhotoModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoModels.swift; sourceTree = "<group>"; };
 		F4883D943E8D04916E34F942 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		F92A896402809E48A4E52EC9 /* AuthService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthService.swift; sourceTree = "<group>"; };
+		FB6CA342B81BA8E34A959167 /* BetaHardeningUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BetaHardeningUITests.swift; sourceTree = "<group>"; };
 		FD404ACEE983B9A4E920DCC4 /* Debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Debug.xcconfig; sourceTree = "<group>"; };
 		FF62BC89575F119DD50B7526 /* CatchDiscovery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchDiscovery.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -271,6 +275,7 @@
 		413EC4953FAA2F5C0476C018 /* ReelRecordsUITests */ = {
 			isa = PBXGroup;
 			children = (
+				FB6CA342B81BA8E34A959167 /* BetaHardeningUITests.swift */,
 				7B18FAB250BF4623DB4AE9EC /* ProfileUITests.swift */,
 				7D141A6AE25E8E4A917AB711 /* TackleBoxUITests.swift */,
 				8E2E9438AE2DE1AE57573856 /* TracerBulletUITests.swift */,
@@ -303,6 +308,7 @@
 			children = (
 				F4883D943E8D04916E34F942 /* Assets.xcassets */,
 				62165F3A6543C726A57EFC48 /* Info.plist */,
+				AC078EC1F6C14C5B8D164106 /* PrivacyInfo.xcprivacy */,
 			);
 			path = Resources;
 			sourceTree = "<group>";
@@ -540,6 +546,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				2B6BA3F82A8ECDD3916BDE96 /* Assets.xcassets in Resources */,
+				A5313374265BB5E630B552A0 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -569,6 +576,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FDDFF67E89A80F640BFEF163 /* BetaHardeningUITests.swift in Sources */,
 				F7920B489AE20D9AB979777E /* ProfileUITests.swift in Sources */,
 				4AFC15446FE19F38DCE48DBA /* TackleBoxUITests.swift in Sources */,
 				92E0F55AAA42F17F2AFED640 /* TracerBulletUITests.swift in Sources */,
@@ -744,7 +752,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEVELOPMENT_TEAM = JPJ3AJ5U8A;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -811,7 +819,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = JPJ3AJ5U8A;
 				ENABLE_NS_ASSERTIONS = NO;
@@ -906,7 +914,7 @@
 				CLANG_WARN_UNREACHABLE_CODE = YES;
 				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
 				COPY_PHASE_STRIP = NO;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEVELOPMENT_TEAM = JPJ3AJ5U8A;
 				ENABLE_NS_ASSERTIONS = NO;

@@ -97,7 +97,7 @@ struct ProfileView: View {
             ProfileAvatar(url: profile.flatMap(profileRepository.fileURL(for:)), size: 92)
             VStack(spacing: 4) {
                 Text(profile?.displayName ?? account.username)
-                    .font(ReelFont.display(27, weight: .heavy))
+                    .reelDisplayFont(27, weight: .heavy)
                     .multilineTextAlignment(.center)
                     .accessibilityIdentifier("profile.display-name")
                 Text("@\(account.username)")
@@ -111,8 +111,9 @@ struct ProfileView: View {
                 }
             }
             Button("Edit Profile") { isEditing = true }
-                .buttonStyle(.bordered)
+                .buttonStyle(.borderedProminent)
                 .tint(ReelTheme.accent)
+                .foregroundStyle(ReelTheme.accentInk)
                 .accessibilityIdentifier("profile.edit")
         }
         .frame(maxWidth: .infinity)

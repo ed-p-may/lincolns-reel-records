@@ -12,7 +12,7 @@ struct DetailMetricCard: View {
                 .font(ReelFont.metadata(.caption2, weight: .bold))
                 .foregroundStyle(prominent ? ReelTheme.accentHighlight : ReelTheme.secondaryText)
             Text(value ?? "Not recorded")
-                .font(ReelFont.display(value == nil ? 15 : 25, weight: .heavy))
+                .reelDisplayFont(value == nil ? 15 : 25, weight: .heavy)
                 .foregroundStyle(value == nil ? ReelTheme.tertiaryText : textColor)
                 .minimumScaleFactor(0.72)
                 .lineLimit(2)
@@ -61,7 +61,7 @@ struct DetailSection<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
             Text(title)
-                .font(ReelFont.display(17))
+                .reelDisplayFont(17)
                 .foregroundStyle(ReelTheme.primaryText)
             content
         }

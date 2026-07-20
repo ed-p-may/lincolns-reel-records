@@ -92,7 +92,7 @@ struct CatchMapView: View {
                         .background(ReelTheme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
                     VStack(alignment: .leading, spacing: 3) {
                         Text(selectedCatch.species)
-                            .font(ReelFont.display(17))
+                            .reelDisplayFont(17)
                             .foregroundStyle(ReelTheme.primaryText)
                             .lineLimit(1)
                         Text(selectedCatch.location ?? "Named spot not recorded")

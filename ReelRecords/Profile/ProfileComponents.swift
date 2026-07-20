@@ -41,7 +41,7 @@ struct ProfileStatTile: View {
     var body: some View {
         VStack(spacing: 5) {
             Text(value)
-                .font(ReelFont.display(21, weight: .heavy))
+                .reelDisplayFont(21, weight: .heavy)
                 .foregroundStyle(ReelTheme.primaryText)
                 .lineLimit(1)
                 .minimumScaleFactor(0.65)
@@ -65,8 +65,8 @@ struct ProfileCard<Content: View>: View {
         VStack(alignment: .leading, spacing: 14) {
             Text(title.uppercased())
                 .font(ReelFont.metadata(.caption2, weight: .bold))
-                .tracking(0.8)
                 .foregroundStyle(ReelTheme.tertiaryText)
+                .fixedSize(horizontal: false, vertical: true)
             content
         }
         .padding(16)

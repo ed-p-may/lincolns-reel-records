@@ -250,10 +250,11 @@ private struct LogSearchField: View {
         HStack(spacing: 10) {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(ReelTheme.tertiaryText)
-            TextField("Search species, spot, lure, or notes", text: $text)
+            TextField("Search catches", text: $text)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
                 .submitLabel(.search)
+                .accessibilityLabel("Search species, spot, lure, or notes")
                 .accessibilityIdentifier("log.search")
             if !text.isEmpty {
                 Button {

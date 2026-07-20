@@ -17,7 +17,7 @@ struct PrimaryButton: View {
                 }
                 Text(title)
             }
-            .font(ReelFont.display(17, weight: .heavy))
+            .reelDisplayFont(17, weight: .heavy)
             .foregroundStyle(ReelTheme.accentInk)
             .frame(maxWidth: .infinity, minHeight: 56)
             .background(ReelTheme.accent, in: RoundedRectangle(cornerRadius: 16))

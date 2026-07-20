@@ -103,7 +103,7 @@ struct CatchDetailView: View {
                     .tracking(1.2)
                     .foregroundStyle(ReelTheme.accentHighlight)
                 Text(catchItem.species)
-                    .font(ReelFont.display(32, weight: .heavy))
+                    .reelDisplayFont(32, weight: .heavy)
                     .foregroundStyle(.white)
                     .lineLimit(3)
                 HStack(spacing: 12) {

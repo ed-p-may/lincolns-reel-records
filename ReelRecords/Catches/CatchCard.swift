@@ -8,7 +8,7 @@ struct CatchCard: View {
 
     var body: some View {
         Group {
-            if dynamicTypeSize.isAccessibilitySize {
+            if dynamicTypeSize >= .xxxLarge {
                 accessibilityLayout
             } else {
                 regularLayout
@@ -52,7 +52,7 @@ struct CatchCard: View {
                 .clipped()
 
             Text(catchItem.species)
-                .font(ReelFont.display(22, weight: .heavy))
+                .reelDisplayFont(22, weight: .heavy)
                 .foregroundStyle(ReelTheme.primaryText)
 
             ViewThatFits(in: .horizontal) {
@@ -128,7 +128,7 @@ struct CatchCard: View {
     private var titleOverlay: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text(catchItem.species)
-                .font(ReelFont.display(22, weight: .heavy))
+                .reelDisplayFont(22, weight: .heavy)
                 .foregroundStyle(.white)
                 .lineLimit(2)
             HStack(spacing: 12) {
