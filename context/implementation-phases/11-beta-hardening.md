@@ -145,11 +145,16 @@ notifications; full-logbook export; first-class Spots; post-v1 analytics.
   the expected password-recovery URL scheme, and no privileged-key scan hits. It installed over build 4
   on the physical iPhone, and Ed confirmed the real recovery email/deep link/new-password flow succeeds.
   Existing Catches, Profile, and Tackle Box data remained intact after the build-5 upgrade and password
-  reset. The archive privacy report, upload, and App Store processing still need confirmation.
+  reset. Xcode validation passed; the generated archive privacy report matched the six-category privacy
+  inventory with no tracking; App Store Connect processed the upload; and Ed installed the Apple-hosted
+  internal TestFlight build 5 and confirmed Home, Log/photos, Profile, Tackle Box, and Map data remained
+  intact.
 - Build-5 automated gate: `make ci` passes with 0 formatting/lint violations across 75 Swift files,
   85 unit tests, 16 UI tests, and 99 pgTAP assertions across all 8 local migrations.
-- External tester group: `Reel Records Friends & Family` was created early during Phase 01. Build
-  `0.1.0 (3)` is `Waiting for Review`, and Lincoln Fisher has been added by email; the tester has no
+- External tester group: `Reel Records Friends & Family` was created early during Phase 01 and contains
+  Lincoln Fisher by email. Superseded build `0.1.0 (3)` was removed from review and detached from the
+  external group. Verified build `0.1.0 (5)` is assigned to the internal and external groups and is
+  `Waiting for Review` as live-verified in App Store Connect on 2026-07-20. The external tester has no
   build until Apple approves it. Exact tester addresses remain authoritative in App Store Connect.
 - Acceptance matrix: [`../beta/acceptance-matrix.md`](../beta/acceptance-matrix.md)
 - Security/privacy evidence: [`../beta/privacy-inventory.md`](../beta/privacy-inventory.md)

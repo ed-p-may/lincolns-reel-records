@@ -7,9 +7,9 @@ signing material, device identifiers, or tester addresses into logs or this repo
 
 - [ ] Confirm scope is Phases 01–10 with no release-blocking open defects.
 - [x] Confirm `MARKETING_VERSION = 0.1.0` and `CURRENT_PROJECT_VERSION = 5` in `project.yml`.
-- [ ] Regenerate the project and run `make ci` from a clean checkout.
+- [x] Regenerate the project and run `make ci` from a clean checkout.
 - [x] Confirm the privacy manifest is in the built app root.
-- [ ] Generate and inspect the archive privacy report.
+- [x] Generate and inspect the archive privacy report.
 - [ ] Confirm the public privacy-policy URL, feedback contact, beta description, and What to Test copy.
 - [x] Scan tracked files and the built/archive bundle for privileged keys, private keys, dev endpoints,
   personal test data, and verbose sensitive logs.
@@ -37,17 +37,17 @@ availability, preserve evidence/backup, and ship no ad hoc destructive SQL.
 
 - [x] In Xcode, verify the Apple account/team, automatic signing, bundle ID, and Beta archive config.
 - [x] Archive the shared `LincolnReelRecords` scheme normally; do not disable signing for this gate.
-- [ ] Inspect validation/privacy reports and resolve every error before upload.
-- [ ] Upload `0.1.0 (5)` to App Store Connect; record processing and compliance results.
-- [ ] Add it to `Reel Records Internal` only; install over the tested build 4 and repeat a clean install if
+- [x] Inspect validation/privacy reports and resolve every error before upload.
+- [x] Upload `0.1.0 (5)` to App Store Connect; record processing and compliance results.
+- [x] Add it to `Reel Records Internal` only; install over the tested build 4 and repeat a clean install if
   recovery changes affect account state.
 - [ ] Complete every physical/hosted acceptance row before external submission.
 
 ## 4. External beta
 
 - [ ] Put the reviewer credentials only in App Store Connect Test Information and verify them immediately.
-- [ ] Use the private `Reel Records Friends & Family` email-only group; keep public link disabled.
-- [ ] Submit the accepted internal RC for external review with `tester-script.md` What to Test notes.
+- [x] Use the private `Reel Records Friends & Family` email-only group; keep public link disabled.
+- [x] Submit the accepted internal RC for external review with `tester-script.md` What to Test notes.
 - [ ] After approval, add the build to the existing group and verify the named testers receive access.
 - [ ] Monitor TestFlight feedback and triage release blockers without expanding v1 scope.
 

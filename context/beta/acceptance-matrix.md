@@ -40,13 +40,13 @@ evidence never substitute for the consolidated hosted/physical gate.
 | Hosted `delete-account` Function | PASS | Active JWT-verified Function deployed; disposable physical account deletion removed Auth, rows, cached data, and objects with no orphans. |
 | Password-reset email/deep link | PASS | Ed's receivable account completed the real build-5 reset request, email link, app deep link, and new-password flow on the physical iPhone on 2026-07-20. |
 | Privacy policy and App Store privacy answers | BLOCKED | Publish/confirm policy URL and reconcile answers with `privacy-inventory.md`. |
-| Signed internal RC `0.1.0 (5)` | NOT RUN | Build 5 has a valid development-signed archive and is installed on the physical iPhone; archive privacy report, App Store upload/processing, and TestFlight internal install remain. |
+| Signed internal RC `0.1.0 (5)` | PASS | Xcode archive validation and the six-category/no-tracking privacy report passed; App Store Connect processed build 5; Ed installed the Apple-hosted internal build on the physical iPhone and confirmed existing Home, Log/photos, Profile, Tackle Box, and Map data. |
 | Upgrade from `0.1.0 (3)` | PASS | Physical build-3 → build-4 and build-4 → build-5 upgrades preserved the existing Catches, Profile, and Tackle Box data; build 5 also retained data through password recovery. |
 | Clean physical install/fresh restore | PASS | Build 4 uninstall/reinstall recovered 8 Catches/photos, exact Walleye map/conditions/bookmark, Tackle item/photo, Profile, and avatar from hosted state. |
 | Physical permissions/camera/photos/GPS/weather | PASS | Camera, Photos none/limited, Location never/while-using, Settings recovery, manual fallback, live GPS/Open-Meteo, and exact hosted conditions passed on iOS 18.6. |
 | Physical offline/reconnect | PASS | Airplane-mode Catch/photo/manual map/conditions, relaunch, unchanged hosted state while offline, reconnect upload, Tackle ordering, Profile/avatar, and bookmark sync passed. |
 | Physical low-storage/time-zone boundary | NOT RUN | Both runnable failure/derived-date scenarios still need final-RC evidence. |
 | Physical share destinations and cleanup | NOT RUN | Save Image and cancellation pass; Messages/Mail, representative sparse/complete cards, and final temporary-file inspection remain. |
-| External App Review and invite-only group | BLOCKED | Internal acceptance first; then submit/add approved build to the named email-only group. |
+| External App Review and invite-only group | BLOCKED | Verified build 5 is assigned to the email-only `Reel Records Friends & Family` group and is `Waiting for Review` as of 2026-07-20; Apple approval/availability remains. Superseded build 3 is no longer under review or assigned externally. |
 
 Phase 11 cannot close while any row in the second table is blocked.

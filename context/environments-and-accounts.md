@@ -46,18 +46,18 @@ Developer account. Do not copy them into this public repository.
 
 | Group | Type | Membership / current state |
 |---|---|---|
-| `Reel Records Internal` | Internal | Ed May; build `0.1.0 (3)` is available internally |
-| `Reel Records Friends & Family` | External, email-only | Lincoln Fisher is added; build `0.1.0 (3)` is `Waiting for Review` as live-verified 2026-07-20 |
+| `Reel Records Internal` | Internal | Ed May; build `0.1.0 (5)` is installed and verified on the named iPhone |
+| `Reel Records Friends & Family` | External, email-only | Lincoln Fisher is added; build `0.1.0 (5)` is `Waiting for Review` as live-verified 2026-07-20 |
 
 There is no public TestFlight link. Tester email addresses are authoritative in App Store Connect; the
 minor tester's address is intentionally not duplicated in this public repository.
 
-Build `0.1.0 (5)` is reserved in `project.yml` for the final Phase 11 release candidate after password
-recovery was added. Build 4 passed a signed local archive, physical upgrade, and clean-install recovery,
-but was not uploaded and is superseded. Build 5 passed a development-signed archive and was installed
-over build 4 on the physical device on 2026-07-20; Ed then confirmed the real password-recovery email,
-deep link, and new-password flow with the existing Catches, Profile, and Tackle Box data preserved.
-Build `0.1.0 (3)` remains the only current TestFlight build.
+Build `0.1.0 (5)` is the final Phase 11 release candidate after password recovery was added. Build 4
+passed a signed local archive, physical upgrade, and clean-install recovery, but was not uploaded and is
+superseded. Build 5 passed archive validation/privacy inspection, processed in App Store Connect, and was
+installed from internal TestFlight on the physical device on 2026-07-20. Ed confirmed the real password-
+recovery flow and that existing Home, Log/photos, Profile, Tackle Box, and Map data remained intact.
+Superseded build 3 is no longer assigned to the external group; build 5 is awaiting external review.
 
 The Phase 01 physical device is an iPhone 16 Pro on iOS 18.6, registered to the developer team with
 Developer Mode enabled. Its serial number and UDID are authoritative in Apple Developer > Devices and

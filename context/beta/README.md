@@ -1,9 +1,9 @@
 # Beta Operations Packet
 
 Release verification for Reel Records `0.1.0 (5)`. This packet is operational evidence, not approval to
-distribute the build. The hosted baseline and primary build-4 physical scenarios pass; Phase 11 stays
-open until build 5 completes recovery/accessibility/performance/privacy checks, signed TestFlight upload,
-and Apple review gates in
+distribute the build. The hosted baseline, primary build-4 physical scenarios, build-5 recovery flow,
+archive/privacy validation, internal TestFlight install, and external review submission pass; Phase 11
+stays open until the remaining accessibility/performance/privacy and Apple approval gates in
 `../implementation-phases/11-beta-hardening.md` pass.
 
 | File | Purpose |
