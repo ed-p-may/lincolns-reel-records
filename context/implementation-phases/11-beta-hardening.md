@@ -66,8 +66,12 @@ evidence during the phone-free implementation loop. Before this phase closes:
   and exercise upgrade from `0.1.0 (3)` as well as a clean install;
 - on physical iPhone hardware, exercise camera capture, full- and limited-library access, permission
   denial/recovery, airplane-mode photo save and relaunch, reconnect/upload, and a low-storage failure;
+- on physical iPhone hardware, exercise explicit foreground GPS capture outdoors, all location
+  permission states and Settings recovery, accuracy/timeout behavior, manual correction after denial,
+  airplane-mode coordinate save/relaunch, and reconnect synchronization;
 - verify a fresh physical install recovers every hosted Catch and photo with stable order/hero choice,
-  then audit the private bucket for orphan objects after replacement, photo removal, and Catch deletion;
+  including exact coordinate pairs and map focus, then audit the private bucket for orphan objects after
+  replacement, photo removal, and Catch deletion;
 - repeat the physical offline/reconnect and fresh-device recovery gates for the final included feature
   set rather than treating earlier Simulator or in-memory recovery evidence as hosted acceptance.
 

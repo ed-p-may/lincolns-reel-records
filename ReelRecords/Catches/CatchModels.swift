@@ -24,6 +24,8 @@ final class CatchRecord {
     var length: Double?
     var caughtAt: Date
     var location: String?
+    var latitude: Double?
+    var longitude: Double?
     var lureText: String?
     var rodReel: String?
     var notes: String?
@@ -48,6 +50,7 @@ final class CatchRecord {
         length: Double? = nil,
         caughtAt: Date,
         location: String? = nil,
+        coordinate: CatchCoordinate? = nil,
         lureText: String? = nil,
         rodReel: String? = nil,
         notes: String? = nil,
@@ -66,6 +69,8 @@ final class CatchRecord {
         self.length = length
         self.caughtAt = caughtAt
         self.location = location
+        latitude = coordinate?.latitude
+        longitude = coordinate?.longitude
         self.lureText = lureText
         self.rodReel = rodReel
         self.notes = notes
@@ -128,10 +133,35 @@ struct CatchValues: Equatable, Sendable {
     let length: Double?
     let caughtAt: Date
     let location: String?
+    let coordinate: CatchCoordinate?
     let lureText: String?
     let rodReel: String?
     let notes: String?
     let released: Bool
+
+    init(
+        species: String,
+        weight: Double?,
+        length: Double?,
+        caughtAt: Date,
+        location: String?,
+        coordinate: CatchCoordinate? = nil,
+        lureText: String?,
+        rodReel: String?,
+        notes: String?,
+        released: Bool
+    ) {
+        self.species = species
+        self.weight = weight
+        self.length = length
+        self.caughtAt = caughtAt
+        self.location = location
+        self.coordinate = coordinate
+        self.lureText = lureText
+        self.rodReel = rodReel
+        self.notes = notes
+        self.released = released
+    }
 }
 
 struct CatchItem: Identifiable, Equatable, Sendable {
@@ -163,6 +193,10 @@ struct CatchItem: Identifiable, Equatable, Sendable {
 
     var location: String? {
         values.location
+    }
+
+    var coordinate: CatchCoordinate? {
+        values.coordinate
     }
 
     var lureText: String? {
@@ -253,6 +287,7 @@ extension CatchRecord {
             length: length,
             caughtAt: caughtAt,
             location: location,
+            coordinate: CatchCoordinate(latitude: latitude, longitude: longitude),
             lureText: lureText,
             rodReel: rodReel,
             notes: notes,

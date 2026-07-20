@@ -55,6 +55,7 @@ targets:
         ITSAppUsesNonExemptEncryption: false
         LSRequiresIPhoneOS: true
         NSCameraUsageDescription: Add a catch photo while logging on the water.
+        NSLocationWhenInUseUsageDescription: Save the location of a catch when you choose to capture it.
         NSPhotoLibraryUsageDescription: Choose catch photos for your private fishing logbook.
         SUPABASE_PROJECT_HOST: $(SUPABASE_PROJECT_HOST)
         SUPABASE_PUBLISHABLE_KEY: $(SUPABASE_PUBLISHABLE_KEY)

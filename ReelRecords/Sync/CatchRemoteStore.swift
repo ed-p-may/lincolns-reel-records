@@ -14,6 +14,8 @@ private struct CatchDTO: Codable, Sendable {
     let length: Double?
     let caughtAt: Date
     let location: String?
+    let latitude: Double?
+    let longitude: Double?
     let lureText: String?
     let rodReel: String?
     let notes: String?
@@ -31,6 +33,8 @@ private struct CatchDTO: Codable, Sendable {
         case length
         case caughtAt = "caught_at"
         case location
+        case latitude
+        case longitude
         case lureText = "lure_text"
         case rodReel = "rod_reel"
         case notes
@@ -49,6 +53,8 @@ private struct CatchDTO: Codable, Sendable {
         length = catchItem.values.length
         caughtAt = catchItem.values.caughtAt
         location = catchItem.values.location
+        latitude = catchItem.values.coordinate?.latitude
+        longitude = catchItem.values.coordinate?.longitude
         lureText = catchItem.values.lureText
         rodReel = catchItem.values.rodReel
         notes = catchItem.values.notes
@@ -69,6 +75,7 @@ private struct CatchDTO: Codable, Sendable {
                 length: length,
                 caughtAt: caughtAt,
                 location: location,
+                coordinate: CatchCoordinate(latitude: latitude, longitude: longitude),
                 lureText: lureText,
                 rodReel: rodReel,
                 notes: notes,
@@ -94,6 +101,8 @@ struct CatchUpdateDTO: Encodable, Sendable {
         case length
         case caughtAt = "caught_at"
         case location
+        case latitude
+        case longitude
         case lureText = "lure_text"
         case rodReel = "rod_reel"
         case notes
@@ -117,6 +126,8 @@ struct CatchUpdateDTO: Encodable, Sendable {
         try container.encode(values.length, forKey: .length)
         try container.encode(values.caughtAt, forKey: .caughtAt)
         try container.encode(values.location, forKey: .location)
+        try container.encode(values.coordinate?.latitude, forKey: .latitude)
+        try container.encode(values.coordinate?.longitude, forKey: .longitude)
         try container.encode(values.lureText, forKey: .lureText)
         try container.encode(values.rodReel, forKey: .rodReel)
         try container.encode(values.notes, forKey: .notes)
@@ -262,6 +273,7 @@ private extension CatchValues {
             && length == other.length
             && abs(caughtAt.timeIntervalSince(other.caughtAt)) < 0.01
             && location == other.location
+            && coordinate == other.coordinate
             && lureText == other.lureText
             && rodReel == other.rodReel
             && notes == other.notes

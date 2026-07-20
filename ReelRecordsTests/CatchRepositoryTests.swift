@@ -8,6 +8,7 @@ final class CatchRepositoryTests: XCTestCase {
         let store = try makeStore()
         let ownerID = UUID()
         let caughtAt = Date(timeIntervalSince1970: 1_700_000_000)
+        let coordinate = try XCTUnwrap(CatchCoordinate(latitude: 42.3169, longitude: -73.3226))
 
         let created = try store.repository.create(NewCatch(
             ownerID: ownerID,
@@ -17,6 +18,7 @@ final class CatchRepositoryTests: XCTestCase {
                 length: 18.5,
                 caughtAt: caughtAt,
                 location: "  Stockbridge Bowl ",
+                coordinate: coordinate,
                 lureText: "  Green pumpkin jig ",
                 rodReel: "  7-foot medium / spinning ",
                 notes: "  Wind picked up after noon. ",
@@ -29,6 +31,7 @@ final class CatchRepositoryTests: XCTestCase {
         XCTAssertEqual(created.length, 18.5)
         XCTAssertEqual(created.caughtAt, caughtAt)
         XCTAssertEqual(created.location, "Stockbridge Bowl")
+        XCTAssertEqual(created.coordinate, coordinate)
         XCTAssertEqual(created.lureText, "Green pumpkin jig")
         XCTAssertEqual(created.rodReel, "7-foot medium / spinning")
         XCTAssertEqual(created.notes, "Wind picked up after noon.")
@@ -50,6 +53,7 @@ final class CatchRepositoryTests: XCTestCase {
         XCTAssertNil(item.weight)
         XCTAssertNil(item.length)
         XCTAssertNil(item.location)
+        XCTAssertNil(item.coordinate)
         XCTAssertNil(item.lureText)
         XCTAssertNil(item.rodReel)
         XCTAssertNil(item.notes)
@@ -172,6 +176,7 @@ final class CatchRepositoryTests: XCTestCase {
         length: Double? = nil,
         caughtAt: Date = Date(timeIntervalSince1970: 1_700_000_000),
         location: String? = nil,
+        coordinate: CatchCoordinate? = nil,
         lureText: String? = nil,
         rodReel: String? = nil,
         notes: String? = nil,
@@ -183,6 +188,7 @@ final class CatchRepositoryTests: XCTestCase {
             length: length,
             caughtAt: caughtAt,
             location: location,
+            coordinate: coordinate,
             lureText: lureText,
             rodReel: rodReel,
             notes: notes,
@@ -243,7 +249,10 @@ final class CatchTransportTests: XCTestCase {
         XCTAssertNil(object["id"])
         XCTAssertNil(object["owner_id"])
         XCTAssertNil(object["created_at"])
-        for key in ["weight", "length", "location", "lure_text", "rod_reel", "notes", "deleted_at"] {
+        for key in [
+            "weight", "length", "location", "latitude", "longitude", "lure_text", "rod_reel", "notes",
+            "deleted_at"
+        ] {
             XCTAssertTrue(object[key] is NSNull, "Expected explicit null for \(key)")
         }
     }

@@ -16,10 +16,12 @@ final class AppDependencies {
     let authService: AuthService
     let catchRepository: SwiftDataCatchRepository
     let catchPhotoRepository: SwiftDataCatchPhotoRepository
+    let locationService: CatchLocationService
     let modelContainer: ModelContainer
     let syncCoordinator: SyncCoordinator
 
     init(isUITesting: Bool = AppDependencies.isRunningTests) {
+        locationService = CatchLocationService()
         do {
             let modelConfiguration = ModelConfiguration(isStoredInMemoryOnly: isUITesting)
             let container = try ModelContainer(
@@ -109,6 +111,7 @@ final class AppDependencies {
                 length: 18.5,
                 caughtAt: Date(timeIntervalSince1970: 1_753_000_000),
                 location: "Stockbridge Bowl North Shore By The Old Stone Landing",
+                coordinate: CatchCoordinate(latitude: 42.3169, longitude: -73.3226),
                 lureText: "Green pumpkin jig",
                 rodReel: "7-foot medium spinning rod",
                 notes: "Calm morning with a long field note to verify that the complete story remains readable.",
@@ -123,6 +126,7 @@ final class AppDependencies {
                 length: 24,
                 caughtAt: Date(timeIntervalSince1970: 1_752_000_000),
                 location: "Lake Mansfield",
+                coordinate: CatchCoordinate(latitude: 42.1951, longitude: -73.3544),
                 lureText: "Café spoon",
                 rodReel: nil,
                 notes: "Caught beside the old dock.",

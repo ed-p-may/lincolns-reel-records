@@ -56,6 +56,7 @@ final class SwiftDataCatchRepository {
             length: values.length,
             caughtAt: values.caughtAt,
             location: values.location,
+            coordinate: values.coordinate,
             lureText: values.lureText,
             rodReel: values.rodReel,
             notes: values.notes,
@@ -265,6 +266,7 @@ final class SwiftDataCatchRepository {
             length: proposedValues.length,
             caughtAt: proposedValues.caughtAt,
             location: normalized(proposedValues.location),
+            coordinate: proposedValues.coordinate,
             lureText: normalized(proposedValues.lureText),
             rodReel: normalized(proposedValues.rodReel),
             notes: normalized(proposedValues.notes),
@@ -283,6 +285,8 @@ final class SwiftDataCatchRepository {
         record.length = values.length
         record.caughtAt = values.caughtAt
         record.location = values.location
+        record.latitude = values.coordinate?.latitude
+        record.longitude = values.coordinate?.longitude
         record.lureText = values.lureText
         record.rodReel = values.rodReel
         record.notes = values.notes

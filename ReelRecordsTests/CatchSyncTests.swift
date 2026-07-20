@@ -9,12 +9,17 @@ final class CatchSyncTests: XCTestCase {
         let ownerID = UUID()
         let remoteStore = InMemoryCatchRemoteStore()
         let coordinator = SyncCoordinator(repository: store.repository, remoteStore: remoteStore)
-        let created = try store.repository.create(NewCatch(ownerID: ownerID, species: "Rainbow Trout", caughtAt: .now))
+        let coordinate = try XCTUnwrap(CatchCoordinate(latitude: 42.3169, longitude: -73.3226))
+        let created = try store.repository.create(NewCatch(
+            ownerID: ownerID,
+            values: values(species: "Rainbow Trout", coordinate: coordinate)
+        ))
 
         await coordinator.sync(ownerID: ownerID)
         await coordinator.sync(ownerID: ownerID)
         let synced = try XCTUnwrap(store.repository.item(id: created.id, ownerID: ownerID))
         XCTAssertEqual(synced.syncState, .synced)
+        XCTAssertEqual(synced.coordinate, coordinate)
         XCTAssertEqual(synced.remoteVersion, 1)
         XCTAssertEqual(try store.repository.pendingCount(ownerID: ownerID), 0)
 
@@ -111,6 +116,7 @@ final class CatchSyncTests: XCTestCase {
                 length: created.length,
                 caughtAt: created.caughtAt.addingTimeInterval(0.005),
                 location: created.location,
+                coordinate: created.coordinate,
                 lureText: created.lureText,
                 rodReel: created.rodReel,
                 notes: created.notes,
@@ -162,6 +168,7 @@ final class CatchSyncTests: XCTestCase {
                 weight: 2.75,
                 length: 19,
                 location: "Lake Mansfield",
+                coordinate: CatchCoordinate(latitude: 42.1965, longitude: -73.3526),
                 lureText: "Spinnerbait",
                 rodReel: "Medium casting",
                 notes: "Initial note",
@@ -179,6 +186,7 @@ final class CatchSyncTests: XCTestCase {
         XCTAssertEqual(reopened.weight, 2.75)
         XCTAssertEqual(reopened.length, 19)
         XCTAssertEqual(reopened.location, "Lake Mansfield")
+        XCTAssertEqual(reopened.coordinate, CatchCoordinate(latitude: 42.1965, longitude: -73.3526))
         XCTAssertEqual(reopened.lureText, "Spinnerbait")
         XCTAssertEqual(reopened.rodReel, "Medium casting")
         XCTAssertEqual(reopened.notes, "Initial note")
@@ -231,6 +239,7 @@ final class CatchSyncTests: XCTestCase {
         length: Double? = nil,
         caughtAt: Date = Date(timeIntervalSince1970: 1_700_000_000),
         location: String? = nil,
+        coordinate: CatchCoordinate? = nil,
         lureText: String? = nil,
         rodReel: String? = nil,
         notes: String? = nil,
@@ -242,6 +251,7 @@ final class CatchSyncTests: XCTestCase {
             length: length,
             caughtAt: caughtAt,
             location: location,
+            coordinate: coordinate,
             lureText: lureText,
             rodReel: rodReel,
             notes: notes,

@@ -131,6 +131,61 @@ final class TracerBulletUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["detail.photo-count"].label, "1 PHOTO")
     }
 
+    func testCatchMapSelectionAndDetailFocusRoundTrip() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--ui-testing-logbook"]
+        app.launch()
+
+        let trout = app.staticTexts["Rainbow Trout"]
+        XCTAssertTrue(trout.waitForExistence(timeout: 5))
+        trout.tap()
+        XCTAssertTrue(app.navigationBars["Rainbow Trout"].waitForExistence(timeout: 3))
+
+        let detailScroll = app.scrollViews.firstMatch
+        detailScroll.swipeUp()
+        detailScroll.swipeUp()
+        let showOnMap = app.buttons["detail.show-on-map"]
+        XCTAssertTrue(showOnMap.waitForExistence(timeout: 3))
+        showOnMap.tap()
+
+        let counts = app.staticTexts["map.counts"]
+        XCTAssertTrue(counts.waitForExistence(timeout: 5))
+        XCTAssertEqual(counts.label, "2 CATCHES ACROSS 2 SPOTS")
+        let selectedCatch = app.buttons["map.selected-catch"]
+        XCTAssertTrue(selectedCatch.waitForExistence(timeout: 3))
+        XCTAssertTrue(selectedCatch.label.contains("Rainbow Trout"))
+        XCTAssertTrue(selectedCatch.label.contains("Lake Mansfield"))
+        selectedCatch.tap()
+        XCTAssertTrue(app.navigationBars["Rainbow Trout"].waitForExistence(timeout: 3))
+    }
+
+    func testManualPinCanBeChosenWithoutRequestingGPS() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing"]
+        app.launch()
+
+        XCTAssertTrue(app.buttons["log.empty.add"].waitForExistence(timeout: 5))
+        app.buttons["log.empty.add"].tap()
+        let addScroll = app.scrollViews.firstMatch
+        addScroll.swipeUp()
+        addScroll.swipeUp()
+
+        let chooseOnMap = app.buttons["add.location.manual"]
+        XCTAssertTrue(chooseOnMap.waitForExistence(timeout: 3))
+        chooseOnMap.tap()
+
+        let map = app.otherElements["manual-location.map"]
+        XCTAssertTrue(map.waitForExistence(timeout: 5))
+        map.coordinate(withNormalizedOffset: CGVector(dx: 0.55, dy: 0.45)).tap()
+        let usePin = app.buttons["manual-location.use"]
+        XCTAssertTrue(usePin.waitForExistence(timeout: 3))
+        XCTAssertTrue(usePin.isEnabled)
+        usePin.tap()
+
+        XCTAssertTrue(app.buttons["add.location.clear"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.buttons["add.save"].isEnabled)
+    }
+
     func testLogAndDetailRemainNavigableAtLargestAccessibilityText() {
         let app = XCUIApplication()
         app.launchArguments = [

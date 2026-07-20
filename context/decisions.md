@@ -9,6 +9,28 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-07-19 — Foreground location capture and manual MapKit fallback contract
+- **Context:** Phase 05 needs useful coordinates without making Catch save depend on permission,
+  satellite availability, Apple search, or a network connection. The named spot must stay human-owned
+  rather than being silently replaced by reverse geocoding.
+- **Decision:**
+  - Request when-in-use permission only after the angler taps **Use Current Location**. Do not request
+    at launch or when merely opening Add Catch or Map.
+  - Accept a foreground fix only when its horizontal accuracy is positive and at most 100 meters and
+    its timestamp is no more than two minutes old. Keep listening briefly for a better fix, but expose
+    failure/manual fallback after 12 seconds; Catch save remains enabled throughout.
+  - Coordinates are an optional pair: both latitude and longitude are present and range-valid, or both
+    are `nil`. Editing can replace or clear the pair independently of the named `location` string.
+  - Manual selection is a sheet with Apple `MKLocalSearch` results when available and direct map
+    tap-to-drop/correct behavior that does not require search. Search failure is an honest inline state,
+    never a reason to hide an already selected pin or prevent save.
+  - Map and mini-map read only account-scoped local SwiftData. Missing Apple basemap tiles may be an
+    offline presentation limitation, but cached Catch coordinates/pins and selected Catch data remain
+    available.
+- **Consequences:** No background-location capability is added. Core Location and MapKit are wrapped
+  behind testable acceptance/domain seams; physical permission, outdoor GPS, and offline basemap
+  behavior are repeated in Phase 11.
+
 ## 2026-07-19 — Catch-photo file, privacy, ordering, and cleanup contract
 - **Context:** Phase 04 must keep photos usable offline while coordinating local files, private Storage
   objects, ordered metadata, cancellation, and retry without making Catch save depend on the network.
@@ -271,9 +293,8 @@ made; keep the "Open" list current. Newest entries at the top.
 - **Consequences / follow-ups:**
   - Auth emails (confirm-email / password-reset) use Supabase's built-in email; configure SMTP only if
     deliverability needs it. (No custom approval email — approval was dropped.)
-  - **Offline strategy** still open: catches must be loggable offline (PRD E5, P0). Likely a local
-    cache on device that syncs to Supabase when online. Depth TBD with the persistence choice — see
-    Open decisions.
+  - **Offline strategy superseded:** the later local-first SwiftData plus explicit outbox decision above
+    resolves this follow-up; catches commit locally and synchronize to Supabase when online.
   - iOS client talks to Supabase via the `supabase-swift` SDK.
 
 ## 2026-07-19 — Real accounts (Auth model, PRD Q1)

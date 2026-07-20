@@ -52,6 +52,8 @@ enum AppSheet: Identifiable {
 final class AppRouter {
     var selectedTab: AppTab = .log
     var presentedSheet: AppSheet?
+    var mapFocusCatchID: UUID?
+    var mapFocusRevision = 0
 
     func select(_ tab: AppTab) {
         if tab == .add {
@@ -59,6 +61,13 @@ final class AppRouter {
         } else {
             selectedTab = tab
         }
+    }
+
+    func showOnMap(_ catchItem: CatchItem) {
+        mapFocusCatchID = catchItem.id
+        mapFocusRevision += 1
+        presentedSheet = nil
+        selectedTab = .map
     }
 }
 
@@ -91,7 +100,15 @@ struct AppShellView: View {
                 )
             }
             tab(.add) { Color.clear }
-            tab(.map) { PlaceholderTabView(title: "Map", message: "Catch locations arrive in Phase 05.") }
+            tab(.map) {
+                CatchMapView(
+                    ownerID: account.ownerID,
+                    refreshToken: logRevision,
+                    focusCatchID: router.mapFocusCatchID,
+                    focusRevision: router.mapFocusRevision,
+                    onOpenCatch: { router.presentedSheet = .catchDetail($0) }
+                )
+            }
             tab(.profile) { ProfilePlaceholderView(account: account) }
         }
         .tint(ReelTheme.accent)
@@ -103,9 +120,11 @@ struct AppShellView: View {
                     router.selectedTab = .log
                 }
             case let .catchDetail(catchItem):
-                CatchDetailView(catchItem: catchItem) {
-                    logRevision += 1
-                }
+                CatchDetailView(
+                    catchItem: catchItem,
+                    onChanged: { logRevision += 1 },
+                    onShowOnMap: { router.showOnMap($0) }
+                )
             }
         }
         .task(id: SyncRequest(ownerID: account.ownerID, isOffline: account.isOffline)) {

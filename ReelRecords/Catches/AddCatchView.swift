@@ -15,6 +15,7 @@ struct AddCatchView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(SwiftDataCatchRepository.self) private var repository
     @Environment(SwiftDataCatchPhotoRepository.self) private var photoRepository
+    @Environment(CatchLocationService.self) private var locationService
     @Environment(SyncCoordinator.self) private var syncCoordinator
     @State private var selectedSpecies: String
     @State private var customSpecies: String
@@ -22,6 +23,7 @@ struct AddCatchView: View {
     @State private var length: String
     @State private var caughtAt: Date
     @State private var location: String
+    @State private var coordinate: CatchCoordinate?
     @State private var lureText: String
     @State private var rodReel: String
     @State private var notes: String
@@ -32,6 +34,7 @@ struct AddCatchView: View {
     @State private var didCommitPhotos = false
     @State private var didNotifySaved = false
     @State private var persistedCatchID: UUID?
+    @State private var isChoosingLocation = false
     @State private var errorMessage: String?
 
     let ownerID: UUID
@@ -51,6 +54,7 @@ struct AddCatchView: View {
         _length = State(initialValue: CatchFormatting.input(values?.length))
         _caughtAt = State(initialValue: values?.caughtAt ?? .now)
         _location = State(initialValue: values?.location ?? "")
+        _coordinate = State(initialValue: values?.coordinate)
         _lureText = State(initialValue: values?.lureText ?? "")
         _rodReel = State(initialValue: values?.rodReel ?? "")
         _notes = State(initialValue: values?.notes ?? "")
@@ -67,6 +71,11 @@ struct AddCatchView: View {
                     speciesSection
                     measurementSection
                     caughtSection
+                    CatchLocationEditor(
+                        location: $location,
+                        coordinate: $coordinate,
+                        isChoosingLocation: $isChoosingLocation
+                    )
                     textSection
                     releaseSection
 
@@ -98,8 +107,23 @@ struct AddCatchView: View {
                 .accessibilityIdentifier("add.save")
             }
         }
-        .task { loadPhotos() }
+        .task {
+            locationService.reset()
+            loadPhotos()
+        }
+        .onChange(of: locationService.state) { _, state in
+            if case let .captured(capturedCoordinate, _) = state {
+                coordinate = capturedCoordinate
+            }
+        }
+        .sheet(isPresented: $isChoosingLocation) {
+            ManualLocationPicker(initialCoordinate: coordinate) { selected in
+                locationService.reset()
+                coordinate = selected
+            }
+        }
         .onDisappear {
+            locationService.reset()
             if !didCommitPhotos {
                 try? photoRepository.discardDrafts(sessionID: photoSessionID)
             }
@@ -167,10 +191,6 @@ struct AddCatchView: View {
     private var textSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             fieldLabel("Details")
-            TextField("Named spot", text: $location)
-                .textInputAutocapitalization(.words)
-                .fieldInputStyle()
-                .accessibilityIdentifier("add.location")
             TextField("Lure or bait", text: $lureText)
                 .fieldInputStyle()
                 .accessibilityIdentifier("add.lure")
@@ -195,7 +215,9 @@ struct AddCatchView: View {
             .accessibilityIdentifier("add.released")
         }
     }
+}
 
+private extension AddCatchView {
     private var finalSpecies: String {
         let custom = customSpecies.trimmingCharacters(in: .whitespacesAndNewlines)
         return custom.isEmpty ? selectedSpecies : custom
@@ -234,6 +256,7 @@ struct AddCatchView: View {
     }
 
     private func save() {
+        locationService.reset()
         do {
             let values = try CatchValues(
                 species: finalSpecies,
@@ -241,6 +264,7 @@ struct AddCatchView: View {
                 length: CatchFormatting.parseOptionalMeasurement(length, field: .length),
                 caughtAt: caughtAt,
                 location: location,
+                coordinate: coordinate,
                 lureText: lureText,
                 rodReel: rodReel,
                 notes: notes,
@@ -299,7 +323,95 @@ struct AddCatchView: View {
     }
 
     private func cancel() {
+        locationService.reset()
         try? photoRepository.discardDrafts(sessionID: photoSessionID)
         dismiss()
+    }
+}
+
+private struct CatchLocationEditor: View {
+    @Environment(CatchLocationService.self) private var locationService
+    @Binding var location: String
+    @Binding var coordinate: CatchCoordinate?
+    @Binding var isChoosingLocation: Bool
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("LOCATION")
+                .font(ReelFont.metadata(.caption2, weight: .bold))
+                .tracking(1)
+                .foregroundStyle(ReelTheme.tertiaryText)
+            TextField("Named spot", text: $location)
+                .textInputAutocapitalization(.words)
+                .fieldInputStyle()
+                .accessibilityIdentifier("add.location")
+            pinEditor
+        }
+    }
+
+    private var pinEditor: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HStack(spacing: 10) {
+                Image(systemName: coordinate == nil ? "mappin.slash" : "mappin.and.ellipse")
+                    .font(.title3)
+                    .foregroundStyle(coordinate == nil ? ReelTheme.tertiaryText : ReelTheme.accent)
+                VStack(alignment: .leading, spacing: 3) {
+                    Text(coordinate == nil ? "No coordinate pin" : "Catch pin saved")
+                        .font(ReelFont.body(.subheadline, weight: .bold))
+                        .foregroundStyle(ReelTheme.primaryText)
+                    Text(statusMessage)
+                        .font(ReelFont.body(.caption))
+                        .foregroundStyle(ReelTheme.secondaryText)
+                }
+                Spacer()
+            }
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 10) { locationButtons }
+                VStack(spacing: 10) { locationButtons }
+            }
+            if coordinate != nil {
+                Button("Clear Pin", role: .destructive) {
+                    coordinate = nil
+                    locationService.reset()
+                }
+                .frame(minHeight: 44)
+                .accessibilityIdentifier("add.location.clear")
+            }
+        }
+        .padding(14)
+        .background(ReelTheme.surface, in: RoundedRectangle(cornerRadius: 18))
+        .overlay { RoundedRectangle(cornerRadius: 18).stroke(ReelTheme.border) }
+    }
+
+    @ViewBuilder
+    private var locationButtons: some View {
+        Button {
+            locationService.requestCurrentLocation()
+        } label: {
+            Label("Use Current", systemImage: "location.fill")
+                .frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .buttonStyle(.bordered)
+        .tint(ReelTheme.accent)
+        .disabled(locationService.state == .requestingPermission || locationService.state == .locating)
+        .accessibilityIdentifier("add.location.current")
+
+        Button {
+            isChoosingLocation = true
+        } label: {
+            Label("Choose on Map", systemImage: "map.fill")
+                .frame(maxWidth: .infinity, minHeight: 44)
+        }
+        .buttonStyle(.bordered)
+        .tint(ReelTheme.accent)
+        .accessibilityIdentifier("add.location.manual")
+    }
+
+    private var statusMessage: String {
+        guard let coordinate else { return locationService.state.message }
+        if case let .captured(captured, _) = locationService.state, captured == coordinate {
+            return locationService.state.message
+        }
+        return coordinate.displayLabel
     }
 }

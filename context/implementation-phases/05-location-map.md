@@ -1,6 +1,6 @@
 # Phase 05 — Location and Map
 
-**Status:** Ready
+**Status:** Complete
 **Depends on:** Phase 04 complete  
 **Primary stories:** A5, D1, D2, E5
 
@@ -46,8 +46,26 @@ Supabase synchronization, MapKit browsing, and Catch Detail navigation.
 4. Implement GPS capture and non-blocking draft integration.
 5. Implement manual pin/search fallback.
 6. Build Map tab, pins, selection card, detail mini-map, and focused navigation.
-7. Test permissions, no-signal behavior, spot normalization, and second-device recovery.
-8. Deploy and verify the slice through TestFlight.
+7. Test deterministic permission mapping, no-signal/manual behavior, spot normalization, persistence,
+   sync transport, and focused Map navigation locally and in Simulator.
+8. Defer hosted migration, signed TestFlight, physical GPS/permission, offline/reconnect, and
+   fresh-device recovery to the consolidated Phase 11 gate.
+
+## Location interaction design
+
+- Add/Edit Catch keeps **Named spot** as a normal text field. A separate location card shows one of:
+  no coordinates, requesting permission/fix, accepted coordinates with accuracy, or a concise
+  denied/unavailable/inaccurate error. Save is never disabled by this card.
+- **Use Current Location** is the only action that requests permission. **Choose on Map** opens the
+  manual sheet in every permission state; **Clear Pin** removes only coordinates.
+- The manual sheet has an optional Apple place-search field/result list and a map. Selecting a result
+  centers and drops the draft pin; tapping the map moves it. **Use This Pin** commits the pair to the
+  Catch draft, while Cancel leaves the prior pair unchanged. Search/offline errors stay inline.
+- The Map tab shows the local catch/derived-spot count, an honest no-coordinate empty state, MapKit
+  annotations, and one bottom selected-Catch card. Opening from Catch Detail selects that Catch and
+  centers its coordinate; a Catch without coordinates shows “Location not pinned” instead of a fake map.
+- Accessibility labels state species, named spot, and coordinate availability; every control retains a
+  44-point target and the selected pin does not rely on color alone.
 
 ## Verification
 
@@ -72,7 +90,15 @@ regulations or lake-boundary data.
 
 ## Closeout record
 
-- TestFlight build: _TBD_
-- Location decisions/design evidence: _TBD_
-- Automated checks: _TBD_
-- Real-device permission/GPS evidence: _TBD_
+- TestFlight build: no Phase 05 build. Signed `0.1.0 (3)` remains the latest hosted beta; the coordinate
+  migration and a final signed build are deferred to Phase 11.
+- Location decisions/design evidence: `context/decisions.md`, “Foreground location capture and manual
+  MapKit fallback contract,” plus the interaction states above.
+- Automated checks: `make ci` passes with 35 Swift unit/integration tests, 6 Simulator UI tests, and
+  49 local pgTAP assertions. This includes coordinate/policy, repository/sync/relaunch, manual
+  tap-to-pin, and Detail → the specific selected Catch pin coverage.
+- Simulator evidence: two real-coordinate seeded catches render as two pins/two normalized spots;
+  manual placement commits a valid coordinate pair without requesting GPS; a Rainbow Trout Detail
+  mini-map opens Map with Rainbow Trout selected and reopens the correct Detail.
+- Real-device permission/GPS evidence: deferred to Phase 11, including outdoor accuracy, every system
+  permission state, denial recovery, manual correction, airplane-mode save/relaunch, and reconnect.

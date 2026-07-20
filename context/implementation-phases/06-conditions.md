@@ -1,6 +1,6 @@
 # Phase 06 — Weather and Water Conditions
 
-**Status:** Planned  
+**Status:** Ready
 **Depends on:** Phase 05 complete  
 **Primary stories:** A4 (conditions subset), B1, B5, E5
 

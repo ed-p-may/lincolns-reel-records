@@ -1,3 +1,4 @@
+import MapKit
 import SwiftUI
 
 struct CatchDetailView: View {
@@ -13,10 +14,16 @@ struct CatchDetailView: View {
     @State private var errorMessage: String?
 
     let onChanged: () -> Void
+    let onShowOnMap: (CatchItem) -> Void
 
-    init(catchItem: CatchItem, onChanged: @escaping () -> Void) {
+    init(
+        catchItem: CatchItem,
+        onChanged: @escaping () -> Void,
+        onShowOnMap: @escaping (CatchItem) -> Void
+    ) {
         _catchItem = State(initialValue: catchItem)
         self.onChanged = onChanged
+        self.onShowOnMap = onShowOnMap
     }
 
     var body: some View {
@@ -27,6 +34,7 @@ struct CatchDetailView: View {
                     measurementSummary
                     catchDetails
                     fieldNotes
+                    locationMap
                     recordStatus
                     deleteButton
                 }
@@ -194,6 +202,12 @@ struct CatchDetailView: View {
         }
     }
 
+    private var locationMap: some View {
+        DetailCatchLocationMap(catchItem: catchItem) {
+            onShowOnMap(catchItem)
+        }
+    }
+
     private var recordStatus: some View {
         DetailSection(title: "Record status") {
             HStack(spacing: 10) {
@@ -282,6 +296,62 @@ struct CatchDetailView: View {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+}
+
+private struct DetailCatchLocationMap: View {
+    let catchItem: CatchItem
+    let onShowOnMap: () -> Void
+
+    var body: some View {
+        DetailSection(title: "Where it happened") {
+            if let coordinate = catchItem.coordinate {
+                ZStack(alignment: .bottom) {
+                    Map(initialPosition: .region(MKCoordinateRegion(
+                        center: coordinate.mapCoordinate,
+                        span: MKCoordinateSpan(latitudeDelta: 0.025, longitudeDelta: 0.025)
+                    ))) {
+                        Marker(catchItem.species, coordinate: coordinate.mapCoordinate)
+                            .tint(ReelTheme.accent)
+                    }
+                    .mapStyle(.standard(
+                        elevation: .flat,
+                        emphasis: .muted,
+                        pointsOfInterest: .excludingAll
+                    ))
+                    .allowsHitTesting(false)
+                    Button(action: onShowOnMap) { mapCaption }
+                        .buttonStyle(.plain)
+                        .accessibilityLabel("Show \(catchItem.species) location on Catch Map")
+                        .accessibilityIdentifier("detail.show-on-map")
+                }
+                .frame(height: 190)
+                .clipShape(RoundedRectangle(cornerRadius: 18))
+                .overlay { RoundedRectangle(cornerRadius: 18).stroke(ReelTheme.border) }
+            } else {
+                Label("Location not pinned", systemImage: "mappin.slash")
+                    .font(ReelFont.body(.subheadline, weight: .semibold))
+                    .foregroundStyle(ReelTheme.secondaryText)
+                    .frame(maxWidth: .infinity, minHeight: 84, alignment: .leading)
+                    .padding(.horizontal, 16)
+                    .background(ReelTheme.surface, in: RoundedRectangle(cornerRadius: 16))
+                    .accessibilityIdentifier("detail.location-missing")
+            }
+        }
+    }
+
+    private var mapCaption: some View {
+        HStack {
+            Label(catchItem.location ?? "Unnamed catch location", systemImage: "map.fill")
+                .lineLimit(1)
+            Spacer()
+            Image(systemName: "arrow.up.right")
+        }
+        .font(ReelFont.body(.caption, weight: .semibold))
+        .foregroundStyle(.white)
+        .frame(minHeight: 52)
+        .padding(12)
+        .background(.ultraThinMaterial)
     }
 }
 
