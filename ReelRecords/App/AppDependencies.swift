@@ -8,6 +8,15 @@ private struct AppServices {
     let catchRemoteStore: any CatchRemoteStore
     let photoRemoteStore: any CatchPhotoRemoteStore
     let tackleRemoteStore: any TackleRemoteStore
+    let profileRemoteStore: any ProfileRemoteStore
+}
+
+private struct LocalStores {
+    let container: ModelContainer
+    let catchRepository: SwiftDataCatchRepository
+    let photoRepository: SwiftDataCatchPhotoRepository
+    let tackleRepository: SwiftDataTackleRepository
+    let profileRepository: SwiftDataProfileRepository
 }
 
 @MainActor
@@ -18,6 +27,7 @@ final class AppDependencies {
     let catchRepository: SwiftDataCatchRepository
     let catchPhotoRepository: SwiftDataCatchPhotoRepository
     let tackleRepository: SwiftDataTackleRepository
+    let profileRepository: SwiftDataProfileRepository
     let locationService: CatchLocationService
     let modelContainer: ModelContainer
     let syncCoordinator: SyncCoordinator
@@ -27,26 +37,12 @@ final class AppDependencies {
         locationService = CatchLocationService()
         weatherSuggestionProvider = Self.makeWeatherSuggestionProvider(isUITesting: isUITesting)
         do {
-            let modelConfiguration = ModelConfiguration(isStoredInMemoryOnly: isUITesting)
-            let container = try ModelContainer(
-                for: CatchRecord.self,
-                OutboxOperation.self,
-                CatchPhotoRecord.self,
-                PhotoOutboxOperation.self,
-                TackleItemRecord.self,
-                TackleOutboxOperation.self,
-                configurations: modelConfiguration
-            )
-            let repository = SwiftDataCatchRepository(modelContext: container.mainContext)
-            let photoFileStore = try Self.makePhotoFileStore(isUITesting: isUITesting)
-            let photoRepository = try SwiftDataCatchPhotoRepository(
-                modelContext: container.mainContext,
-                fileStore: photoFileStore
-            )
-            let tackleRepository = SwiftDataTackleRepository(
-                modelContext: container.mainContext,
-                fileStore: photoFileStore
-            )
+            let stores = try Self.makeLocalStores(isUITesting: isUITesting)
+            let container = stores.container
+            let repository = stores.catchRepository
+            let photoRepository = stores.photoRepository
+            let tackleRepository = stores.tackleRepository
+            let profileRepository = stores.profileRepository
 
             try Self.seedUITestLogbookIfNeeded(
                 isUITesting: isUITesting,
@@ -61,6 +57,7 @@ final class AppDependencies {
             catchRepository = repository
             catchPhotoRepository = photoRepository
             self.tackleRepository = tackleRepository
+            self.profileRepository = profileRepository
             authService = AuthService(backend: services.authBackend)
             syncCoordinator = SyncCoordinator(
                 repository: repository,
@@ -72,6 +69,10 @@ final class AppDependencies {
                 tackleSync: TackleSyncDependencies(
                     repository: tackleRepository,
                     remoteStore: services.tackleRemoteStore
+                ),
+                profileSync: ProfileSyncDependencies(
+                    repository: profileRepository,
+                    remoteStore: services.profileRemoteStore
                 )
             )
         } catch {
@@ -82,6 +83,29 @@ final class AppDependencies {
     private static var isRunningTests: Bool {
         ProcessInfo.processInfo.arguments.contains("--ui-testing")
             || ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
+
+    private static func makeLocalStores(isUITesting: Bool) throws -> LocalStores {
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: isUITesting)
+        let container = try ModelContainer(
+            for: CatchRecord.self,
+            OutboxOperation.self,
+            CatchPhotoRecord.self,
+            PhotoOutboxOperation.self,
+            TackleItemRecord.self,
+            TackleOutboxOperation.self,
+            ProfileRecord.self,
+            ProfileOutboxOperation.self,
+            configurations: configuration
+        )
+        let fileStore = try makePhotoFileStore(isUITesting: isUITesting)
+        return LocalStores(
+            container: container,
+            catchRepository: SwiftDataCatchRepository(modelContext: container.mainContext),
+            photoRepository: SwiftDataCatchPhotoRepository(modelContext: container.mainContext, fileStore: fileStore),
+            tackleRepository: SwiftDataTackleRepository(modelContext: container.mainContext, fileStore: fileStore),
+            profileRepository: SwiftDataProfileRepository(modelContext: container.mainContext, fileStore: fileStore)
+        )
     }
 
     private static func makePhotoFileStore(isUITesting: Bool) throws -> PhotoFileStore {
@@ -110,7 +134,20 @@ final class AppDependencies {
                 authBackend: MockAuthBackend(account: account),
                 catchRemoteStore: InMemoryCatchRemoteStore(),
                 photoRemoteStore: InMemoryCatchPhotoRemoteStore(),
-                tackleRemoteStore: InMemoryTackleRemoteStore()
+                tackleRemoteStore: InMemoryTackleRemoteStore(),
+                profileRemoteStore: InMemoryProfileRemoteStore(profile: RemoteProfile(
+                    ownerID: account.ownerID,
+                    username: account.username,
+                    values: ProfileValues(
+                        displayName: "Lincoln Fisher",
+                        homeWater: "Stockbridge Bowl",
+                        anglerSince: 2019
+                    ),
+                    avatarStoragePath: nil,
+                    createdAt: Date(timeIntervalSince1970: 1_550_000_000),
+                    updatedAt: Date(timeIntervalSince1970: 1_753_000_000),
+                    version: 1
+                ))
             )
         }
         let configuration = AppConfiguration.live()
@@ -122,7 +159,8 @@ final class AppDependencies {
             authBackend: SupabaseAuthBackend(client: client),
             catchRemoteStore: SupabaseCatchRemoteStore(client: client),
             photoRemoteStore: SupabaseCatchPhotoRemoteStore(client: client),
-            tackleRemoteStore: SupabaseTackleRemoteStore(client: client)
+            tackleRemoteStore: SupabaseTackleRemoteStore(client: client),
+            profileRemoteStore: SupabaseProfileRemoteStore(client: client)
         )
     }
 

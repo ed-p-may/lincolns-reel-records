@@ -94,7 +94,7 @@ select throws_ok(
 );
 
 select lives_ok(
-    $$update public.profiles set username = 'angler_a_updated'
+    $$update public.profiles set display_name = 'Angler A'
       where id = '10000000-0000-0000-0000-000000000001'$$,
     'a user can update their own profile'
 );

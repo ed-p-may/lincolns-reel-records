@@ -5,11 +5,13 @@ struct DashboardView: View {
     @Environment(\.scenePhase) private var scenePhase
     @Environment(SwiftDataCatchRepository.self) private var repository
     @Environment(SwiftDataCatchPhotoRepository.self) private var photoRepository
+    @Environment(SwiftDataProfileRepository.self) private var profileRepository
     @Environment(SyncCoordinator.self) private var syncCoordinator
     @State private var catches: [CatchItem] = []
     @State private var heroPhotosByCatch: [UUID: CatchPhotoItem] = [:]
     @State private var now = Date.now
     @State private var loadError: String?
+    @State private var greetingName: String?
 
     let account: AccountSession
     let refreshToken: Int
@@ -23,7 +25,7 @@ struct DashboardView: View {
 
         ScrollView {
             LazyVStack(alignment: .leading, spacing: 0) {
-                DashboardHeader(account: account, now: now, calendar: calendar)
+                DashboardHeader(account: account, greetingName: greetingName, now: now, calendar: calendar)
                 DashboardHero(insights: insights, onAddCatch: onAddCatch)
                     .padding(.top, 20)
                 DashboardStatGrid(insights: insights)
@@ -128,6 +130,8 @@ struct DashboardView: View {
             let recentIDs = DashboardDerivation.insights(from: loadedCatches, now: now, calendar: calendar)
                 .recentCatches.map(\.id)
             catches = loadedCatches
+            let profile = try profileRepository.profile(account: account)
+            greetingName = profile.displayName.split(separator: " ").first.map(String.init)
             heroPhotosByCatch = try photoRepository.heroPhotos(catchIDs: recentIDs, ownerID: account.ownerID)
             loadError = nil
         } catch {
@@ -142,6 +146,7 @@ struct DashboardView: View {
 
 private struct DashboardHeader: View {
     let account: AccountSession
+    let greetingName: String?
     let now: Date
     let calendar: Calendar
 
@@ -152,7 +157,7 @@ private struct DashboardHeader: View {
                 .tracking(1)
                 .textCase(.uppercase)
                 .foregroundStyle(ReelTheme.accent)
-            Text("\(greeting), \(account.username)")
+            Text("\(greeting), \(greetingName ?? account.username)")
                 .font(ReelFont.display(26, weight: .heavy))
                 .foregroundStyle(ReelTheme.primaryText)
                 .lineLimit(2)

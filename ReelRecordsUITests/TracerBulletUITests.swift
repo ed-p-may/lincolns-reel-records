@@ -246,7 +246,7 @@ final class TracerBulletUITests: XCTestCase {
         let total = app.staticTexts["dashboard.total"]
         XCTAssertTrue(total.waitForExistence(timeout: 5))
         XCTAssertEqual(total.label, "2")
-        XCTAssertTrue(app.staticTexts["dashboard.greeting"].label.contains("ui_test"))
+        XCTAssertTrue(app.staticTexts["dashboard.greeting"].label.contains("Lincoln"))
         XCTAssertTrue(app.staticTexts["6.5 lb"].exists)
 
         let recentBass = app.buttons["dashboard.recent.0"]

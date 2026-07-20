@@ -11,6 +11,11 @@ struct TackleSyncDependencies {
     let remoteStore: any TackleRemoteStore
 }
 
+struct ProfileSyncDependencies {
+    let repository: SwiftDataProfileRepository
+    let remoteStore: any ProfileRemoteStore
+}
+
 @MainActor
 @Observable
 final class SyncCoordinator {
@@ -23,25 +28,30 @@ final class SyncCoordinator {
     private let remoteStore: any CatchRemoteStore
     private let photoSync: PhotoSyncDependencies?
     private let tackleSync: TackleSyncDependencies?
+    let profileSync: ProfileSyncDependencies?
     @ObservationIgnored private var pendingSyncRequest: SyncRequest?
+    @ObservationIgnored let suspension = SyncSuspension()
 
     private(set) var isSyncing = false
     private(set) var revision = 0
-    private(set) var statusMessage: String?
+    var statusMessage: String?
 
     init(
         repository: SwiftDataCatchRepository,
         remoteStore: any CatchRemoteStore,
         photoSync: PhotoSyncDependencies? = nil,
-        tackleSync: TackleSyncDependencies? = nil
+        tackleSync: TackleSyncDependencies? = nil,
+        profileSync: ProfileSyncDependencies? = nil
     ) {
         self.repository = repository
         self.remoteStore = remoteStore
         self.photoSync = photoSync
         self.tackleSync = tackleSync
+        self.profileSync = profileSync
     }
 
     func sync(ownerID: UUID, confirmingConflicts: Bool = false) async {
+        guard !suspension.contains(ownerID) else { return }
         guard !isSyncing else {
             queueFollowUp(ownerID: ownerID, confirmingConflicts: confirmingConflicts)
             return
@@ -51,6 +61,7 @@ final class SyncCoordinator {
         var didChange = false
         defer {
             isSyncing = false
+            suspension.resumeIdleWaiters()
             if didChange {
                 revision += 1
             }
@@ -68,6 +79,7 @@ final class SyncCoordinator {
     private func performSync(_ request: SyncRequest) async -> Bool {
         var didChange = false
         do {
+            didChange = await performProfileSync(request) || didChange
             var blockedTackleItemIDs: Set<UUID> = []
             if let tackleSync {
                 didChange = await syncTackle(
@@ -113,6 +125,15 @@ final class SyncCoordinator {
             statusMessage = "Sync unavailable. Your local logbook is safe."
         }
         return didChange
+    }
+
+    private func performProfileSync(_ request: SyncRequest) async -> Bool {
+        guard let profileSync else { return false }
+        return await syncProfile(
+            ownerID: request.ownerID,
+            confirmingConflicts: request.confirmingConflicts,
+            dependencies: profileSync
+        )
     }
 
     private func queueFollowUp(ownerID: UUID, confirmingConflicts: Bool) {

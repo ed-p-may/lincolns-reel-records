@@ -1,6 +1,6 @@
 # Phase 09 — Profile and Settings
 
-**Status:** Planned  
+**Status:** Complete
 **Depends on:** Phase 08 complete
 **Primary stories:** C4, E3, E6
 
@@ -75,7 +75,28 @@ notifications without a separately approved scope.
 
 ## Closeout record
 
-- TestFlight build: _TBD_
-- Profile/Storage migrations: _TBD_
-- Automated checks: _TBD_
-- Account-isolation evidence: _TBD_
+- TestFlight build: no Phase 09 build; signed build `0.1.0 (3)` remains the latest hosted beta.
+  Hosted deployment, signed release, and final physical-device acceptance are consolidated in Phase 11.
+- Profile/Storage migrations: `20260720023000_phase_09_profiles.sql` adds editable profile fields,
+  optimistic versioning, immutable identity enforcement, and the private `avatars` bucket/policies.
+  The authenticated `delete-account` Edge Function removes all private objects before deleting the Auth
+  user. Local migration/policy checks pass; hosted deployment and probes are deferred to Phase 11.
+- Automated checks: `make ci` passes SwiftFormat and strict SwiftLint across 72 Swift files, 77 unit
+  tests, 13 Simulator UI tests, and 94 local pgTAP database/RLS assertions. Profile UI coverage includes
+  Dynamic Type, editing, derived statistics, honest settings, and the display-name Dashboard greeting.
+- Account-isolation evidence: deterministic tests cover owner-scoped profile/Catch access, offline edit
+  delivery from the production version-1 baseline, explicit conflict retry, binary/metadata retry,
+  immutable avatar replacement/removal cleanup, missing-file redownload, second-store recovery, staged
+  draft purge, deletion cleanup retry, and suspension of in-flight sync before destructive purge.
+
+## Confirmed implementation contract
+
+- Edit Profile follows the existing dark profile prototype with a native full-screen editor; username,
+  email, UUID, and signup date stay immutable.
+- `anglerSince` is optional and validates as a whole year from 1900 through the current calendar year.
+- Avatar replacement/removal uses immutable `owner-id/avatar-id.jpg` objects and metadata-first cleanup.
+- Account deletion is included because the app supports account creation; it requires connectivity and
+  uses an authenticated Edge Function, then purges hosted plus account-local data after explicit
+  confirmation.
+- Password-reset email/deep-link configuration is an explicit Phase 11 hosted-auth follow-up; Phase 09
+  does not show a control that cannot yet complete its flow.

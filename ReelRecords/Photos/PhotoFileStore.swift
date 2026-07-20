@@ -99,6 +99,10 @@ final class PhotoFileStore: @unchecked Sendable {
         "\(ownerID.uuidString.lowercased())/\(parentID.uuidString.lowercased())/\(photoID.uuidString.lowercased()).jpg"
     }
 
+    static func avatarRemoteStoragePath(ownerID: UUID, photoID: UUID) -> String {
+        "\(ownerID.uuidString.lowercased())/\(photoID.uuidString.lowercased()).jpg"
+    }
+
     func stageNormalizedAsync(data: Data, sessionID: UUID) async throws -> DraftPhoto {
         try await Task.detached(priority: .userInitiated) { [self] in
             let normalized = try PhotoImageNormalizer.normalize(data)
@@ -122,6 +126,10 @@ final class PhotoFileStore: @unchecked Sendable {
     func commitTackle(_ draft: DraftPhoto, ownerID: UUID, itemID: UUID) throws -> CommittedDraft {
         let relativePath = tackleRelativePath(ownerID: ownerID, itemID: itemID, photoID: draft.id)
         return try commit(draft, to: relativePath)
+    }
+
+    func commitAvatar(_ draft: DraftPhoto, ownerID: UUID) throws -> CommittedDraft {
+        try commit(draft, to: avatarRelativePath(ownerID: ownerID, photoID: draft.id))
     }
 
     private func commit(_ draft: DraftPhoto, to relativePath: String) throws -> CommittedDraft {
@@ -178,6 +186,10 @@ final class PhotoFileStore: @unchecked Sendable {
         return try storeDownloaded(data, relativePath: relativePath)
     }
 
+    func storeDownloadedAvatar(_ data: Data, ownerID: UUID, photoID: UUID) throws -> String {
+        try storeDownloaded(data, relativePath: avatarRelativePath(ownerID: ownerID, photoID: photoID))
+    }
+
     private func storeDownloaded(_ data: Data, relativePath: String) throws -> String {
         let destination = url(for: relativePath)
         try ensureParentDirectory(for: destination)
@@ -214,6 +226,19 @@ final class PhotoFileStore: @unchecked Sendable {
         try fileManager.removeItem(at: directory)
     }
 
+    func removeAccountFiles(ownerID: UUID) throws {
+        let accountDirectory = rootURL
+            .appendingPathComponent("Accounts", isDirectory: true)
+            .appendingPathComponent(ownerID.uuidString.lowercased(), isDirectory: true)
+        if fileManager.fileExists(atPath: accountDirectory.path) {
+            try fileManager.removeItem(at: accountDirectory)
+        }
+        let draftsDirectory = rootURL.appendingPathComponent("Drafts", isDirectory: true)
+        if fileManager.fileExists(atPath: draftsDirectory.path) {
+            try fileManager.removeItem(at: draftsDirectory)
+        }
+    }
+
     private func committedRelativePath(ownerID: UUID, catchID: UUID, photoID: UUID) -> String {
         let owner = ownerID.uuidString.lowercased()
         let catchComponent = catchID.uuidString.lowercased()
@@ -226,6 +251,12 @@ final class PhotoFileStore: @unchecked Sendable {
         let item = itemID.uuidString.lowercased()
         let photo = photoID.uuidString.lowercased()
         return "Accounts/\(owner)/Tackle/\(item)/\(photo).jpg"
+    }
+
+    private func avatarRelativePath(ownerID: UUID, photoID: UUID) -> String {
+        let owner = ownerID.uuidString.lowercased()
+        let photo = photoID.uuidString.lowercased()
+        return "Accounts/\(owner)/Profile/\(photo).jpg"
     }
 
     private func url(for relativePath: String) -> URL {

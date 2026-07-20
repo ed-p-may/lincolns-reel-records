@@ -79,6 +79,12 @@ evidence during the phone-free implementation loop. Before this phase closes:
   library photos, inline item creation followed immediately by Catch save, free-text fallback, linked
   Log search, and archived Catch history in airplane mode; then reconnect and verify item-before-Catch
   ordering plus fresh-install recovery of item metadata/photos without cross-account or orphan objects;
+- deploy the Phase 09 profile migration and authenticated `delete-account` Edge Function, configure and
+  verify the password-reset email/deep-link route, then probe profile/avatar isolation plus complete
+  account deletion across Auth, all three private Storage buckets, and account-local cached data;
+- on physical iPhone hardware, exercise Profile edits and avatar choose/camera/remove in airplane mode,
+  relaunch with pending work, reconnect/conflict retry, account switching, and fresh-install recovery of
+  display name, home water, angler-since, avatar, and Catch-derived statistics;
 - verify a fresh physical install recovers every hosted Catch and photo with stable order/hero choice,
   including exact coordinate pairs and map focus, then audit the private bucket for orphan objects after
   replacement, photo removal, and Catch deletion;

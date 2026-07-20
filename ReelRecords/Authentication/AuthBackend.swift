@@ -6,6 +6,7 @@ protocol AuthBackend: Sendable {
     func signIn(email: String, password: String) async throws -> AccountSession
     func signUp(username: String, email: String, password: String) async throws -> AccountSession
     func signOut() async throws
+    func deleteAccount() async throws
 }
 
 actor SupabaseAuthBackend: AuthBackend {
@@ -52,6 +53,11 @@ actor SupabaseAuthBackend: AuthBackend {
 
     func signOut() async throws {
         try await client.auth.signOut()
+    }
+
+    func deleteAccount() async throws {
+        try await client.functions.invoke("delete-account")
+        try? await client.auth.signOut(scope: .local)
     }
 
     private func account(for ownerID: UUID, email: String) async throws -> AccountSession {
@@ -106,6 +112,10 @@ actor MockAuthBackend: AuthBackend {
     }
 
     func signOut() async throws {
+        account = nil
+    }
+
+    func deleteAccount() async throws {
         account = nil
     }
 }

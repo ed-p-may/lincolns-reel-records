@@ -9,6 +9,39 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-07-19 — Profile identity, offline sync, and account-management contract
+- **Context:** Phase 09 adds editable app-owned profile data while Supabase Auth and the signup-created
+  `profiles` row remain the identity boundary. The profile also owns a replaceable private avatar and
+  the app currently supports account creation, which makes account deletion a release requirement.
+- **Decision:**
+  - `username`, email, profile UUID, and signup time are immutable in Edit Profile. The screen owns only
+    optional display name, home water, avatar, and angler-since year; presentation falls back to
+    `username`, a person placeholder, and omission of empty metadata.
+  - Angler-since accepts an omitted value or a whole year from 1900 through the device's current
+    calendar year. The database enforces 1900 through its own current year; the client performs the
+    same validation before a local save.
+  - The signup-created profile is cached account-locally in SwiftData and uses a single versioned
+    outbox operation. Offline edits are authoritative local drafts; optimistic conflicts require an
+    explicit keep-mine retry, matching Catch/Tackle behavior. Profile sync precedes derived UI reloads.
+  - The avatar uses one canonical private Storage object at `owner-id/avatar-id.jpg`. Replacement
+    uploads the new immutable path, updates profile metadata, then removes the obsolete object; retry
+    state and local bytes survive interruption. Removal follows the same metadata-then-cleanup order.
+  - Profile statistics remain pure derivations from the owner-scoped local Catch collection. The
+    Profile screen reuses `DashboardDerivation` for total and personal best, and its shared normalized
+    species ranking for signature species, distinct count, and breakdown ordering.
+  - Sign-out remains blocked by any queued Catch, CatchPhoto, TackleItem, or Profile operation. All
+    presentation and fetches stay owner-scoped, so another authenticated account never sees prior
+    cached data.
+  - Because the app creates accounts, Settings includes an in-app, explicit account-deletion flow.
+    Deletion requires connectivity, removes private Storage objects and the Supabase Auth user through
+    an authenticated server-owned Edge Function, then purges that owner's local rows/files and cached
+    session. Password-reset link/deep-link handling is not implied by Phase 09 and is scheduled
+    for the hosted auth hardening gate in Phase 11.
+- **Consequences:** Username changes require a future identity migration. Phase 11 owns hosted deletion
+  and reset-email configuration evidence, signed-device confirmation, and fresh-device profile/avatar
+  recovery; Phase 09 can fully verify the local/simulated contract and database policies without a
+  physical phone.
+
 ## 2026-07-19 — Tackle Box history, ownership, and sync ordering contract
 - **Context:** Phase 08 adds an offline-created object that a Catch can reference, plus one private
   photo. Archive/delete behavior and cross-object delivery order must be fixed before the schema and

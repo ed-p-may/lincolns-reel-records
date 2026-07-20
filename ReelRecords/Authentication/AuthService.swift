@@ -15,6 +15,7 @@ final class AuthService {
     private(set) var state: AuthState = .loading
     private(set) var isWorking = false
     private(set) var signOutFailure: SignOutFailure?
+    private(set) var hasPendingLocalAccountDeletion = false
     var errorMessage: String?
 
     init(backend: any AuthBackend, defaults: UserDefaults = .standard) {
@@ -78,6 +79,33 @@ final class AuthService {
             state = .signedOut
         } catch {
             signOutFailure = .backend(error.localizedDescription)
+        }
+    }
+
+    func deleteAccount(purgeLocalData: () throws -> Void) async -> Bool {
+        isWorking = true
+        errorMessage = nil
+        defer { isWorking = false }
+
+        do {
+            if !hasPendingLocalAccountDeletion {
+                try await backend.deleteAccount()
+                hasPendingLocalAccountDeletion = true
+            }
+            do {
+                try purgeLocalData()
+            } catch {
+                errorMessage = "Your account was deleted, but local files could not be fully removed: "
+                    + error.localizedDescription
+                return false
+            }
+            hasPendingLocalAccountDeletion = false
+            clearCachedAccount()
+            state = .signedOut
+            return true
+        } catch {
+            errorMessage = error.localizedDescription
+            return false
         }
     }
 

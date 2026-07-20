@@ -27,6 +27,12 @@ struct DashboardInsights: Equatable, Sendable {
     }
 }
 
+struct DashboardRecordSummary: Equatable, Sendable {
+    let totalCatches: Int
+    let biggestCatch: CatchItem?
+    let speciesBreakdown: [DashboardLabelStat]
+}
+
 enum DashboardDerivation {
     static func insights(
         from catches: [CatchItem],
@@ -36,16 +42,16 @@ enum DashboardDerivation {
     ) -> DashboardInsights {
         let visible = catches.filter { $0.deletedAt == nil }
         let recent = visible.sorted(by: CatchDiscovery.recentPrecedes)
-        let speciesGroups = groups(in: visible, label: \CatchItem.species)
+        let recordSummary = summary(fromVisible: visible)
         let spots = spotGroups(in: visible)
         let thisWeek = calendar.dateInterval(of: .weekOfYear, for: now)
         let thisYear = calendar.dateInterval(of: .year, for: now)
 
         return DashboardInsights(
-            totalCatches: visible.count,
+            totalCatches: recordSummary.totalCatches,
             catchesThisWeek: count(in: visible, interval: thisWeek, through: now),
-            biggestCatch: visible.filter { $0.weight != nil }.sorted(by: heaviestPrecedes).first,
-            topSpecies: speciesGroups.first.map { DashboardLabelStat(label: $0.label, count: $0.catches.count) },
+            biggestCatch: recordSummary.biggestCatch,
+            topSpecies: recordSummary.speciesBreakdown.first,
             speciesThisYear: Set<String>(visible.compactMap { catchItem in
                 guard contains(catchItem.caughtAt, in: thisYear, through: now) else { return nil }
                 return CatchDiscovery.normalized(catchItem.species.trimmed)
@@ -53,6 +59,10 @@ enum DashboardDerivation {
             recentCatches: Array(recent.prefix(recentLimit)),
             favoriteSpots: spots
         )
+    }
+
+    static func recordSummary(from catches: [CatchItem]) -> DashboardRecordSummary {
+        summary(fromVisible: catches.filter { $0.deletedAt == nil })
     }
 }
 
@@ -78,6 +88,17 @@ private extension DashboardDerivation {
                 return CatchGroup(key: key, label: ordered[0][keyPath: label].trimmed, catches: ordered)
             }
             .sorted(by: groupPrecedes)
+    }
+
+    static func summary(fromVisible catches: [CatchItem]) -> DashboardRecordSummary {
+        let species = groups(in: catches, label: \CatchItem.species).map {
+            DashboardLabelStat(label: $0.label, count: $0.catches.count)
+        }
+        return DashboardRecordSummary(
+            totalCatches: catches.count,
+            biggestCatch: catches.filter { $0.weight != nil }.sorted(by: heaviestPrecedes).first,
+            speciesBreakdown: species
+        )
     }
 
     static func spotGroups(in catches: [CatchItem]) -> [DashboardSpot] {

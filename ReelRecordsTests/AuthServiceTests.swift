@@ -76,6 +76,88 @@ final class AuthServiceTests: XCTestCase {
         XCTAssertEqual(service.signOutFailure?.canRetrySync, true)
         XCTAssertEqual(service.state, .authenticated(account))
     }
+
+    func testDeleteAccountPurgesLocalDataAndSignsOut() async {
+        let account = AccountSession(
+            ownerID: UUID(),
+            email: "angler@example.com",
+            username: "angler",
+            isOffline: false
+        )
+        let service = AuthService(backend: MockAuthBackend(account: account))
+        await service.restoreSession()
+        var didPurge = false
+
+        let deleted = await service.deleteAccount { didPurge = true }
+
+        XCTAssertTrue(deleted)
+        XCTAssertTrue(didPurge)
+        XCTAssertEqual(service.state, .signedOut)
+    }
+
+    func testDeleteAccountRetriesLocalPurgeWithoutRepeatingHostedDeletion() async {
+        let account = AccountSession(
+            ownerID: UUID(),
+            email: "angler@example.com",
+            username: "angler",
+            isOffline: false
+        )
+        let backend = CountingDeleteAuthBackend(account: account)
+        let service = AuthService(backend: backend)
+        await service.restoreSession()
+        var purgeAttempts = 0
+
+        let firstResult = await service.deleteAccount {
+            purgeAttempts += 1
+            throw LocalPurgeFailure()
+        }
+        XCTAssertFalse(firstResult)
+        XCTAssertTrue(service.hasPendingLocalAccountDeletion)
+        XCTAssertEqual(service.state, .authenticated(account))
+
+        let retryResult = await service.deleteAccount { purgeAttempts += 1 }
+        let hostedDeleteCount = await backend.deleteCount
+        XCTAssertTrue(retryResult)
+        XCTAssertEqual(purgeAttempts, 2)
+        XCTAssertEqual(hostedDeleteCount, 1)
+        XCTAssertEqual(service.state, .signedOut)
+    }
+}
+
+private struct LocalPurgeFailure: LocalizedError {
+    var errorDescription: String? {
+        "Test purge failed."
+    }
+}
+
+private actor CountingDeleteAuthBackend: AuthBackend {
+    private var account: AccountSession?
+    private(set) var deleteCount = 0
+
+    init(account: AccountSession) {
+        self.account = account
+    }
+
+    func restoreSession() async throws -> AccountSession? {
+        account
+    }
+
+    func signIn(email _: String, password _: String) async throws -> AccountSession {
+        throw URLError(.unsupportedURL)
+    }
+
+    func signUp(username _: String, email _: String, password _: String) async throws -> AccountSession {
+        throw URLError(.unsupportedURL)
+    }
+
+    func signOut() async throws {
+        account = nil
+    }
+
+    func deleteAccount() async throws {
+        deleteCount += 1
+        account = nil
+    }
 }
 
 private actor DelayedAuthBackend: AuthBackend {
@@ -114,6 +196,10 @@ private actor DelayedAuthBackend: AuthBackend {
     func signOut() async throws {
         throw URLError(.unsupportedURL)
     }
+
+    func deleteAccount() async throws {
+        throw URLError(.unsupportedURL)
+    }
 }
 
 private actor OfflineAuthBackend: AuthBackend {
@@ -130,6 +216,10 @@ private actor OfflineAuthBackend: AuthBackend {
     }
 
     func signOut() async throws {
+        throw URLError(.notConnectedToInternet)
+    }
+
+    func deleteAccount() async throws {
         throw URLError(.notConnectedToInternet)
     }
 }

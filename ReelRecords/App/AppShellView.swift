@@ -139,7 +139,7 @@ struct AppShellView: View {
                     onOpenCatch: { router.presentedSheet = .catchDetail($0) }
                 )
             }
-            tab(.profile) { ProfilePlaceholderView(account: account) }
+            tab(.profile) { ProfileView(account: account) }
         }
         .tint(ReelTheme.accent)
         .sheet(item: $router.presentedSheet) { destination in
