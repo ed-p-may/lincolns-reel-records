@@ -1,6 +1,6 @@
 # Phase 07 — Dashboard and Derived Insight
 
-**Status:** Planned  
+**Status:** Complete
 **Depends on:** Phase 06 complete  
 **Primary stories:** C1, C2, C3
 
@@ -65,7 +65,13 @@ notifications; Profile species-breakdown UI.
 
 ## Closeout record
 
-- TestFlight build: _TBD_
-- Derivation decision references: _TBD_
-- Automated/performance checks: _TBD_
-- Manual device evidence: _TBD_
+- TestFlight build: no Phase 07 build; signed build `0.1.0 (3)` remains the latest hosted beta.
+  Signed deployment and final physical-device acceptance are consolidated in Phase 11.
+- Derivation decision references: [`../decisions.md`](../decisions.md), "Dashboard derivation and
+  calendar contract" (2026-07-19).
+- Automated/performance checks: `make ci` passes 56 Swift unit tests, 9 Simulator UI tests, and 59
+  local pgTAP database/RLS tests with clean SwiftFormat and strict SwiftLint. Deriving a representative
+  1,000-Catch dataset takes approximately 27 ms on the development Mac.
+- Manual device evidence: the empty and populated Home states were inspected in iPhone 16 Pro
+  Simulator, including Add, Detail, Log, and focused Map navigation. Physical airplane-mode,
+  time-zone/date-boundary, reconnect, and fresh-install recovery checks are consolidated in Phase 11.

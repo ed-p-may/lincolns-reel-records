@@ -50,21 +50,41 @@ enum AppSheet: Identifiable {
 @MainActor
 @Observable
 final class AppRouter {
-    var selectedTab: AppTab = .log
+    var selectedTab: AppTab = .home
     var presentedSheet: AppSheet?
+    var addReturnTab: AppTab = .home
     var mapFocusCatchID: UUID?
+    var mapFocusSpotName: String?
     var mapFocusRevision = 0
 
     func select(_ tab: AppTab) {
         if tab == .add {
-            presentedSheet = .addCatch
+            presentAddCatch(returningTo: selectedTab)
         } else {
+            if tab == .map {
+                mapFocusCatchID = nil
+                mapFocusSpotName = nil
+            }
             selectedTab = tab
         }
     }
 
+    func presentAddCatch(returningTo tab: AppTab) {
+        addReturnTab = tab
+        presentedSheet = .addCatch
+    }
+
     func showOnMap(_ catchItem: CatchItem) {
-        mapFocusCatchID = catchItem.id
+        showOnMap(catchID: catchItem.id, spotName: catchItem.location)
+    }
+
+    func showSpotOnMap(_ spot: DashboardSpot) {
+        showOnMap(catchID: spot.mapFocusCatchID, spotName: spot.name)
+    }
+
+    private func showOnMap(catchID: UUID?, spotName: String?) {
+        mapFocusCatchID = catchID
+        mapFocusSpotName = spotName
         mapFocusRevision += 1
         presentedSheet = nil
         selectedTab = .map
@@ -90,12 +110,21 @@ struct AppShellView: View {
             get: { router.selectedTab },
             set: { router.select($0) }
         )) {
-            tab(.home) { PlaceholderTabView(title: "Home", message: "Dashboard arrives in Phase 07.") }
+            tab(.home) {
+                DashboardView(
+                    account: account,
+                    refreshToken: logRevision,
+                    onAddCatch: { router.presentAddCatch(returningTo: .home) },
+                    onOpenCatch: { router.presentedSheet = .catchDetail($0) },
+                    onOpenLog: { router.selectedTab = .log },
+                    onOpenSpot: { router.showSpotOnMap($0) }
+                )
+            }
             tab(.log) {
                 LogbookView(
                     ownerID: account.ownerID,
                     refreshToken: logRevision,
-                    onAddCatch: { router.presentedSheet = .addCatch },
+                    onAddCatch: { router.presentAddCatch(returningTo: .log) },
                     onOpenCatch: { router.presentedSheet = .catchDetail($0) }
                 )
             }
@@ -105,6 +134,7 @@ struct AppShellView: View {
                     ownerID: account.ownerID,
                     refreshToken: logRevision,
                     focusCatchID: router.mapFocusCatchID,
+                    focusSpotName: router.mapFocusSpotName,
                     focusRevision: router.mapFocusRevision,
                     onOpenCatch: { router.presentedSheet = .catchDetail($0) }
                 )
@@ -117,7 +147,7 @@ struct AppShellView: View {
             case .addCatch:
                 AddCatchView(ownerID: account.ownerID) {
                     logRevision += 1
-                    router.selectedTab = .log
+                    router.selectedTab = router.addReturnTab
                 }
             case let .catchDetail(catchItem):
                 CatchDetailView(
@@ -139,18 +169,5 @@ struct AppShellView: View {
         }
         .tabItem { Label(appTab.title, systemImage: appTab.systemImage) }
         .tag(appTab)
-    }
-}
-
-private struct PlaceholderTabView: View {
-    let title: String
-    let message: String
-
-    var body: some View {
-        ContentUnavailableView(title, systemImage: "fish.fill", description: Text(message))
-            .foregroundStyle(ReelTheme.primaryText)
-            .frame(maxWidth: .infinity, maxHeight: .infinity)
-            .background(ReelTheme.background)
-            .navigationTitle(title)
     }
 }

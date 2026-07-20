@@ -72,6 +72,9 @@ evidence during the phone-free implementation loop. Before this phase closes:
 - on physical iPhone hardware, exercise a live Open-Meteo suggestion from GPS/time, provider
   timeout/error handling, manual condition entry and clearing in airplane mode, reconnect without
   overwriting manual edits, and exact hosted recovery of all four values plus the expected weather icon;
+- on physical iPhone hardware, verify Dashboard totals, calendar-derived week/year values, rankings,
+  recent catches, and favorite spots from the offline local cache across airplane mode, relaunch,
+  time-zone/date-boundary changes, reconnect, and hosted fresh-install recovery;
 - verify a fresh physical install recovers every hosted Catch and photo with stable order/hero choice,
   including exact coordinate pairs and map focus, then audit the private bucket for orphan objects after
   replacement, photo removal, and Catch deletion;

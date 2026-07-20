@@ -36,6 +36,10 @@ final class CatchPhotoTests: XCTestCase {
 
         var photos = try store.repository.photos(catchID: catchID, ownerID: ownerID)
         XCTAssertEqual(photos.map(\.id), [second.id, first.id])
+        XCTAssertEqual(
+            try store.repository.heroPhotos(catchIDs: [catchID, UUID()], ownerID: ownerID)[catchID]?.id,
+            second.id
+        )
         XCTAssertTrue(photos.allSatisfy { store.repository.fileURL(for: $0) != nil })
         XCTAssertEqual(try store.repository.pendingCount(ownerID: ownerID), 2)
 
@@ -47,6 +51,7 @@ final class CatchPhotoTests: XCTestCase {
         )
         photos = try store.repository.photos(catchID: catchID, ownerID: ownerID)
         XCTAssertEqual(photos.map(\.id), [first.id])
+        XCTAssertEqual(try store.repository.heroPhotos(catchIDs: [catchID], ownerID: ownerID)[catchID]?.id, first.id)
         XCTAssertEqual(photos.first?.position, 0)
         XCTAssertEqual(try store.repository.pendingCount(ownerID: ownerID), 1)
 

@@ -7,9 +7,7 @@ final class TracerBulletUITests: XCTestCase {
     }
 
     func testCatchCanBeCreatedEditedAndDeleted() {
-        let app = XCUIApplication()
-        app.launchArguments = ["--ui-testing"]
-        app.launch()
+        let app = launchLogbook()
 
         let addFromEmptyState = app.buttons["log.empty.add"]
         XCTAssertTrue(addFromEmptyState.waitForExistence(timeout: 5))
@@ -71,9 +69,7 @@ final class TracerBulletUITests: XCTestCase {
     }
 
     func testLogDiscoveryControlsComposeAndSurviveDetail() {
-        let app = XCUIApplication()
-        app.launchArguments = ["--ui-testing", "--ui-testing-logbook"]
-        app.launch()
+        let app = launchLogbook(arguments: ["--ui-testing-logbook"])
 
         let search = app.textFields["log.search"]
         XCTAssertTrue(search.waitForExistence(timeout: 5))
@@ -107,9 +103,7 @@ final class TracerBulletUITests: XCTestCase {
     }
 
     func testPhotoGalleryReorderAndRemovalPersistThroughEdit() {
-        let app = XCUIApplication()
-        app.launchArguments = ["--ui-testing", "--ui-testing-logbook"]
-        app.launch()
+        let app = launchLogbook(arguments: ["--ui-testing-logbook"])
 
         let bass = app.staticTexts["Largemouth Bass With An Exceptionally Long Display Name"]
         XCTAssertTrue(bass.waitForExistence(timeout: 5))
@@ -132,9 +126,7 @@ final class TracerBulletUITests: XCTestCase {
     }
 
     func testCatchMapSelectionAndDetailFocusRoundTrip() {
-        let app = XCUIApplication()
-        app.launchArguments = ["--ui-testing", "--ui-testing-logbook"]
-        app.launch()
+        let app = launchLogbook(arguments: ["--ui-testing-logbook"])
 
         let trout = app.staticTexts["Rainbow Trout"]
         XCTAssertTrue(trout.waitForExistence(timeout: 5))
@@ -160,9 +152,7 @@ final class TracerBulletUITests: XCTestCase {
     }
 
     func testManualPinCanBeChosenWithoutRequestingGPS() {
-        let app = XCUIApplication()
-        app.launchArguments = ["--ui-testing"]
-        app.launch()
+        let app = launchLogbook()
 
         XCTAssertTrue(app.buttons["log.empty.add"].waitForExistence(timeout: 5))
         app.buttons["log.empty.add"].tap()
@@ -187,9 +177,7 @@ final class TracerBulletUITests: XCTestCase {
     }
 
     func testManualConditionsSaveWithoutWeatherService() {
-        let app = XCUIApplication()
-        app.launchArguments = ["--ui-testing"]
-        app.launch()
+        let app = launchLogbook()
 
         XCTAssertTrue(app.buttons["log.empty.add"].waitForExistence(timeout: 5))
         app.buttons["log.empty.add"].tap()
@@ -227,14 +215,11 @@ final class TracerBulletUITests: XCTestCase {
     }
 
     func testLogAndDetailRemainNavigableAtLargestAccessibilityText() {
-        let app = XCUIApplication()
-        app.launchArguments = [
-            "--ui-testing",
+        let app = launchLogbook(arguments: [
             "--ui-testing-logbook",
             "-UIPreferredContentSizeCategoryName",
             "UICTContentSizeCategoryAccessibilityExtraExtraExtraLarge"
-        ]
-        app.launch()
+        ])
 
         XCTAssertTrue(app.textFields["log.search"].waitForExistence(timeout: 5))
         XCTAssertTrue(app.buttons["log.sort.recent"].isHittable)
@@ -247,5 +232,70 @@ final class TracerBulletUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["2.2 lb"].exists)
         XCTAssertTrue(app.staticTexts["Field notes"].exists)
         XCTAssertTrue(app.buttons["detail.done"].isHittable)
+    }
+
+    func testDashboardSummaryDetailAndSpotNavigationUseLocalLogbook() {
+        let app = launchApp(arguments: ["--ui-testing-logbook"])
+
+        let total = app.staticTexts["dashboard.total"]
+        XCTAssertTrue(total.waitForExistence(timeout: 5))
+        XCTAssertEqual(total.label, "2")
+        XCTAssertTrue(app.staticTexts["dashboard.greeting"].label.contains("ui_test"))
+        XCTAssertTrue(app.staticTexts["6.5 lb"].exists)
+
+        let recentBass = app.buttons["dashboard.recent.0"]
+        XCTAssertTrue(recentBass.waitForExistence(timeout: 3))
+        recentBass.tap()
+        XCTAssertTrue(app.navigationBars["Largemouth Bass With An Exceptionally Long Display Name"]
+            .waitForExistence(timeout: 3))
+        app.buttons["detail.done"].tap()
+        XCTAssertTrue(total.waitForExistence(timeout: 3))
+
+        let dashboard = app.scrollViews.firstMatch
+        dashboard.swipeUp()
+        let seeAll = app.buttons["dashboard.see-all"]
+        XCTAssertTrue(seeAll.waitForExistence(timeout: 3))
+        seeAll.tap()
+        XCTAssertTrue(app.textFields["log.search"].waitForExistence(timeout: 3))
+        app.tabBars.buttons["Home"].tap()
+        XCTAssertTrue(total.waitForExistence(timeout: 3))
+
+        dashboard.swipeUp()
+        dashboard.swipeUp()
+        let favoriteSpot = app.buttons["dashboard.spot.stockbridge bowl north shore by the old stone landing"]
+        XCTAssertTrue(favoriteSpot.waitForExistence(timeout: 3))
+        favoriteSpot.tap()
+        XCTAssertTrue(app.staticTexts["map.counts"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["map.selected-catch"].label.contains("Largemouth Bass"))
+    }
+
+    func testDashboardEmptyStateAddsCatchAndReturnsHome() {
+        let app = launchApp()
+
+        XCTAssertTrue(app.staticTexts["dashboard.total"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["dashboard.total"].label, "0")
+        XCTAssertTrue(app.staticTexts["Your first catch will appear here"].exists)
+        app.buttons["dashboard.add"].tap()
+        app.buttons["add.species.Smallmouth Bass"].tap()
+        app.buttons["add.save"].tap()
+
+        XCTAssertTrue(app.staticTexts["dashboard.total"].waitForExistence(timeout: 5))
+        XCTAssertEqual(app.staticTexts["dashboard.total"].label, "1")
+        XCTAssertTrue(app.staticTexts["Smallmouth Bass"].exists)
+    }
+
+    private func launchLogbook(arguments: [String] = []) -> XCUIApplication {
+        let app = launchApp(arguments: arguments)
+        let logTab = app.tabBars.buttons["Log"]
+        XCTAssertTrue(logTab.waitForExistence(timeout: 5))
+        logTab.tap()
+        return app
+    }
+
+    private func launchApp(arguments: [String] = []) -> XCUIApplication {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing"] + arguments
+        app.launch()
+        return app
     }
 }

@@ -82,7 +82,7 @@ enum CatchDiscovery {
         }
     }
 
-    private static func measurementPrecedes(
+    static func measurementPrecedes(
         _ firstValue: Double?,
         _ secondValue: Double?,
         first: CatchItem,
@@ -100,7 +100,7 @@ enum CatchDiscovery {
         }
     }
 
-    private static func recentPrecedes(_ first: CatchItem, _ second: CatchItem) -> Bool {
+    static func recentPrecedes(_ first: CatchItem, _ second: CatchItem) -> Bool {
         if first.caughtAt != second.caughtAt {
             return first.caughtAt > second.caughtAt
         }
@@ -110,11 +110,11 @@ enum CatchDiscovery {
         return first.id.uuidString < second.id.uuidString
     }
 
-    private static func normalized(_ value: String) -> String {
+    static func normalized(_ value: String) -> String {
         value.folding(options: comparisonOptions, locale: comparisonLocale).lowercased()
     }
 
-    private static func alphabeticallyPrecedes(_ first: String, _ second: String) -> Bool {
+    static func alphabeticallyPrecedes(_ first: String, _ second: String) -> Bool {
         first.compare(
             second,
             options: comparisonOptions,

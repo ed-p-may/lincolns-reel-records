@@ -84,6 +84,25 @@ final class SwiftDataCatchPhotoRepository {
         return try Dictionary(grouping: modelContext.fetch(descriptor).map(\.item), by: \.catchID)
     }
 
+    func heroPhotos(catchIDs: [UUID], ownerID: UUID) throws -> [UUID: CatchPhotoItem] {
+        var result: [UUID: CatchPhotoItem] = [:]
+        for catchID in Set(catchIDs) {
+            var descriptor = FetchDescriptor<CatchPhotoRecord>(
+                predicate: #Predicate {
+                    $0.catchID == catchID && $0.ownerID == ownerID && $0.deletedAt == nil
+                },
+                sortBy: [
+                    SortDescriptor(\CatchPhotoRecord.position),
+                    SortDescriptor(\CatchPhotoRecord.createdAt),
+                    SortDescriptor(\CatchPhotoRecord.id)
+                ]
+            )
+            descriptor.fetchLimit = 1
+            result[catchID] = try modelContext.fetch(descriptor).first?.item
+        }
+        return result
+    }
+
     func fileURL(for photo: CatchPhotoItem) -> URL? {
         fileStore.fileURL(relativePath: photo.localRelativePath)
     }

@@ -26,6 +26,7 @@
 		71729EAFE7EFAC2352AC01AB /* CatchPhotoRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4E421F41A4DE520309B1A7EE /* CatchPhotoRepository.swift */; };
 		7824E4378024C26E3362EA93 /* CatchRepositoryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 05AA0ADC77F4E1A1922BD9FF /* CatchRepositoryTests.swift */; };
 		78DE675A590584F984CB33E6 /* AppDependencies.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32F3AE12ADFCAAAE2AF35E22 /* AppDependencies.swift */; };
+		7B7602E11B5F4F0AC0FED883 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D23BC765920DD9DFBAB42A9 /* DashboardView.swift */; };
 		7DFB8CE29178AE46D91B274F /* AuthBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DDAE86ED1D2AE8E06A0B91 /* AuthBackend.swift */; };
 		879092C5467F9A7E4D17F1AD /* CatchDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798FBE5458AC3FD926D9B6DD /* CatchDetailView.swift */; };
 		87EA90297E973C0C9206F77A /* ConditionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B93E885658057151862F91 /* ConditionModels.swift */; };
@@ -33,7 +34,9 @@
 		8AB00FBB94EDE94BE97CA242 /* LocationModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D6A7479E66DA33689CF35AB /* LocationModels.swift */; };
 		8B13A2B9A3DBB681C8875B67 /* CatchPhotoViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = D8D65117E1FE60166150F1BC /* CatchPhotoViews.swift */; };
 		8C41C09FBBF83C179FCCB12E /* OpenMeteoClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = F154528CB461BE96AC18928D /* OpenMeteoClient.swift */; };
+		90FD7615D6CFCAE9022654BC /* DashboardInsights.swift in Sources */ = {isa = PBXBuildFile; fileRef = E786F9B54BB4D51DC632F505 /* DashboardInsights.swift */; };
 		92E0F55AAA42F17F2AFED640 /* TracerBulletUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8E2E9438AE2DE1AE57573856 /* TracerBulletUITests.swift */; };
+		944ABA75DB53F06B13590F57 /* DashboardTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6EE7F4CFAEC93D8C5C08D31 /* DashboardTests.swift */; };
 		9949AC8FB26861F08331ABB4 /* LocationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 24BAE2D9BDF1C599368E859D /* LocationTests.swift */; };
 		A4C1A9297F6CD8422EC3B729 /* CatchConditionsEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C91064C704B8FB6367D49F /* CatchConditionsEditor.swift */; };
 		B29B50BE600BB6CA4B133492 /* SyncCoordinator.swift in Sources */ = {isa = PBXBuildFile; fileRef = C6BBC96B2E6E83C521FB85DB /* SyncCoordinator.swift */; };
@@ -108,11 +111,13 @@
 		90EB0B98DE3DA57383F40F23 /* ProfilePlaceholderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfilePlaceholderView.swift; sourceTree = "<group>"; };
 		9364A178D385938DBE2CFDAB /* CatchFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchFormatting.swift; sourceTree = "<group>"; };
 		987E097BF08486AC4CDAEB69 /* AppShellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppShellView.swift; sourceTree = "<group>"; };
+		9D23BC765920DD9DFBAB42A9 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
 		9E88CFB1033937DE196E8833 /* ManualLocationPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManualLocationPicker.swift; sourceTree = "<group>"; };
 		9FF14F732C0227876CB641DB /* LincolnReelRecordsTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LincolnReelRecordsTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		9FF546C999DE7F6FF1F037B6 /* LincolnReelRecordsUITests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = LincolnReelRecordsUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2F96EABC8DC1C4D991C710E /* CatchDiscoveryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchDiscoveryTests.swift; sourceTree = "<group>"; };
 		AB172ADDBD5EB7D3BEBC20EE /* CatchRepository.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchRepository.swift; sourceTree = "<group>"; };
+		B6EE7F4CFAEC93D8C5C08D31 /* DashboardTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardTests.swift; sourceTree = "<group>"; };
 		B8DDAE86ED1D2AE8E06A0B91 /* AuthBackend.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthBackend.swift; sourceTree = "<group>"; };
 		BB1D66212FEC995C64FA8427 /* CatchPhotoTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoTests.swift; sourceTree = "<group>"; };
 		C4B93E885658057151862F91 /* ConditionModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConditionModels.swift; sourceTree = "<group>"; };
@@ -123,6 +128,7 @@
 		DD98D5A388B178A2654ADF8E /* CatchSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchSyncTests.swift; sourceTree = "<group>"; };
 		E2513386627DC7050E07AB13 /* AuthenticationFlowView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationFlowView.swift; sourceTree = "<group>"; };
 		E75A0561228AEF7D6A1A099E /* CatchLocationEditor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchLocationEditor.swift; sourceTree = "<group>"; };
+		E786F9B54BB4D51DC632F505 /* DashboardInsights.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardInsights.swift; sourceTree = "<group>"; };
 		EC094B2EE2E9355950DFBBD5 /* CatchModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchModels.swift; sourceTree = "<group>"; };
 		F154528CB461BE96AC18928D /* OpenMeteoClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMeteoClient.swift; sourceTree = "<group>"; };
 		F36043304E7F65970C20AFA1 /* CatchPhotoModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoModels.swift; sourceTree = "<group>"; };
@@ -154,6 +160,15 @@
 				9E88CFB1033937DE196E8833 /* ManualLocationPicker.swift */,
 			);
 			path = Location;
+			sourceTree = "<group>";
+		};
+		06FB0A12A17AA91194CD8EC8 /* Dashboard */ = {
+			isa = PBXGroup;
+			children = (
+				E786F9B54BB4D51DC632F505 /* DashboardInsights.swift */,
+				9D23BC765920DD9DFBAB42A9 /* DashboardView.swift */,
+			);
+			path = Dashboard;
 			sourceTree = "<group>";
 		};
 		170B519A46EBAD8CCDCEDF35 /* App */ = {
@@ -257,6 +272,7 @@
 				1B4E50EF8CD3CE40E4EF3DAE /* Authentication */,
 				35ACC28D4B754B2AAFDA9FDD /* Catches */,
 				513C17425D349837F55FCA1B /* Conditions */,
+				06FB0A12A17AA91194CD8EC8 /* Dashboard */,
 				E2078527CD57D29999CE85E3 /* DesignSystem */,
 				028B62131CB07B63328C7294 /* Location */,
 				C17E9258A65E2DC5DE4E4D29 /* Photos */,
@@ -288,6 +304,7 @@
 				05AA0ADC77F4E1A1922BD9FF /* CatchRepositoryTests.swift */,
 				DD98D5A388B178A2654ADF8E /* CatchSyncTests.swift */,
 				6CFFBDC9C3F7088E5E0F75E8 /* ConditionTests.swift */,
+				B6EE7F4CFAEC93D8C5C08D31 /* DashboardTests.swift */,
 				24BAE2D9BDF1C599368E859D /* LocationTests.swift */,
 			);
 			path = ReelRecordsTests;
@@ -443,6 +460,7 @@
 				7824E4378024C26E3362EA93 /* CatchRepositoryTests.swift in Sources */,
 				D0684D2587D43AD3BEBC1462 /* CatchSyncTests.swift in Sources */,
 				017C331EBFC6AFB73CD2A6D6 /* ConditionTests.swift in Sources */,
+				944ABA75DB53F06B13590F57 /* DashboardTests.swift in Sources */,
 				9949AC8FB26861F08331ABB4 /* LocationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -484,6 +502,8 @@
 				1E292BF35DC0CC215EE3E268 /* CatchRemoteStore.swift in Sources */,
 				68CD66FCBEEF95A0A60D9355 /* CatchRepository.swift in Sources */,
 				87EA90297E973C0C9206F77A /* ConditionModels.swift in Sources */,
+				90FD7615D6CFCAE9022654BC /* DashboardInsights.swift in Sources */,
+				7B7602E11B5F4F0AC0FED883 /* DashboardView.swift in Sources */,
 				C6D64A58791A3E614FE85BBD /* FieldInputStyle.swift in Sources */,
 				6E82789F6E3F64C3D68CC25F /* LincolnsReelRecordsApp.swift in Sources */,
 				8AB00FBB94EDE94BE97CA242 /* LocationModels.swift in Sources */,

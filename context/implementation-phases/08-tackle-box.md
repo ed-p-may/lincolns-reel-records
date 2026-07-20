@@ -1,6 +1,6 @@
 # Phase 08 — Tackle Box
 
-**Status:** Planned  
+**Status:** Ready
 **Depends on:** Phase 07 complete  
 **Primary stories:** A4 (gear subset), A7, F1, F2, F3, E5
 

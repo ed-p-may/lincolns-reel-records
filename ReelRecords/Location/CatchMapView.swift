@@ -12,6 +12,7 @@ struct CatchMapView: View {
     let ownerID: UUID
     let refreshToken: Int
     let focusCatchID: UUID?
+    let focusSpotName: String?
     let focusRevision: Int
     let onOpenCatch: (CatchItem) -> Void
 
@@ -67,7 +68,7 @@ struct CatchMapView: View {
                 .tracking(0.7)
                 .foregroundStyle(ReelTheme.primaryText)
                 .accessibilityIdentifier("map.counts")
-            Text("Catch pins stay saved offline; Apple map tiles may need a connection.")
+            Text(mapSubtitle)
                 .font(ReelFont.body(.caption2))
                 .foregroundStyle(ReelTheme.secondaryText)
         }
@@ -122,9 +123,7 @@ struct CatchMapView: View {
         ContentUnavailableView {
             Label("No catches pinned yet", systemImage: "map")
         } description: {
-            Text(catches.isEmpty
-                ? "Log a catch to start your private map."
-                : "Your catches are safe; add a GPS or manual pin from Edit Catch.")
+            Text(emptyDescription)
         }
         .accessibilityIdentifier("map.empty")
     }
@@ -136,6 +135,30 @@ struct CatchMapView: View {
     private var selectedCatch: CatchItem? {
         guard let selectedCatchID else { return nil }
         return pinnedCatches.first { $0.id == selectedCatchID }
+    }
+
+    private var unmappedFocusName: String? {
+        guard let focusSpotName else { return nil }
+        guard let focusCatchID, pinnedCatches.contains(where: { $0.id == focusCatchID }) else {
+            return focusSpotName
+        }
+        return nil
+    }
+
+    private var mapSubtitle: String {
+        if let unmappedFocusName {
+            return "\(unmappedFocusName) has no saved pin yet; showing your other mapped catches."
+        }
+        return "Catch pins stay saved offline; Apple map tiles may need a connection."
+    }
+
+    private var emptyDescription: String {
+        if let unmappedFocusName {
+            return "\(unmappedFocusName) has no saved pin. Add GPS or a manual pin from Edit Catch."
+        }
+        return catches.isEmpty
+            ? "Log a catch to start your private map."
+            : "Your catches are safe; add a GPS or manual pin from Edit Catch."
     }
 
     private var errorBinding: Binding<Bool> {
@@ -166,7 +189,13 @@ struct CatchMapView: View {
         guard let focusCatchID,
               let catchItem = pinnedCatches.first(where: { $0.id == focusCatchID }),
               let coordinate = catchItem.coordinate
-        else { return }
+        else {
+            if focusSpotName != nil {
+                selectedCatchID = nil
+                cameraPosition = .automatic
+            }
+            return
+        }
         selectedCatchID = catchItem.id
         cameraPosition = .region(MKCoordinateRegion(
             center: coordinate.mapCoordinate,

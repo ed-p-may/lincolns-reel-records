@@ -9,6 +9,26 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-07-19 — Dashboard derivation and calendar contract
+- **Context:** Phase 07 must produce stable, honest summaries from the local Catch cache across missing
+  measurements, spelling/case variants, ties, back-entered records, future dates, and time-zone changes.
+- **Decision:**
+  - Derive every dashboard value at render/load time from the account-scoped, non-deleted local Catch
+    collection. Persist no summary rows or parallel statistics cache.
+  - Use the device's current `Calendar` and time zone. "This week" and "this year" use `caughtAt`, not
+    `createdAt`, and include dates from the containing calendar interval through `now`; a future-dated
+    Catch remains visible in totals/recent/rankings but does not enter a period count until that time.
+  - Normalize species and named spots by trimming and case-insensitive exact comparison. Rank modes by
+    count, then most-recent `caughtAt`, then display label. Biggest/best ignores missing weights and
+    uses recent/created/UUID order for equal values; a spot with no weights falls back to longest, and
+    a completely unmeasured set displays an explicit unmeasured state rather than zero.
+  - Recent catches use descending `caughtAt`, then `createdAt`, then UUID. Favorite spots use the same
+    deterministic mode order; Map focus uses the most-recent coordinate-bearing Catch at that named
+    spot, while a spot without coordinates still opens Map's honest no-pin state.
+- **Consequences:** Fixture tests inject `now` and `Calendar`, including week/year boundaries and a
+  second time zone. Dashboard recomputation remains a small pure pass over the beta-scale local set;
+  the representative 1,000-Catch performance check remains in the focused suite.
+
 ## 2026-07-19 — Weather suggestion request, mapping, and draft precedence contract
 - **Context:** Phase 06 must enrich an offline-first Catch draft without turning hourly model data,
   network latency, or a late response into authoritative user data. Open-Meteo exposes hourly
