@@ -63,6 +63,7 @@ final class SwiftDataCatchRepository {
             rodReel: values.rodReel,
             notes: values.notes,
             released: values.released,
+            bookmarked: values.bookmarked,
             createdAt: now,
             updatedAt: now
         )
@@ -74,10 +75,29 @@ final class SwiftDataCatchRepository {
     }
 
     @discardableResult
+    func setBookmarked(id: UUID, ownerID: UUID, bookmarked: Bool) throws -> CatchItem {
+        guard let record = try record(id: id, ownerID: ownerID) else {
+            throw CatchRepositoryError.missingCatch(id)
+        }
+        var values = record.values
+        values.bookmarked = bookmarked
+        return try update(record: record, ownerID: ownerID, proposedValues: values)
+    }
+
+    @discardableResult
     func update(id: UUID, ownerID: UUID, values proposedValues: CatchValues) throws -> CatchItem {
         guard let record = try record(id: id, ownerID: ownerID) else {
             throw CatchRepositoryError.missingCatch(id)
         }
+        return try update(record: record, ownerID: ownerID, proposedValues: proposedValues)
+    }
+
+    private func update(
+        record: CatchRecord,
+        ownerID: UUID,
+        proposedValues: CatchValues
+    ) throws -> CatchItem {
+        let id = record.id
         guard record.deletedAt == nil else { throw CatchRepositoryError.deletedCatch(id) }
 
         let values = try validated(proposedValues)
@@ -287,7 +307,8 @@ private extension SwiftDataCatchRepository {
             lureText: normalized(proposedValues.lureText),
             rodReel: normalized(proposedValues.rodReel),
             notes: normalized(proposedValues.notes),
-            released: proposedValues.released
+            released: proposedValues.released,
+            bookmarked: proposedValues.bookmarked
         )
     }
 
@@ -313,6 +334,7 @@ private extension SwiftDataCatchRepository {
         record.rodReel = values.rodReel
         record.notes = values.notes
         record.released = values.released
+        record.bookmarked = values.bookmarked
     }
 
     func apply(_ remote: RemoteCatch, to record: CatchRecord) {
@@ -329,6 +351,7 @@ private extension SwiftDataCatchRepository {
             ownerID: remote.ownerID,
             species: remote.values.species,
             caughtAt: remote.values.caughtAt,
+            bookmarked: remote.values.bookmarked,
             syncState: .synced
         )
         apply(remote, to: record)

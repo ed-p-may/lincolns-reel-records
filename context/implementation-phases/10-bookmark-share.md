@@ -1,6 +1,6 @@
 # Phase 10 — Bookmark and Per-Catch Share
 
-**Status:** Planned  
+**Status:** Complete
 **Depends on:** Phase 04 complete  
 **Primary stories:** B6
 
@@ -67,7 +67,20 @@ watermarks beyond the approved composition.
 
 ## Closeout record
 
-- TestFlight build: _TBD_
-- Share design reference: _TBD_
-- Automated/image checks: _TBD_
-- Real-device share evidence: _TBD_
+- TestFlight build: no new signed build in this phone-free phase; the final hosted/signed release is a
+  consolidated Phase 11 gate.
+- Share design reference: deterministic 1080 × 1350 (4:5) JPEG; first ordered Catch photo or branded
+  fish placeholder; Reel Records mark, species, optional weight/length, named spot, and caught date.
+  Coordinates, account identity, notes, tackle, conditions, and source-photo metadata are excluded.
+- Temporary-file policy: generate beneath `tmp/ReelRecords/Share`, remove on share completion or
+  cancellation, and prune surviving artifacts after 24 hours. Photo decode is bounded to 1,400 px and
+  cached; decode, JPEG encoding, directory scan, and file writing run off the main actor.
+- Automated/image checks: focused 20-test Catch repository/discovery/transport/share suite passed;
+  complete, sparse, long-text, and large-photo fixtures render at exact dimensions without inherited
+  GPS/camera/user metadata. Full `make ci` passed with 0 lint violations, 82 unit tests, 14 Simulator
+  UI tests, and all 99 pgTAP assertions.
+- Simulator evidence: Saved filtering, immediate bookmark/unbookmark, native share-sheet presentation,
+  explicit cancellation, return to Catch Detail, and temporary-artifact cleanup passed on iPhone 17 Pro
+  / iOS 26.5 Simulator.
+- Real-device share evidence: Messages/Mail/Save Image, physical cancellation, hosted cross-device
+  bookmark recovery, and final signed-build confirmation are consolidated in Phase 11.

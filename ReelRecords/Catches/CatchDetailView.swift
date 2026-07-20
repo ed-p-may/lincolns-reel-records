@@ -14,7 +14,10 @@ struct CatchDetailView: View {
     @State private var isEditing = false
     @State private var isShowingTackleItem = false
     @State private var isConfirmingDelete = false
+    @State private var isPreparingShare = false
+    @State private var shareArtifact: ShareArtifact?
     @State private var errorMessage: String?
+    private let shareStore = TemporaryShareStore()
 
     let onChanged: () -> Void
     let onShowOnMap: (CatchItem) -> Void
@@ -62,6 +65,11 @@ struct CatchDetailView: View {
                     }
                 }
             }
+            .sheet(item: $shareArtifact, onDismiss: cleanupShareArtifact) { artifact in
+                CatchActivityView(artifact: artifact, onCompletion: cleanupShareArtifact)
+                    .ignoresSafeArea()
+                    .accessibilityIdentifier("catch.share-sheet")
+            }
             .confirmationDialog(
                 "Delete this catch?",
                 isPresented: $isConfirmingDelete,
@@ -73,7 +81,7 @@ struct CatchDetailView: View {
                 Text("It disappears now and the deletion syncs when connected.")
             }
         }
-        .alert("Catch not changed", isPresented: errorBinding) {
+        .alert("Catch action unavailable", isPresented: errorBinding) {
             Button("OK", role: .cancel) { errorMessage = nil }
         } message: {
             Text(errorMessage ?? "")
@@ -113,6 +121,14 @@ struct CatchDetailView: View {
         }
         .frame(minHeight: 300)
         .clipped()
+        .overlay(alignment: .topTrailing) {
+            CatchDetailShareActions(
+                isBookmarked: catchItem.bookmarked,
+                isPreparingShare: isPreparingShare,
+                onToggleBookmark: toggleBookmark,
+                onShare: prepareShare
+            )
+        }
     }
 
     @ViewBuilder
@@ -323,6 +339,44 @@ private extension CatchDetailView {
         } catch {
             errorMessage = error.localizedDescription
         }
+    }
+
+    private func toggleBookmark() {
+        do {
+            catchItem = try repository.setBookmarked(
+                id: catchItem.id,
+                ownerID: catchItem.ownerID,
+                bookmarked: !catchItem.bookmarked
+            )
+            onChanged()
+            Task { await syncCoordinator.sync(ownerID: catchItem.ownerID) }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func prepareShare() {
+        guard !isPreparingShare else { return }
+        isPreparingShare = true
+        let content = CatchShareContent(catchItem: catchItem)
+        let photoURL = photos.first.flatMap(photoRepository.fileURL(for:))
+        Task {
+            defer { isPreparingShare = false }
+            do {
+                let data = try await CatchShareRenderer().render(content: content, photoURL: photoURL)
+                shareArtifact = try await Task.detached(priority: .userInitiated) {
+                    try shareStore.create(data: data)
+                }.value
+            } catch {
+                errorMessage = error.localizedDescription
+            }
+        }
+    }
+
+    private func cleanupShareArtifact() {
+        guard let artifact = shareArtifact else { return }
+        shareStore.remove(artifact)
+        shareArtifact = nil
     }
 
     private func reloadPhotos() {

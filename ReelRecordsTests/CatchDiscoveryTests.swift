@@ -43,6 +43,24 @@ final class CatchDiscoveryTests: XCTestCase {
         XCTAssertEqual(filtered.map(\.weight), [5, 2])
     }
 
+    func testSavedSearchSpeciesAndSortCompose() {
+        let catches = [
+            catchItem(species: "Bass", weight: 2, location: "Bowl", bookmarked: true),
+            catchItem(species: "Bass", weight: 6, location: "Bowl", bookmarked: false),
+            catchItem(species: "Perch", weight: 8, location: "Bowl", bookmarked: true)
+        ]
+
+        let filtered = CatchDiscovery.results(
+            in: catches,
+            query: "bowl",
+            species: "bass",
+            savedOnly: true,
+            sort: .heaviest
+        )
+
+        XCTAssertEqual(filtered.map(\.weight), [2])
+    }
+
     func testMeasurementSortsPutMissingValuesLastThenUseRecentTieBreaks() {
         let olderHeavy = catchItem(id: 1, species: "Older", weight: 4, length: 20, caughtAt: date(1))
         let newerHeavy = catchItem(id: 2, species: "Newer", weight: 4, length: 19, caughtAt: date(2))
@@ -111,6 +129,7 @@ final class CatchDiscoveryTests: XCTestCase {
         location: String? = nil,
         lure: String? = nil,
         notes: String? = nil,
+        bookmarked: Bool = false,
         caughtAt: Date = Date(timeIntervalSince1970: 1),
         createdAt: Date = Date(timeIntervalSince1970: 1)
     ) -> CatchItem {
@@ -126,7 +145,8 @@ final class CatchDiscoveryTests: XCTestCase {
                 lureText: lure,
                 rodReel: nil,
                 notes: notes,
-                released: true
+                released: true,
+                bookmarked: bookmarked
             ),
             createdAt: createdAt,
             updatedAt: createdAt,

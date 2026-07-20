@@ -341,7 +341,8 @@ private extension AddCatchView {
                 lureText: lureText,
                 rodReel: rodReel,
                 notes: notes,
-                released: released
+                released: released,
+                bookmarked: editItem?.bookmarked ?? false
             )
             let catchItem: CatchItem
             if let catchID = editItem?.id ?? persistedCatchID {

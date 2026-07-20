@@ -11,6 +11,7 @@ struct LogbookView: View {
     @State private var tackleItemNames: [UUID: String] = [:]
     @State private var searchQuery = ""
     @State private var selectedSpecies: String?
+    @State private var savedOnly = false
     @State private var sort: CatchSort = .recent
     @State private var loadError: String?
 
@@ -24,6 +25,7 @@ struct LogbookView: View {
             in: catches,
             query: searchQuery,
             species: selectedSpecies,
+            savedOnly: savedOnly,
             sort: sort,
             tackleItemNames: tackleItemNames
         )
@@ -68,7 +70,7 @@ struct LogbookView: View {
             LazyVStack(alignment: .leading, spacing: 14) {
                 resultCount(resultCount: results.count)
                 LogSearchField(text: $searchQuery)
-                speciesFilters(availableSpecies: availableSpecies)
+                filters(availableSpecies: availableSpecies)
                 sortControls
 
                 if results.isEmpty {
@@ -111,13 +113,18 @@ struct LogbookView: View {
         .accessibilityIdentifier("log.result-count")
     }
 
-    private func speciesFilters(availableSpecies: [String]) -> some View {
+    private func filters(availableSpecies: [String]) -> some View {
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 SelectionChip(title: "All", isSelected: selectedSpecies == nil) {
                     selectedSpecies = nil
                 }
                 .accessibilityIdentifier("log.species.All")
+
+                SelectionChip(title: "Saved", isSelected: savedOnly) {
+                    savedOnly.toggle()
+                }
+                .accessibilityIdentifier("log.saved")
 
                 ForEach(availableSpecies, id: \.self) { species in
                     SelectionChip(title: species, isSelected: selectedSpecies == species) {
@@ -127,7 +134,7 @@ struct LogbookView: View {
                 }
             }
         }
-        .accessibilityLabel("Species filters")
+        .accessibilityLabel("Catch filters")
     }
 
     private var sortControls: some View {
@@ -159,6 +166,7 @@ struct LogbookView: View {
             Button("Clear filters") {
                 searchQuery = ""
                 selectedSpecies = nil
+                savedOnly = false
             }
             .accessibilityIdentifier("log.clear-filters")
         }

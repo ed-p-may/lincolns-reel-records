@@ -9,6 +9,23 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-07-19 — Catch share-image and temporary-artifact contract
+- **Context:** Phase 10 turns a private Catch into a deliberate image for the system share sheet. The
+  layout, privacy boundary, output dimensions, primary-photo choice, and artifact lifetime were still
+  open, and source images may contain private metadata or be large enough to affect interaction.
+- **Decision:** Render a portrait 1080 × 1350 (4:5) JPEG in the established dark/green design language.
+  Use the first ordered Catch photo, or a branded fish placeholder when no local photo exists. Include
+  only Reel Records branding, species, optional weight and length, named spot, and caught date. Never
+  include account identity, coordinates, notes, tackle, conditions, or source-photo metadata. Downsample
+  the chosen photo through the shared 1,400 px cached decoder; keep SwiftUI `ImageRenderer` work on the
+  main actor and move decode, JPEG encoding, stale-file pruning, and disk writes off-main.
+- **Decision:** Share a generated file from `tmp/ReelRecords/Share`; remove it when the activity
+  completes or is cancelled and prune any interrupted-session artifact older than 24 hours. Do not
+  persist or upload share images.
+- **Consequences:** Complete and sparse outputs are deterministic and fixture-testable, source EXIF is
+  not inherited, and sharing creates no new backend/social surface. Phase 11 owns physical destination,
+  image-memory, hosted bookmark recovery, and signed-build evidence.
+
 ## 2026-07-19 — Profile identity, offline sync, and account-management contract
 - **Context:** Phase 09 adds editable app-owned profile data while Supabase Auth and the signup-created
   `profiles` row remain the identity boundary. The profile also owns a replaceable private avatar and

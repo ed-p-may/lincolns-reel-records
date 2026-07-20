@@ -131,6 +131,34 @@ final class TracerBulletUITests: XCTestCase {
         XCTAssertEqual(app.staticTexts["detail.photo-count"].label, "1 PHOTO")
     }
 
+    func testSavedFilterBookmarkAndShareSheetCompose() {
+        let app = launchLogbook(arguments: ["--ui-testing-logbook"])
+
+        app.buttons["log.saved"].tap()
+        let bass = app.staticTexts["Largemouth Bass With An Exceptionally Long Display Name"]
+        XCTAssertTrue(bass.waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts["Rainbow Trout"].exists)
+        bass.tap()
+
+        let bookmark = app.buttons["detail.bookmark"]
+        XCTAssertTrue(bookmark.waitForExistence(timeout: 3))
+        XCTAssertEqual(bookmark.label, "Remove from Saved")
+        bookmark.tap()
+        XCTAssertEqual(bookmark.label, "Save catch")
+        bookmark.tap()
+        XCTAssertEqual(bookmark.label, "Remove from Saved")
+
+        let share = app.buttons["detail.share"]
+        XCTAssertTrue(share.isHittable)
+        share.tap()
+        let shareSheet = app.descendants(matching: .any)["catch.share-sheet"]
+        XCTAssertTrue(shareSheet.waitForExistence(timeout: 8))
+        let close = app.buttons["Close"]
+        XCTAssertTrue(close.waitForExistence(timeout: 3))
+        close.tap()
+        XCTAssertTrue(app.buttons["detail.share"].waitForExistence(timeout: 3))
+    }
+
     func testCatchMapSelectionAndDetailFocusRoundTrip() {
         let app = launchLogbook(arguments: ["--ui-testing-logbook"])
 

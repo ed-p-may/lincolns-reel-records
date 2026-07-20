@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		01022AC90A7B0924A16D1172 /* CatchPhotoModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = F36043304E7F65970C20AFA1 /* CatchPhotoModels.swift */; };
+		015408438C2A398089ACB8E9 /* CatchShare.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8716A08151980BCFCC4E9B6D /* CatchShare.swift */; };
 		017C331EBFC6AFB73CD2A6D6 /* ConditionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6CFFBDC9C3F7088E5E0F75E8 /* ConditionTests.swift */; };
 		07355BB0CD4FBE7DA51314B9 /* CatchFormatting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9364A178D385938DBE2CFDAB /* CatchFormatting.swift */; };
 		0A60F7EA95D89AD5FFEBEACE /* TackleRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 015C75254CCE9FBA822C58BE /* TackleRepository.swift */; };
@@ -65,6 +66,7 @@
 		CDA625C2270FEAB0AF3837D4 /* AuthModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5BDAA0521F34D5A8FB3D03F0 /* AuthModels.swift */; };
 		D0684D2587D43AD3BEBC1462 /* CatchSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD98D5A388B178A2654ADF8E /* CatchSyncTests.swift */; };
 		D1C96280086F2D82E732781E /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = D13C431D11FE05755CB3D633 /* RootView.swift */; };
+		D45A5E4AA8E648052D45A7E1 /* CatchShareTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 357D8827DB6786E542225859 /* CatchShareTests.swift */; };
 		D54836A1A443C5B8318AA700 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 2330B6A10F0EDCDE0088F482 /* Supabase */; };
 		D6DFA8229B0D5C9630319D57 /* TackleItemEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6F4D6EDAC04F93FD449CD07 /* TackleItemEditor.swift */; };
 		D74682B77578FF1C21879C28 /* AppShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987E097BF08486AC4CDAEB69 /* AppShellView.swift */; };
@@ -111,6 +113,7 @@
 		24BAE2D9BDF1C599368E859D /* LocationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTests.swift; sourceTree = "<group>"; };
 		2728A9C584315ED3C913E70B /* SelectionChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionChip.swift; sourceTree = "<group>"; };
 		32F3AE12ADFCAAAE2AF35E22 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
+		357D8827DB6786E542225859 /* CatchShareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchShareTests.swift; sourceTree = "<group>"; };
 		39A826C3942C30F4548BED31 /* LincolnReelRecords.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LincolnReelRecords.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		3F73760CFFF73B490EF880D6 /* LogbookView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LogbookView.swift; sourceTree = "<group>"; };
 		4346541BB12F23B2D341FADF /* PhotoFileStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoFileStore.swift; sourceTree = "<group>"; };
@@ -140,6 +143,7 @@
 		7DE47DECA45D73AF0EB4E7FF /* PrimaryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PrimaryButton.swift; sourceTree = "<group>"; };
 		831DA8F736CB0543691570E8 /* AppConfiguration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppConfiguration.swift; sourceTree = "<group>"; };
 		84E160E2B1126073E8AACCCF /* Beta.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Beta.xcconfig; sourceTree = "<group>"; };
+		8716A08151980BCFCC4E9B6D /* CatchShare.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchShare.swift; sourceTree = "<group>"; };
 		8D2B2D3DD76BDEFD0A5F19C0 /* TackleTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TackleTests.swift; sourceTree = "<group>"; };
 		8E2E9438AE2DE1AE57573856 /* TracerBulletUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TracerBulletUITests.swift; sourceTree = "<group>"; };
 		9364A178D385938DBE2CFDAB /* CatchFormatting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchFormatting.swift; sourceTree = "<group>"; };
@@ -355,6 +359,7 @@
 				C17E9258A65E2DC5DE4E4D29 /* Photos */,
 				7216D801F7516CCF9C4B4DBB /* Profile */,
 				62C023C941A5F3A2154E9524 /* Resources */,
+				E1B528921433000524BF5F2D /* Sharing */,
 				767A0736819F1A5181611668 /* Sync */,
 				843F40860915CC5FA14DF1A8 /* Tackle */,
 			);
@@ -381,6 +386,7 @@
 				A2F96EABC8DC1C4D991C710E /* CatchDiscoveryTests.swift */,
 				BB1D66212FEC995C64FA8427 /* CatchPhotoTests.swift */,
 				05AA0ADC77F4E1A1922BD9FF /* CatchRepositoryTests.swift */,
+				357D8827DB6786E542225859 /* CatchShareTests.swift */,
 				DD98D5A388B178A2654ADF8E /* CatchSyncTests.swift */,
 				6CFFBDC9C3F7088E5E0F75E8 /* ConditionTests.swift */,
 				B6EE7F4CFAEC93D8C5C08D31 /* DashboardTests.swift */,
@@ -401,6 +407,14 @@
 				413EC4953FAA2F5C0476C018 /* ReelRecordsUITests */,
 				5902024FFE7CAD44BEA3677E /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		E1B528921433000524BF5F2D /* Sharing */ = {
+			isa = PBXGroup;
+			children = (
+				8716A08151980BCFCC4E9B6D /* CatchShare.swift */,
+			);
+			path = Sharing;
 			sourceTree = "<group>";
 		};
 		E2078527CD57D29999CE85E3 /* DesignSystem */ = {
@@ -540,6 +554,7 @@
 				3181317F76C7F0FA64F0586F /* CatchDiscoveryTests.swift in Sources */,
 				1F71CDCE453DC30D0B520DE5 /* CatchPhotoTests.swift in Sources */,
 				7824E4378024C26E3362EA93 /* CatchRepositoryTests.swift in Sources */,
+				D45A5E4AA8E648052D45A7E1 /* CatchShareTests.swift in Sources */,
 				D0684D2587D43AD3BEBC1462 /* CatchSyncTests.swift in Sources */,
 				017C331EBFC6AFB73CD2A6D6 /* ConditionTests.swift in Sources */,
 				944ABA75DB53F06B13590F57 /* DashboardTests.swift in Sources */,
@@ -589,6 +604,7 @@
 				8B13A2B9A3DBB681C8875B67 /* CatchPhotoViews.swift in Sources */,
 				1E292BF35DC0CC215EE3E268 /* CatchRemoteStore.swift in Sources */,
 				68CD66FCBEEF95A0A60D9355 /* CatchRepository.swift in Sources */,
+				015408438C2A398089ACB8E9 /* CatchShare.swift in Sources */,
 				A38BD16CC9802436C5E43AD4 /* CatchTackleSection.swift in Sources */,
 				87EA90297E973C0C9206F77A /* ConditionModels.swift in Sources */,
 				90FD7615D6CFCAE9022654BC /* DashboardInsights.swift in Sources */,

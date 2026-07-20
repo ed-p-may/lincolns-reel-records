@@ -39,6 +39,7 @@ enum CatchDiscovery {
         in catches: [CatchItem],
         query: String,
         species: String?,
+        savedOnly: Bool = false,
         sort: CatchSort,
         tackleItemNames: [UUID: String] = [:]
     ) -> [CatchItem] {
@@ -49,6 +50,7 @@ enum CatchDiscovery {
             .filter { catchItem in
                 matches(catchItem, query: query, tackleItemNames: tackleItemNames)
                     && matches(catchItem, species: species)
+                    && (!savedOnly || catchItem.bookmarked)
             }
             .sorted { first, second in
                 precedes(first, second, sort: sort)

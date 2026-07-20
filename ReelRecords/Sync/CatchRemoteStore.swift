@@ -25,6 +25,7 @@ private struct CatchDTO: Codable, Sendable {
     let rodReel: String?
     let notes: String?
     let released: Bool
+    let bookmarked: Bool
     let createdAt: Date
     let updatedAt: Date
     let deletedAt: Date?
@@ -49,6 +50,7 @@ private struct CatchDTO: Codable, Sendable {
         case rodReel = "rod_reel"
         case notes
         case released
+        case bookmarked
         case createdAt = "created_at"
         case updatedAt = "updated_at"
         case deletedAt = "deleted_at"
@@ -74,6 +76,7 @@ private struct CatchDTO: Codable, Sendable {
         rodReel = catchItem.values.rodReel
         notes = catchItem.values.notes
         released = catchItem.values.released
+        bookmarked = catchItem.values.bookmarked
         createdAt = catchItem.createdAt
         updatedAt = catchItem.updatedAt
         deletedAt = catchItem.deletedAt
@@ -101,7 +104,8 @@ private struct CatchDTO: Codable, Sendable {
                 lureText: lureText,
                 rodReel: rodReel,
                 notes: notes,
-                released: released
+                released: released,
+                bookmarked: bookmarked
             ),
             createdAt: createdAt,
             updatedAt: updatedAt,
@@ -134,6 +138,7 @@ struct CatchUpdateDTO: Encodable, Sendable {
         case rodReel = "rod_reel"
         case notes
         case released
+        case bookmarked
         case updatedAt = "updated_at"
         case deletedAt = "deleted_at"
         case version
@@ -164,6 +169,7 @@ struct CatchUpdateDTO: Encodable, Sendable {
         try container.encode(values.rodReel, forKey: .rodReel)
         try container.encode(values.notes, forKey: .notes)
         try container.encode(values.released, forKey: .released)
+        try container.encode(values.bookmarked, forKey: .bookmarked)
         try container.encode(updatedAt, forKey: .updatedAt)
         try container.encode(deletedAt, forKey: .deletedAt)
         try container.encode(version, forKey: .version)
@@ -312,5 +318,6 @@ private extension CatchValues {
             && rodReel == other.rodReel
             && notes == other.notes
             && released == other.released
+            && bookmarked == other.bookmarked
     }
 }

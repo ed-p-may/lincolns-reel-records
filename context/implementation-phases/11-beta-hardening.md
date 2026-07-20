@@ -85,6 +85,10 @@ evidence during the phone-free implementation loop. Before this phase closes:
 - on physical iPhone hardware, exercise Profile edits and avatar choose/camera/remove in airplane mode,
   relaunch with pending work, reconnect/conflict retry, account switching, and fresh-install recovery of
   display name, home water, angler-since, avatar, and Catch-derived statistics;
+- deploy the Phase 10 bookmark migration, verify offline save/unsave plus hosted second-device recovery,
+  and on physical iPhone hardware send/save representative complete and sparse catch images through
+  Messages, Mail, and Save Image (or equivalent available destinations), including cancellation,
+  temporary-file cleanup, long text, multiple photos, and image-memory behavior;
 - verify a fresh physical install recovers every hosted Catch and photo with stable order/hero choice,
   including exact coordinate pairs and map focus, then audit the private bucket for orphan objects after
   replacement, photo removal, and Catch deletion;

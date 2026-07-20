@@ -69,6 +69,7 @@ final class CatchRepositoryTests: XCTestCase {
         XCTAssertNil(item.rodReel)
         XCTAssertNil(item.notes)
         XCTAssertTrue(item.released)
+        XCTAssertFalse(item.bookmarked)
         XCTAssertNil(item.deletedAt)
         XCTAssertEqual(item.remoteVersion, 0)
         XCTAssertEqual(try store.repository.pendingMutations(ownerID: ownerID).first?.kind, .create)
@@ -149,6 +150,30 @@ final class CatchRepositoryTests: XCTestCase {
         XCTAssertEqual(try store.repository.pendingCount(ownerID: ownerID), 0)
     }
 
+    func testBookmarkQueuesOfflineUpdateAndPreservesOtherFields() async throws {
+        let store = try makeStore()
+        let ownerID = UUID()
+        let remoteStore = InMemoryCatchRemoteStore()
+        let coordinator = SyncCoordinator(repository: store.repository, remoteStore: remoteStore)
+        let created = try store.repository.create(NewCatch(
+            ownerID: ownerID,
+            values: values(species: "Bass", notes: "Keep this note")
+        ))
+        await coordinator.sync(ownerID: ownerID)
+
+        let saved = try store.repository.setBookmarked(id: created.id, ownerID: ownerID, bookmarked: true)
+
+        XCTAssertTrue(saved.bookmarked)
+        XCTAssertEqual(saved.notes, "Keep this note")
+        XCTAssertEqual(saved.syncState, .pending)
+        XCTAssertEqual(try store.repository.pendingMutations(ownerID: ownerID).first?.kind, .update)
+
+        await coordinator.sync(ownerID: ownerID)
+        XCTAssertTrue(try XCTUnwrap(store.repository.item(id: created.id, ownerID: ownerID)).bookmarked)
+        let remoteCatches = try await remoteStore.fetch(ownerID: ownerID)
+        XCTAssertTrue(try XCTUnwrap(remoteCatches.first).values.bookmarked)
+    }
+
     func testSavingUnchangedSyncedCatchDoesNotQueueMutation() async throws {
         let store = try makeStore()
         let ownerID = UUID()
@@ -206,7 +231,8 @@ final class CatchRepositoryTests: XCTestCase {
         lureText: String? = nil,
         rodReel: String? = nil,
         notes: String? = nil,
-        released: Bool = true
+        released: Bool = true,
+        bookmarked: Bool = false
     ) -> CatchValues {
         CatchValues(
             species: species,
@@ -219,7 +245,8 @@ final class CatchRepositoryTests: XCTestCase {
             lureText: lureText,
             rodReel: rodReel,
             notes: notes,
-            released: released
+            released: released,
+            bookmarked: bookmarked
         )
     }
 
@@ -292,6 +319,7 @@ final class CatchTransportTests: XCTestCase {
         ] {
             XCTAssertTrue(object[key] is NSNull, "Expected explicit null for \(key)")
         }
+        XCTAssertEqual(object["bookmarked"] as? Bool, false)
     }
 }
 

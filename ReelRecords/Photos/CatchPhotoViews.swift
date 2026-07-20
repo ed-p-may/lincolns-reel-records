@@ -207,7 +207,7 @@ struct LocalPhotoImage<Placeholder: View>: View {
     }
 }
 
-private enum PhotoDownsampler {
+enum PhotoDownsampler {
     private final class CachedImage: NSObject, @unchecked Sendable {
         let value: CGImage
 

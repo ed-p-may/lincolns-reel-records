@@ -205,7 +205,8 @@ final class AppDependencies {
                 lureText: "Green pumpkin jig",
                 rodReel: "7-foot medium spinning rod",
                 notes: "Calm morning with a long field note to verify that the complete story remains readable.",
-                released: true
+                released: true,
+                bookmarked: true
             )
         ))
         _ = try repository.create(NewCatch(

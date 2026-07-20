@@ -35,6 +35,7 @@ final class CatchRecord {
     var rodReel: String?
     var notes: String?
     var released: Bool = true
+    var bookmarked: Bool = false
     var createdAt: Date
     var updatedAt: Date
     var deletedAt: Date?
@@ -62,6 +63,7 @@ final class CatchRecord {
         rodReel: String? = nil,
         notes: String? = nil,
         released: Bool = true,
+        bookmarked: Bool = false,
         createdAt: Date = .now,
         updatedAt: Date = .now,
         deletedAt: Date? = nil,
@@ -87,6 +89,7 @@ final class CatchRecord {
         self.rodReel = rodReel
         self.notes = notes
         self.released = released
+        self.bookmarked = bookmarked
         self.createdAt = createdAt
         self.updatedAt = updatedAt
         self.deletedAt = deletedAt
@@ -152,6 +155,7 @@ struct CatchValues: Equatable, Sendable {
     let rodReel: String?
     let notes: String?
     let released: Bool
+    var bookmarked: Bool
 
     init(
         species: String,
@@ -165,7 +169,8 @@ struct CatchValues: Equatable, Sendable {
         lureText: String?,
         rodReel: String?,
         notes: String?,
-        released: Bool
+        released: Bool,
+        bookmarked: Bool = false
     ) {
         self.species = species
         self.weight = weight
@@ -179,6 +184,7 @@ struct CatchValues: Equatable, Sendable {
         self.rodReel = rodReel
         self.notes = notes
         self.released = released
+        self.bookmarked = bookmarked
     }
 }
 
@@ -239,6 +245,10 @@ struct CatchItem: Identifiable, Equatable, Sendable {
 
     var released: Bool {
         values.released
+    }
+
+    var bookmarked: Bool {
+        values.bookmarked
     }
 }
 
@@ -327,7 +337,8 @@ extension CatchRecord {
             lureText: lureText,
             rodReel: rodReel,
             notes: notes,
-            released: released
+            released: released,
+            bookmarked: bookmarked
         )
     }
 
