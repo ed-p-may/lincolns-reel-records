@@ -15,7 +15,7 @@ slices. Read the high-level plan and the relevant product/design documents befor
 | 08 | [`08-tackle-box.md`](08-tackle-box.md) | Complete |
 | 09 | [`09-profile-settings.md`](09-profile-settings.md) | Complete |
 | 10 | [`10-bookmark-share.md`](10-bookmark-share.md) | Complete |
-| 11 | [`11-beta-hardening.md`](11-beta-hardening.md) | In progress |
+| 11 | [`11-beta-hardening.md`](11-beta-hardening.md) | Verification |
 
 ## Status vocabulary
 

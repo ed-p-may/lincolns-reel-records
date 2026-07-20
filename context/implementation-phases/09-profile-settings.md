@@ -98,5 +98,5 @@ notifications without a separately approved scope.
 - Account deletion is included because the app supports account creation; it requires connectivity and
   uses an authenticated Edge Function, then purges hosted plus account-local data after explicit
   confirmation.
-- Password-reset email/deep-link configuration is an explicit Phase 11 hosted-auth follow-up; Phase 09
-  does not show a control that cannot yet complete its flow.
+- Password reset was deferred to Phase 11 and is now implemented there with a signed-out request
+  control, PKCE app callback, new-password form, and production redirect allowlist.

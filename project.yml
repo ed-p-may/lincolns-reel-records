@@ -28,7 +28,7 @@ settings:
     SWIFT_STRICT_CONCURRENCY: complete
     IPHONEOS_DEPLOYMENT_TARGET: 18.0
     MARKETING_VERSION: 0.1.0
-    CURRENT_PROJECT_VERSION: 4
+    CURRENT_PROJECT_VERSION: 5
 
 targets:
   LincolnReelRecords:
@@ -52,6 +52,10 @@ targets:
         CFBundleDisplayName: Lincoln's Reel Records
         CFBundleShortVersionString: $(MARKETING_VERSION)
         CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleURLTypes:
+          - CFBundleTypeRole: Editor
+            CFBundleURLSchemes:
+              - lincolnsreelrecords
         ITSAppUsesNonExemptEncryption: false
         LSRequiresIPhoneOS: true
         NSCameraUsageDescription: Photograph a catch or an item in your private Tackle Box.

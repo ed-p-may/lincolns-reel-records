@@ -9,6 +9,20 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-07-20 — Password-recovery callback and auth-state ordering
+- **Context:** Supabase password recovery uses a PKCE verifier created when the reset email is requested,
+  then returns through an app URL while cold-start session restoration may still be in flight. Treating
+  those as unrelated tasks can let a stale restore overwrite the recovered session or duplicate a
+  callback.
+- **Decision:** Request recovery with the exact `lincolnsreelrecords://reset-password` redirect and
+  handle that URL once at `RootView`. The auth service accepts only that scheme/host, suppresses duplicate
+  callback delivery, and increments an auth revision before exchanging the PKCE code; any older startup
+  restore must discard its result. Successful exchange authenticates the returned owner before presenting
+  a non-dismissible new-password form. The production Supabase allowlist contains the same exact URL.
+- **Consequences:** Recovery must be requested and completed in the same app installation so the PKCE
+  verifier is available. Future auth callbacks must preserve the root-handling and stale-result invariant
+  rather than adding navigation-local URL handlers.
+
 ## 2026-07-19 — Catch share-image and temporary-artifact contract
 - **Context:** Phase 10 turns a private Catch into a deliberate image for the system share sheet. The
   layout, privacy boundary, output dimensions, primary-photo choice, and artifact lifetime were still
@@ -52,10 +66,10 @@ made; keep the "Open" list current. Newest entries at the top.
   - Because the app creates accounts, Settings includes an in-app, explicit account-deletion flow.
     Deletion requires connectivity, removes private Storage objects and the Supabase Auth user through
     an authenticated server-owned Edge Function, then purges that owner's local rows/files and cached
-    session. Password-reset link/deep-link handling is not implied by Phase 09 and is scheduled
-    for the hosted auth hardening gate in Phase 11.
+    session. Password-reset link/deep-link handling was deferred to and implemented during the hosted
+    auth hardening gate in Phase 11.
 - **Consequences:** Username changes require a future identity migration. Phase 11 owns hosted deletion
-  and reset-email configuration evidence, signed-device confirmation, and fresh-device profile/avatar
+  and reset-email completion evidence, signed-device confirmation, and fresh-device profile/avatar
   recovery; Phase 09 can fully verify the local/simulated contract and database policies without a
   physical phone.
 

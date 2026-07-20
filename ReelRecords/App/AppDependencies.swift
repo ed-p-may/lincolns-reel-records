@@ -130,8 +130,11 @@ final class AppDependencies {
                 username: "ui_test",
                 isOffline: false
             )
+            let authAccount = ProcessInfo.processInfo.arguments.contains("--ui-testing-signed-out")
+                ? nil
+                : account
             return AppServices(
-                authBackend: MockAuthBackend(account: account),
+                authBackend: MockAuthBackend(account: authAccount),
                 catchRemoteStore: InMemoryCatchRemoteStore(),
                 photoRemoteStore: InMemoryCatchPhotoRemoteStore(),
                 tackleRemoteStore: InMemoryTackleRemoteStore(),

@@ -1,6 +1,6 @@
 # Friends-and-Family Tester Script
 
-Target build: `0.1.0 (4)`. Expected time: 15–20 minutes. Each logbook is private; testers cannot see
+Target build: `0.1.0 (5)`. Expected time: 15–20 minutes. Each logbook is private; testers cannot see
 another person's Catch, profile, or photos.
 
 ## What to Test

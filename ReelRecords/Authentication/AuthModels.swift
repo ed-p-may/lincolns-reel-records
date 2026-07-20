@@ -1,5 +1,9 @@
 import Foundation
 
+enum AuthConfiguration {
+    static let passwordRecoveryURL = URL(string: "lincolnsreelrecords://reset-password")!
+}
+
 struct AccountSession: Codable, Equatable, Sendable {
     let ownerID: UUID
     let email: String

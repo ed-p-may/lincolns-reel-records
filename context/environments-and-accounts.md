@@ -2,7 +2,7 @@
 
 Operational source of truth for the accounts and identifiers used to build, sign, distribute, and run
 Lincoln's Reel Records. Last reconciled against the repository and live Supabase project on
-**2026-07-19**. App Store Connect values were reconciled against the setup completed that day.
+**2026-07-20**. App Store Connect values were last reconciled against the setup completed 2026-07-19.
 
 This GitHub repository is **public**. Record stable, non-secret identifiers here; never record passwords,
 Apple two-factor recovery information, signing private keys, device serials/UDIDs, Supabase secret keys,
@@ -47,14 +47,17 @@ Developer account. Do not copy them into this public repository.
 | Group | Type | Membership / current state |
 |---|---|---|
 | `Reel Records Internal` | Internal | Ed May; build `0.1.0 (3)` is available internally |
-| `Reel Records Friends & Family` | External, email-only | Lincoln Fisher is added; build `0.1.0 (3)` is in TestFlight App Review |
+| `Reel Records Friends & Family` | External, email-only | Lincoln Fisher is added; build `0.1.0 (3)` is `Waiting for Review` as live-verified 2026-07-20 |
 
 There is no public TestFlight link. Tester email addresses are authoritative in App Store Connect; the
 minor tester's address is intentionally not duplicated in this public repository.
 
-Build `0.1.0 (4)` is reserved in `project.yml` for the Phase 11 release candidate. It has passed an
-unsigned Beta Simulator build and bundle inspection, but it has not been normally signed, archived, or
-uploaded. Build `0.1.0 (3)` remains the only current TestFlight build.
+Build `0.1.0 (5)` is reserved in `project.yml` for the final Phase 11 release candidate after password
+recovery was added. Build 4 passed a signed local archive, physical upgrade, and clean-install recovery,
+but was not uploaded and is superseded. Build 5 passed a development-signed archive and was installed
+over build 4 on the physical device on 2026-07-20; Ed then confirmed the real password-recovery email,
+deep link, and new-password flow with the existing Catches, Profile, and Tackle Box data preserved.
+Build `0.1.0 (3)` remains the only current TestFlight build.
 
 The Phase 01 physical device is an iPhone 16 Pro on iOS 18.6, registered to the developer team with
 Developer Mode enabled. Its serial number and UDID are authoritative in Apple Developer > Devices and
@@ -72,8 +75,10 @@ Xcode > Devices and Simulators, not in Git.
 | API URL | `https://ptoqkqisgyzypfpjvmvx.supabase.co` |
 | Live status | `ACTIVE_HEALTHY` when verified 2026-07-19 |
 | Database | PostgreSQL 17, hosted by Supabase |
-| Current hosted migration | `20260719191234_create_phase_01_schema` |
+| Current hosted migration | `20260720033000_create_catch_bookmarks` (all 8 Git migrations applied) |
 | Signup | Email/password enabled; email confirmation disabled for this invite-only beta |
+| Password-recovery redirect | `lincolnsreelrecords://reset-password` |
+| Account-deletion Function | `delete-account`, active with JWT verification |
 
 The active client key is the modern Supabase **publishable** key named `default`. Its one canonical
 committed value is `SUPABASE_PUBLISHABLE_KEY` in `Config/Base.xcconfig`; that value matched the active

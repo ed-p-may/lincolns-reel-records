@@ -5,6 +5,9 @@ protocol AuthBackend: Sendable {
     func restoreSession() async throws -> AccountSession?
     func signIn(email: String, password: String) async throws -> AccountSession
     func signUp(username: String, email: String, password: String) async throws -> AccountSession
+    func requestPasswordReset(email: String) async throws
+    func recoverSession(from url: URL) async throws -> AccountSession
+    func updatePassword(_ password: String) async throws
     func signOut() async throws
     func deleteAccount() async throws
 }
@@ -49,6 +52,22 @@ actor SupabaseAuthBackend: AuthBackend {
             username: username,
             isOffline: false
         )
+    }
+
+    func requestPasswordReset(email: String) async throws {
+        try await client.auth.resetPasswordForEmail(
+            email,
+            redirectTo: AuthConfiguration.passwordRecoveryURL
+        )
+    }
+
+    func recoverSession(from url: URL) async throws -> AccountSession {
+        let session = try await client.auth.session(from: url)
+        return try await account(for: session.user.id, email: session.user.email ?? "")
+    }
+
+    func updatePassword(_ password: String) async throws {
+        try await client.auth.update(user: UserAttributes(password: password))
     }
 
     func signOut() async throws {
@@ -110,6 +129,17 @@ actor MockAuthBackend: AuthBackend {
         account = session
         return session
     }
+
+    func requestPasswordReset(email _: String) async throws {}
+
+    func recoverSession(from _: URL) async throws -> AccountSession {
+        guard let account else {
+            throw AuthServiceError.sessionUnavailable
+        }
+        return account
+    }
+
+    func updatePassword(_: String) async throws {}
 
     func signOut() async throws {
         account = nil

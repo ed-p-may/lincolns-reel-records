@@ -21,5 +21,15 @@ struct RootView: View {
         .task {
             await authService.restoreSession()
         }
+        .onOpenURL { url in
+            Task { await authService.handlePasswordRecoveryURL(url) }
+        }
+        .fullScreenCover(isPresented: Binding(
+            get: { authService.isPasswordRecoveryPresented },
+            set: { _ in }
+        )) {
+            PasswordRecoveryView()
+                .interactiveDismissDisabled()
+        }
     }
 }

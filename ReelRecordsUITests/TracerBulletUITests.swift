@@ -318,6 +318,25 @@ final class TracerBulletUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["Smallmouth Bass"].exists)
     }
 
+    func testPasswordResetRequestUsesGenericConfirmation() {
+        let app = launchApp(arguments: ["--ui-testing-signed-out"])
+
+        let logIn = app.buttons["Log In"]
+        XCTAssertTrue(logIn.waitForExistence(timeout: 5))
+        logIn.tap()
+        let forgotPassword = app.buttons["auth.forgot-password"]
+        XCTAssertTrue(forgotPassword.waitForExistence(timeout: 3))
+        forgotPassword.tap()
+
+        let email = app.textFields["auth.reset-email"]
+        XCTAssertTrue(email.waitForExistence(timeout: 3))
+        email.tap()
+        email.typeText("angler@example.com")
+        app.buttons["auth.send-reset"].tap()
+
+        XCTAssertTrue(app.staticTexts["auth.reset-sent"].waitForExistence(timeout: 3))
+    }
+
     private func launchLogbook(arguments: [String] = []) -> XCUIApplication {
         let app = launchApp(arguments: arguments)
         let logTab = app.tabBars.buttons["Log"]

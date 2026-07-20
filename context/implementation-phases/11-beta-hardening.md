@@ -1,6 +1,6 @@
 # Phase 11 — Beta Hardening and Broader TestFlight Release
 
-**Status:** In progress — phone-free release preparation; hosted, signed, and physical gates remain
+**Status:** Verification — hosted baseline and primary physical gates pass; final RC/release gates remain
 **Depends on:** Phases 01–10
 **Primary stories:** Cross-cutting validation of all v1 stories
 
@@ -129,10 +129,27 @@ notifications; full-logbook export; first-class Spots; post-v1 analytics.
   decorative-label, and touch-target fixes; icon/launch resources and placeholders are audited. Final
   `make ci` passes with 0 formatting/lint violations across 75 Swift files, 82 unit tests, 15 UI tests,
   and 99 pgTAP assertions across 8 database files.
-- Release candidate/TestFlight build: `0.1.0 (4)` is reserved in `project.yml`; the phone-free Beta
-  build passes, but no normally signed archive has been created or uploaded.
+- Hosted beta on 2026-07-20: reconciled the Phase 01 migration-ledger timestamp only after schema
+  equivalence was proved; captured a permission-restricted logical backup; applied all eight Git
+  migrations; deployed the authenticated `delete-account` Function; and passed two-user table, private
+  Storage, deletion, and orphan-object probes. The production Auth allowlist now contains
+  `lincolnsreelrecords://reset-password`.
+- Physical iPhone on iOS 18.6: build `0.1.0 (4)` upgraded over TestFlight build `0.1.0 (3)` without data
+  loss and passed camera/GPS/live-weather, denial/recovery, offline photo/Catch/Tackle/Profile/bookmark
+  reconnect, account-switch/deletion, clean-install hosted restore, Save Image, and share-cancellation
+  checks. Low-storage, time-zone boundary, full manual accessibility, performance/energy, and every
+  requested share destination still need evidence.
+- Release candidate/TestFlight build: password-reset request, PKCE callback, and new-password UI were
+  added after the build-4 device pass, so `project.yml` now reserves `0.1.0 (5)`. Build 5 archived with
+  valid development signing on 2026-07-20; its bundle contains the app and dependency privacy manifests,
+  the expected password-recovery URL scheme, and no privileged-key scan hits. It installed over build 4
+  on the physical iPhone, and Ed confirmed the real recovery email/deep link/new-password flow succeeds.
+  Existing Catches, Profile, and Tackle Box data remained intact after the build-5 upgrade and password
+  reset. The archive privacy report, upload, and App Store processing still need confirmation.
+- Build-5 automated gate: `make ci` passes with 0 formatting/lint violations across 75 Swift files,
+  85 unit tests, 16 UI tests, and 99 pgTAP assertions across all 8 local migrations.
 - External tester group: `Reel Records Friends & Family` was created early during Phase 01. Build
-  `0.1.0 (3)` is in TestFlight App Review, and Lincoln Fisher has been added by email; the tester has no
+  `0.1.0 (3)` is `Waiting for Review`, and Lincoln Fisher has been added by email; the tester has no
   build until Apple approves it. Exact tester addresses remain authoritative in App Store Connect.
 - Acceptance matrix: [`../beta/acceptance-matrix.md`](../beta/acceptance-matrix.md)
 - Security/privacy evidence: [`../beta/privacy-inventory.md`](../beta/privacy-inventory.md)

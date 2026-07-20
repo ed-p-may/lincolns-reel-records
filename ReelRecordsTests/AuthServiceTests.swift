@@ -122,6 +122,74 @@ final class AuthServiceTests: XCTestCase {
         XCTAssertEqual(hostedDeleteCount, 1)
         XCTAssertEqual(service.state, .signedOut)
     }
+
+    func testPasswordRecoveryAuthenticatesCallbackAccountAndUpdatesPassword() async throws {
+        let account = AccountSession(
+            ownerID: UUID(),
+            email: "angler@example.com",
+            username: "angler",
+            isOffline: false
+        )
+        let backend = PasswordRecoveryAuthBackend(account: account)
+        let service = AuthService(backend: backend)
+        await service.restoreSession()
+
+        let didSend = await service.requestPasswordReset(email: account.email)
+        try await service.handlePasswordRecoveryURL(
+            XCTUnwrap(URL(string: "lincolnsreelrecords://reset-password?code=test"))
+        )
+        try await service.handlePasswordRecoveryURL(
+            XCTUnwrap(URL(string: "lincolnsreelrecords://reset-password?code=test"))
+        )
+        await service.updateRecoveredPassword("new-password")
+
+        XCTAssertTrue(didSend)
+        XCTAssertFalse(service.isPasswordRecoveryPresented)
+        XCTAssertEqual(service.state, .authenticated(account))
+        let requests = await backend.resetRequests
+        let updatedPassword = await backend.updatedPassword
+        XCTAssertEqual(requests, [account.email])
+        XCTAssertEqual(updatedPassword, "new-password")
+        let callbackCount = await backend.callbackCount
+        XCTAssertEqual(callbackCount, 1)
+    }
+
+    func testPasswordRecoveryIgnoresUnrelatedURL() async throws {
+        let backend = PasswordRecoveryAuthBackend(account: nil)
+        let service = AuthService(backend: backend)
+
+        try await service.handlePasswordRecoveryURL(XCTUnwrap(URL(string: "https://example.com/reset-password")))
+
+        XCTAssertFalse(service.isPasswordRecoveryPresented)
+        let callbackCount = await backend.callbackCount
+        XCTAssertEqual(callbackCount, 0)
+    }
+
+    func testPasswordRecoveryWinsAgainstStaleStartupRestore() async throws {
+        let recoveryAccount = AccountSession(
+            ownerID: UUID(),
+            email: "recovered@example.com",
+            username: "recovered",
+            isOffline: false
+        )
+        let restoreStarted = expectation(description: "Backend restore started")
+        let backend = DelayedAuthBackend(
+            onRestore: { restoreStarted.fulfill() },
+            recoveryAccount: recoveryAccount
+        )
+        let service = AuthService(backend: backend)
+        let restoreTask = Task { await service.restoreSession() }
+        await fulfillment(of: [restoreStarted], timeout: 1)
+
+        try await service.handlePasswordRecoveryURL(
+            XCTUnwrap(URL(string: "lincolnsreelrecords://reset-password?code=recovery"))
+        )
+        await backend.finish(with: nil)
+        await restoreTask.value
+
+        XCTAssertEqual(service.state, .authenticated(recoveryAccount))
+        XCTAssertTrue(service.isPasswordRecoveryPresented)
+    }
 }
 
 private struct LocalPurgeFailure: LocalizedError {
@@ -162,12 +230,17 @@ private actor CountingDeleteAuthBackend: AuthBackend {
 
 private actor DelayedAuthBackend: AuthBackend {
     private let onRestore: @Sendable () -> Void
+    private let recoveryAccount: AccountSession?
     private var hasResult = false
     private var result: AccountSession?
     private var continuation: CheckedContinuation<AccountSession?, Never>?
 
-    init(onRestore: @escaping @Sendable () -> Void) {
+    init(
+        onRestore: @escaping @Sendable () -> Void,
+        recoveryAccount: AccountSession? = nil
+    ) {
         self.onRestore = onRestore
+        self.recoveryAccount = recoveryAccount
     }
 
     func restoreSession() async throws -> AccountSession? {
@@ -193,6 +266,11 @@ private actor DelayedAuthBackend: AuthBackend {
         throw URLError(.unsupportedURL)
     }
 
+    func recoverSession(from _: URL) async throws -> AccountSession {
+        guard let recoveryAccount else { throw URLError(.unsupportedURL) }
+        return recoveryAccount
+    }
+
     func signOut() async throws {
         throw URLError(.unsupportedURL)
     }
@@ -215,11 +293,77 @@ private actor OfflineAuthBackend: AuthBackend {
         throw URLError(.notConnectedToInternet)
     }
 
+    func requestPasswordReset(email _: String) async throws {
+        throw URLError(.notConnectedToInternet)
+    }
+
+    func recoverSession(from _: URL) async throws -> AccountSession {
+        throw URLError(.notConnectedToInternet)
+    }
+
+    func updatePassword(_: String) async throws {
+        throw URLError(.notConnectedToInternet)
+    }
+
     func signOut() async throws {
         throw URLError(.notConnectedToInternet)
     }
 
     func deleteAccount() async throws {
         throw URLError(.notConnectedToInternet)
+    }
+}
+
+private actor PasswordRecoveryAuthBackend: AuthBackend {
+    private let account: AccountSession?
+    private(set) var resetRequests: [String] = []
+    private(set) var callbackCount = 0
+    private(set) var updatedPassword: String?
+
+    init(account: AccountSession?) {
+        self.account = account
+    }
+
+    func restoreSession() async throws -> AccountSession? {
+        nil
+    }
+
+    func signIn(email _: String, password _: String) async throws -> AccountSession {
+        throw URLError(.unsupportedURL)
+    }
+
+    func signUp(username _: String, email _: String, password _: String) async throws -> AccountSession {
+        throw URLError(.unsupportedURL)
+    }
+
+    func requestPasswordReset(email: String) async throws {
+        resetRequests.append(email)
+    }
+
+    func recoverSession(from _: URL) async throws -> AccountSession {
+        callbackCount += 1
+        guard let account else { throw AuthServiceError.sessionUnavailable }
+        return account
+    }
+
+    func updatePassword(_ password: String) async throws {
+        updatedPassword = password
+    }
+
+    func signOut() async throws {}
+    func deleteAccount() async throws {}
+}
+
+private extension AuthBackend {
+    func requestPasswordReset(email _: String) async throws {
+        throw URLError(.unsupportedURL)
+    }
+
+    func recoverSession(from _: URL) async throws -> AccountSession {
+        throw URLError(.unsupportedURL)
+    }
+
+    func updatePassword(_: String) async throws {
+        throw URLError(.unsupportedURL)
     }
 }

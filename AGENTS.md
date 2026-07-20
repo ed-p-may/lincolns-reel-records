@@ -13,11 +13,12 @@ with a **modern tracking app** (clean, tactile, image-forward). Multi-user backe
 social network — no feed, following, or sharing between users.
 
 Status: **Phases 01–10 complete; Phase 11 — Beta Hardening and Broader TestFlight Release is in
-progress.** The phone-free release-preparation checkpoint reserves `0.1.0 (4)`, adds the privacy
-manifest/beta operations packet, and hardens automated accessibility and large-text behavior. Signed
-TestFlight build `0.1.0 (3)` remains the latest hosted beta build; hosted migrations/Edge Functions plus
-physical camera, GPS/permissions, live weather, native share destinations, offline/reconnect, and signed
-recovery remain consolidated in Phase 11. Current plan:
+verification.** Hosted migrations, RLS/Storage isolation, account deletion, and the main physical-device
+upgrade/offline/reconnect/clean-restore scenarios passed on 2026-07-20. Password recovery is implemented
+in release-candidate build `0.1.0 (5)`; its production redirect and physical end-to-end email/deep-link
+flow pass. Build 5 is development-signed and installed on the physical iPhone with existing data intact.
+Final accessibility/performance edge cases, privacy-policy metadata, App Store upload, and external
+TestFlight approval remain. TestFlight build `0.1.0 (3)` is still the latest hosted build. Current plan:
 `context/implementation-phases/11-beta-hardening.md`.
 
 ## Working agreement (read before writing any code)
