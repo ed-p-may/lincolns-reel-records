@@ -16,6 +16,7 @@ struct CatchDetailView: View {
     @State private var isConfirmingDelete = false
     @State private var isPreparingShare = false
     @State private var shareArtifact: ShareArtifact?
+    @State private var photoViewerSelection: CatchPhotoViewerSelection?
     @State private var errorMessage: String?
     private let shareStore = TemporaryShareStore()
 
@@ -70,6 +71,9 @@ struct CatchDetailView: View {
                     .ignoresSafeArea()
                     .accessibilityIdentifier("catch.share-sheet")
             }
+            .fullScreenCover(item: $photoViewerSelection) { selection in
+                CatchPhotoViewer(selection: selection)
+            }
             .confirmationDialog(
                 "Delete this catch?",
                 isPresented: $isConfirmingDelete,
@@ -97,6 +101,7 @@ struct CatchDetailView: View {
                 startPoint: .center,
                 endPoint: .bottom
             )
+            .allowsHitTesting(false)
             VStack(alignment: .leading, spacing: 7) {
                 Text("PERSONAL LOG")
                     .font(ReelFont.metadata(.caption2, weight: .bold))
@@ -118,6 +123,7 @@ struct CatchDetailView: View {
                 .lineLimit(2)
             }
             .padding(20)
+            .allowsHitTesting(false)
         }
         .frame(minHeight: 300)
         .clipped()
@@ -131,35 +137,12 @@ struct CatchDetailView: View {
         }
     }
 
-    @ViewBuilder
     private var heroGallery: some View {
-        if photos.isEmpty {
-            CatchPhotoPlaceholder(species: catchItem.species)
-        } else {
-            TabView {
-                ForEach(Array(photos.enumerated()), id: \.element.id) { index, photo in
-                    LocalPhotoImage(
-                        url: photoRepository.fileURL(for: photo),
-                        maximumPixelSize: 1600,
-                        contentMode: .fill,
-                        placeholder: CatchPhotoPlaceholder(species: catchItem.species)
-                    )
-                    .accessibilityLabel("Photo \(index + 1) of \(photos.count) for \(catchItem.species)")
-                    .accessibilityIdentifier("detail.photo.\(index)")
-                }
-            }
-            .tabViewStyle(.page(indexDisplayMode: photos.count > 1 ? .automatic : .never))
-            .accessibilityIdentifier("detail.photo-gallery")
-            .overlay(alignment: .topTrailing) {
-                Text("\(photos.count) PHOTO\(photos.count == 1 ? "" : "S")")
-                    .font(ReelFont.metadata(.caption2, weight: .bold))
-                    .padding(.horizontal, 9)
-                    .frame(minHeight: 28)
-                    .background(.ultraThinMaterial, in: Capsule())
-                    .padding(14)
-                    .accessibilityIdentifier("detail.photo-count")
-            }
-        }
+        CatchDetailPhotoGallery(
+            photos: photos,
+            catchItem: catchItem,
+            onOpenPhoto: openPhotoViewer
+        )
     }
 
     private var measurementSummary: some View {
@@ -377,6 +360,13 @@ private extension CatchDetailView {
         guard let artifact = shareArtifact else { return }
         shareStore.remove(artifact)
         shareArtifact = nil
+    }
+
+    private func openPhotoViewer(selectedPhotoID: UUID) {
+        photoViewerSelection = CatchPhotoViewerSelection(
+            selectedPhotoID: selectedPhotoID,
+            items: photos.map { CatchPhotoGalleryItem(photo: $0, catchItem: catchItem) }
+        )
     }
 
     private func reloadPhotos() {

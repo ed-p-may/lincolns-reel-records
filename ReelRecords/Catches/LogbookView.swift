@@ -176,6 +176,14 @@ struct LogbookView: View {
     @ToolbarContentBuilder
     private var toolbarContent: some ToolbarContent {
         ToolbarItemGroup(placement: .topBarTrailing) {
+            NavigationLink {
+                CatchPhotoGalleryView(ownerID: ownerID, refreshToken: refreshToken)
+            } label: {
+                Image(systemName: "photo.on.rectangle.angled")
+            }
+            .accessibilityLabel("Open photo gallery")
+            .accessibilityIdentifier("log.photo-gallery")
+
             if syncCoordinator.isSyncing {
                 ProgressView().tint(ReelTheme.accent)
             } else {
