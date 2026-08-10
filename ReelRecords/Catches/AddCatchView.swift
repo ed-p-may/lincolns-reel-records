@@ -44,6 +44,7 @@ struct AddCatchView: View {
     @State private var released: Bool
     @State private var photoSessionID = UUID()
     @State private var photos: [EditableCatchPhoto] = []
+    @State private var photoMetadataDraft = PhotoMetadataDefaultsDraft()
     @State private var didLoadDefaults = false
     @State private var didLoadPhotos = false
     @State private var didCommitPhotos = false
@@ -87,15 +88,18 @@ struct AddCatchView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 24) {
-                    CatchPhotoEditor(photos: $photos, sessionID: photoSessionID) { message in
-                        errorMessage = message
-                    }
+                    CatchPhotoEditor(
+                        photos: $photos,
+                        sessionID: photoSessionID,
+                        onMetadata: applyPhotoMetadata,
+                        onError: { errorMessage = $0 }
+                    )
                     speciesSection
                     measurementSection
-                    caughtSection
+                    CatchDateEditor(caughtAt: caughtAtBinding)
                     CatchLocationEditor(
                         location: $location,
-                        coordinate: $coordinate,
+                        coordinate: coordinateBinding,
                         isChoosingLocation: $isChoosingLocation
                     )
                     conditionsSection
@@ -106,8 +110,8 @@ struct AddCatchView: View {
                         onAdd: { isAddingTackle = true },
                         onManage: { isManagingTackle = true }
                     )
-                    textSection
-                    releaseSection
+                    CatchDetailsEditor(rodReel: $rodReel, notes: $notes)
+                    CatchDispositionEditor(released: $released)
 
                     Text("Species and caught date/time are required. Everything else can be added later.")
                         .font(ReelFont.body(.footnote))
@@ -148,12 +152,14 @@ struct AddCatchView: View {
         }
         .onChange(of: locationService.state) { _, state in
             if case let .captured(capturedCoordinate, _) = state {
+                photoMetadataDraft.markCoordinateManual()
                 coordinate = capturedCoordinate
             }
         }
         .sheet(isPresented: $isChoosingLocation) {
             ManualLocationPicker(initialCoordinate: coordinate) { selected in
                 locationService.reset()
+                photoMetadataDraft.markCoordinateManual()
                 coordinate = selected
             }
         }
@@ -198,7 +204,7 @@ struct AddCatchView: View {
 
     private var speciesSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            fieldLabel("Species")
+            AddCatchFieldLabel("Species")
             LazyVGrid(columns: [GridItem(.adaptive(minimum: 132))], spacing: 10) {
                 ForEach(Self.suggestedSpecies, id: \.self) { species in
                     speciesButton(species)
@@ -219,39 +225,11 @@ struct AddCatchView: View {
 
     private var measurementSection: some View {
         VStack(alignment: .leading, spacing: 12) {
-            fieldLabel("Measurements")
+            AddCatchFieldLabel("Measurements")
             HStack(spacing: 12) {
                 measurementInput("Weight", unit: "lb", text: $weight, identifier: "add.weight")
                 measurementInput("Length", unit: "in", text: $length, identifier: "add.length")
             }
-        }
-    }
-
-    private var caughtSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            fieldLabel("Caught")
-            DatePicker(
-                "Date and time",
-                selection: $caughtAt,
-                displayedComponents: [.date, .hourAndMinute]
-            )
-            .tint(ReelTheme.accent)
-            .padding(14)
-            .background(ReelTheme.surface, in: RoundedRectangle(cornerRadius: 18))
-            .accessibilityIdentifier("add.caught-at")
-        }
-    }
-
-    private var textSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            fieldLabel("Details")
-            TextField("Rod and reel", text: $rodReel)
-                .fieldInputStyle()
-                .accessibilityIdentifier("add.rod-reel")
-            TextField("Field notes", text: $notes, axis: .vertical)
-                .lineLimit(4 ... 8)
-                .fieldInputStyle()
-                .accessibilityIdentifier("add.notes")
         }
     }
 
@@ -269,18 +247,6 @@ struct AddCatchView: View {
             onSkyEdited: { conditionDraft.markSkyConditionManual() }
         )
     }
-
-    private var releaseSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            fieldLabel("Disposition")
-            Picker("Disposition", selection: $released) {
-                Text("Released").tag(true)
-                Text("Kept").tag(false)
-            }
-            .pickerStyle(.segmented)
-            .accessibilityIdentifier("add.released")
-        }
-    }
 }
 
 private extension AddCatchView {
@@ -293,11 +259,24 @@ private extension AddCatchView {
         coordinate.map { WeatherRequestKey(coordinate: $0, caughtAt: caughtAt) }
     }
 
-    private func fieldLabel(_ text: String) -> some View {
-        Text(text.uppercased())
-            .font(ReelFont.metadata(.caption2, weight: .bold))
-            .tracking(1)
-            .foregroundStyle(ReelTheme.tertiaryText)
+    private var caughtAtBinding: Binding<Date> {
+        Binding(
+            get: { caughtAt },
+            set: {
+                photoMetadataDraft.markCapturedAtManual()
+                caughtAt = $0
+            }
+        )
+    }
+
+    private var coordinateBinding: Binding<CatchCoordinate?> {
+        Binding(
+            get: { coordinate },
+            set: {
+                photoMetadataDraft.markCoordinateManual()
+                coordinate = $0
+            }
+        )
     }
 
     private func speciesButton(_ species: String) -> some View {
@@ -412,6 +391,18 @@ private extension AddCatchView {
             waterClarity = defaults.waterClarity
         } catch {
             errorMessage = error.localizedDescription
+        }
+    }
+
+    private func applyPhotoMetadata(_ metadata: PhotoCaptureMetadata) {
+        guard editItem == nil else { return }
+        let applied = photoMetadataDraft.apply(metadata)
+        if let capturedAt = applied.capturedAt {
+            caughtAt = capturedAt
+        }
+        if let coordinate = applied.coordinate {
+            locationService.reset()
+            self.coordinate = coordinate
         }
     }
 

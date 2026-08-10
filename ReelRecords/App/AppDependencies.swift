@@ -32,10 +32,12 @@ final class AppDependencies {
     let modelContainer: ModelContainer
     let syncCoordinator: SyncCoordinator
     let weatherSuggestionProvider: any WeatherSuggestionProviding
+    let photoMetadataDefaultsFixture: PhotoCaptureMetadata?
 
     init(isUITesting: Bool = AppDependencies.isRunningTests) {
         locationService = CatchLocationService()
         weatherSuggestionProvider = Self.makeWeatherSuggestionProvider(isUITesting: isUITesting)
+        photoMetadataDefaultsFixture = Self.makePhotoMetadataDefaultsFixture(isUITesting: isUITesting)
         do {
             let stores = try Self.makeLocalStores(isUITesting: isUITesting)
             let container = stores.container
@@ -120,6 +122,20 @@ final class AppDependencies {
         isUITesting: Bool
     ) -> any WeatherSuggestionProviding {
         isUITesting ? UnavailableWeatherSuggestionProvider() : OpenMeteoClient()
+    }
+
+    private static func makePhotoMetadataDefaultsFixture(
+        isUITesting: Bool
+    ) -> PhotoCaptureMetadata? {
+        guard isUITesting,
+              ProcessInfo.processInfo.arguments.contains("--ui-testing-photo-metadata-defaults")
+        else {
+            return nil
+        }
+        return PhotoCaptureMetadata(
+            capturedAt: Date(timeIntervalSince1970: 1_786_317_300),
+            coordinate: CatchCoordinate(latitude: 42.3169, longitude: -73.3226)
+        )
     }
 
     private static func makeServices(isUITesting: Bool) -> AppServices {

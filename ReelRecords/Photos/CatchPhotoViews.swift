@@ -27,12 +27,14 @@ struct EditableCatchPhoto: Identifiable, Equatable {
 
 struct CatchPhotoEditor: View {
     @Environment(SwiftDataCatchPhotoRepository.self) private var repository
+    @Environment(\.photoMetadataDefaultsFixture) private var metadataDefaultsFixture
     @Binding var photos: [EditableCatchPhoto]
     @State private var pickerItems: [PhotosPickerItem] = []
     @State private var isShowingCamera = false
     @State private var isImporting = false
 
     let sessionID: UUID
+    let onMetadata: (PhotoCaptureMetadata) -> Void
     let onError: (String) -> Void
 
     var body: some View {
@@ -97,18 +99,7 @@ struct CatchPhotoEditor: View {
 
     @ViewBuilder
     private var acquisitionButtons: some View {
-        PhotosPicker(
-            selection: $pickerItems,
-            maxSelectionCount: max(1, 8 - photos.count),
-            matching: .images
-        ) {
-            Label("Choose Photos", systemImage: "photo.on.rectangle.angled")
-                .frame(maxWidth: .infinity, minHeight: 48)
-        }
-        .buttonStyle(.bordered)
-        .tint(ReelTheme.accent)
-        .disabled(isImporting || photos.count >= 8)
-        .accessibilityIdentifier("photo.choose-library")
+        libraryAcquisitionButton
 
         Button {
             isShowingCamera = true
@@ -118,8 +109,35 @@ struct CatchPhotoEditor: View {
         }
         .buttonStyle(.bordered)
         .tint(ReelTheme.accent)
-        .disabled(!isCameraAvailable || photos.count >= 8)
+        .disabled(isImporting || !isCameraAvailable || photos.count >= 8)
         .accessibilityIdentifier("photo.take-camera")
+    }
+
+    private var libraryAcquisitionButton: some View {
+        Group {
+            if let metadataDefaultsFixture {
+                Button {
+                    onMetadata(metadataDefaultsFixture)
+                } label: {
+                    Label("Choose Photos", systemImage: "photo.on.rectangle.angled")
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                }
+            } else {
+                PhotosPicker(
+                    selection: $pickerItems,
+                    maxSelectionCount: max(1, 8 - photos.count),
+                    matching: .images,
+                    preferredItemEncoding: .current
+                ) {
+                    Label("Choose Photos", systemImage: "photo.on.rectangle.angled")
+                        .frame(maxWidth: .infinity, minHeight: 48)
+                }
+            }
+        }
+        .buttonStyle(.bordered)
+        .tint(ReelTheme.accent)
+        .disabled(isImporting || photos.count >= 8)
+        .accessibilityIdentifier("photo.choose-library")
     }
 
     private var isCameraAvailable: Bool {
@@ -147,30 +165,38 @@ struct CatchPhotoEditor: View {
                 guard let data = try await item.loadTransferable(type: Data.self) else {
                     throw PhotoFileStoreError.invalidImage
                 }
-                try await append(data: data)
+                let importResult = try await repository.stageImportAsync(data: data, sessionID: sessionID)
+                append(importResult.draft, metadata: importResult.metadata)
             } catch {
                 onError(error.localizedDescription)
             }
         }
     }
 
-    private func importCameraData(_ data: Data?) {
-        guard let data else { return }
+    private func importCameraData(_ capture: CameraPhotoCapture?) {
+        guard let capture, !isImporting, photos.count < 8 else { return }
+        isImporting = true
         Task {
+            defer { isImporting = false }
             do {
-                try await append(data: data)
+                try await append(data: capture.data, metadata: capture.metadata)
             } catch {
                 onError(error.localizedDescription)
             }
         }
     }
 
-    private func append(data: Data) async throws {
+    private func append(data: Data, metadata: PhotoCaptureMetadata) async throws {
         let draft = try await repository.stageAsync(data: data, sessionID: sessionID)
+        append(draft, metadata: metadata)
+    }
+
+    private func append(_ draft: DraftPhoto, metadata: PhotoCaptureMetadata) {
         photos.append(EditableCatchPhoto(
             source: .draft(draft),
             fileURL: repository.fileURL(for: draft)
         ))
+        onMetadata(metadata)
     }
 }
 
@@ -316,8 +342,13 @@ private struct PhotoEditorTile: View {
     }
 }
 
+struct CameraPhotoCapture: Equatable, Sendable {
+    let data: Data
+    let metadata: PhotoCaptureMetadata
+}
+
 struct CameraImagePicker: UIViewControllerRepresentable {
-    let onImage: (Data?) -> Void
+    let onImage: (CameraPhotoCapture?) -> Void
     let onCancel: () -> Void
 
     func makeCoordinator() -> Coordinator {
@@ -335,10 +366,10 @@ struct CameraImagePicker: UIViewControllerRepresentable {
     func updateUIViewController(_: UIImagePickerController, context _: Context) {}
 
     final class Coordinator: NSObject, UINavigationControllerDelegate, UIImagePickerControllerDelegate {
-        let onImage: (Data?) -> Void
+        let onImage: (CameraPhotoCapture?) -> Void
         let onCancel: () -> Void
 
-        init(onImage: @escaping (Data?) -> Void, onCancel: @escaping () -> Void) {
+        init(onImage: @escaping (CameraPhotoCapture?) -> Void, onCancel: @escaping () -> Void) {
             self.onImage = onImage
             self.onCancel = onCancel
         }
@@ -348,7 +379,12 @@ struct CameraImagePicker: UIViewControllerRepresentable {
             didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey: Any]
         ) {
             let image = info[.originalImage] as? UIImage
-            onImage(image?.jpegData(compressionQuality: 1))
+            let metadata = (info[.mediaMetadata] as? NSDictionary).map(PhotoCaptureMetadata.extract)
+            guard let data = image?.jpegData(compressionQuality: 1) else {
+                onImage(nil)
+                return
+            }
+            onImage(CameraPhotoCapture(data: data, metadata: metadata ?? .empty))
         }
 
         func imagePickerControllerDidCancel(_: UIImagePickerController) {

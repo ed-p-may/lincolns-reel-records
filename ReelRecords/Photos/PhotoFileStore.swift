@@ -28,6 +28,11 @@ struct NormalizedPhoto: Equatable, Sendable {
     let pixelHeight: Int
 }
 
+struct PreparedPhotoImport: Equatable, Sendable {
+    let photo: NormalizedPhoto
+    let metadata: PhotoCaptureMetadata
+}
+
 enum PhotoImageNormalizer {
     static let maximumDimension = 2048
     static let jpegQuality = 0.82
@@ -36,6 +41,20 @@ enum PhotoImageNormalizer {
         guard let source = CGImageSourceCreateWithData(sourceData as CFData, nil) else {
             throw PhotoFileStoreError.invalidImage
         }
+        return try normalize(source)
+    }
+
+    static func prepareImport(_ sourceData: Data) throws -> PreparedPhotoImport {
+        guard let source = CGImageSourceCreateWithData(sourceData as CFData, nil) else {
+            throw PhotoFileStoreError.invalidImage
+        }
+        return try PreparedPhotoImport(
+            photo: normalize(source),
+            metadata: PhotoCaptureMetadata.extract(from: source)
+        )
+    }
+
+    private static func normalize(_ source: CGImageSource) throws -> NormalizedPhoto {
         let thumbnailOptions = [
             kCGImageSourceCreateThumbnailFromImageAlways: true,
             kCGImageSourceCreateThumbnailWithTransform: true,
@@ -73,6 +92,11 @@ struct CommittedDraft: Sendable {
     let didMove: Bool
 }
 
+struct StagedPhotoImport: Equatable, Sendable {
+    let draft: DraftPhoto
+    let metadata: PhotoCaptureMetadata
+}
+
 final class PhotoFileStore: @unchecked Sendable {
     let rootURL: URL
     private let fileManager: FileManager
@@ -107,6 +131,14 @@ final class PhotoFileStore: @unchecked Sendable {
         try await Task.detached(priority: .userInitiated) { [self] in
             let normalized = try PhotoImageNormalizer.normalize(data)
             return try stage(normalized.data, sessionID: sessionID)
+        }.value
+    }
+
+    func stageImportAsync(data: Data, sessionID: UUID) async throws -> StagedPhotoImport {
+        try await Task.detached(priority: .userInitiated) { [self] in
+            let prepared = try PhotoImageNormalizer.prepareImport(data)
+            let draft = try stage(prepared.photo.data, sessionID: sessionID)
+            return StagedPhotoImport(draft: draft, metadata: prepared.metadata)
         }.value
     }
 

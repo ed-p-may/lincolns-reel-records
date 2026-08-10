@@ -9,6 +9,20 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-08-10 — Photo metadata as transient new-Catch defaults
+- **Context:** Camera and selected library photos may contain a capture timestamp and GPS coordinate, but
+  the offline photo pipeline intentionally strips metadata during normalization. Broad Photo Library
+  access would also weaken the existing selected-item privacy boundary.
+- **Decision:** Before normalization, locally read ImageIO EXIF/TIFF/GPS properties from the selected
+  representation or the camera's returned metadata. On a new Catch only, accept the first available
+  value independently for caught date/time and coordinate. Any explicit date edit or pin capture,
+  selection, or clear locks that field against later photos. Missing/malformed metadata is ignored; GPS
+  fills only the explicit coordinate pair and never reverse-geocodes the named spot. The selected photo
+  and metadata preparation share one detached ImageIO source, and imports remain serialized.
+- **Consequences:** Normalized/stored JPEGs continue to contain no EXIF/GPS metadata, and there is no
+  schema, backend, Storage, sync, or broad Photo Library permission change. Photo-derived coordinates
+  enter the same visible/editable field and weather-suggestion path as manual/GPS coordinates.
+
 ## 2026-07-20 — Password-recovery callback and auth-state ordering
 - **Context:** Supabase password recovery uses a PKCE verifier created when the reset email is requested,
   then returns through an app URL while cold-start session restoration may still be in flight. Treating

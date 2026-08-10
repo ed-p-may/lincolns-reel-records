@@ -20,6 +20,10 @@ _As an angler, I want to log a catch in under a minute so I don't lose the momen
 **A2 · Add a photo (P0)**
 _As an angler, I want to attach a photo so I remember what the fish looked like._
 - I can add a photo from camera or library in the Add Catch sheet.
+- On a new Catch, the first available photo capture date/time and GPS coordinate prefill those form
+  fields. Missing or stripped metadata leaves the normal defaults/manual controls in place.
+- A date/time or pin I explicitly edit, capture, select, or clear is never overwritten by a later photo.
+  Photo metadata is not applied while editing an existing Catch and does not name a spot.
 - The photo becomes the hero image on the catch's card and detail view.
 - A catch with no photo still saves and shows a clean placeholder.
 

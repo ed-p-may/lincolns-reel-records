@@ -207,6 +207,10 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval
 - A new form reuses the latest same-local-day catch's named spot, lure/bait, sky, and water clarity.
   The spot name carries forward without its GPS coordinate; weather may replace the carried sky, and
   a new local calendar day returns to the normal empty defaults. Existing-catch editing is unchanged.
+- For a new Catch, each field's first available photo metadata may prefill the caught date/time and GPS
+  pin before the source photo is normalized. Explicit date/pin edits win; missing or malformed metadata
+  falls back to the existing defaults/manual controls. Photo GPS does not reverse-geocode a named spot,
+  and existing-catch editing never imports metadata defaults.
 - Optimized for speed: sensible defaults, big tap targets, minimal required fields (species + date).
 
 ### 6.7 Catch Detail (overlay)
