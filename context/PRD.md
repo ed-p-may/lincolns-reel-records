@@ -204,6 +204,9 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval
 - **Scope note:** `lureText` is the always-available path and ships with core logging; the Tackle Box
   picker (A7 / Epic F, P1) is the structured upgrade over it. If the Tackle Box slips, catches still
   record a lure via `lureText`.
+- A new form reuses the latest same-local-day catch's named spot, lure/bait, sky, and water clarity.
+  The spot name carries forward without its GPS coordinate; weather may replace the carried sky, and
+  a new local calendar day returns to the normal empty defaults. Existing-catch editing is unchanged.
 - Optimized for speed: sensible defaults, big tap targets, minimal required fields (species + date).
 
 ### 6.7 Catch Detail (overlay)

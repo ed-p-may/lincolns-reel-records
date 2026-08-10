@@ -41,6 +41,31 @@ final class SwiftDataCatchRepository {
         return try modelContext.fetch(descriptor).map(\.item)
     }
 
+    func latestSameDayCatch(
+        ownerID: UUID,
+        caughtAt: Date,
+        calendar: Calendar = .current
+    ) throws -> CatchItem? {
+        guard let day = calendar.dateInterval(of: .day, for: caughtAt) else { return nil }
+        let start = day.start
+        let end = day.end
+        var descriptor = FetchDescriptor<CatchRecord>(
+            predicate: #Predicate {
+                $0.ownerID == ownerID
+                    && $0.deletedAt == nil
+                    && $0.caughtAt >= start
+                    && $0.caughtAt < end
+            },
+            sortBy: [
+                SortDescriptor(\CatchRecord.caughtAt, order: .reverse),
+                SortDescriptor(\CatchRecord.createdAt, order: .reverse),
+                SortDescriptor(\CatchRecord.id)
+            ]
+        )
+        descriptor.fetchLimit = 1
+        return try modelContext.fetch(descriptor).first?.item
+    }
+
     func item(id: UUID, ownerID: UUID) throws -> CatchItem? {
         try record(id: id, ownerID: ownerID)?.item
     }

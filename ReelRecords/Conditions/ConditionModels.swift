@@ -131,6 +131,7 @@ struct CatchConditions: Equatable, Sendable {
 
 enum SuggestedConditionSource: Equatable, Sendable {
     case existing
+    case fallback
     case suggested
     case manual
 }
@@ -144,12 +145,21 @@ struct ConditionEnrichmentDraft: Equatable, Sendable {
         skySource = conditions.skyCondition == nil ? nil : .existing
     }
 
+    var weatherSuggestionEligible: Bool {
+        airSource == nil || acceptsSuggestedSky
+    }
+
     mutating func markAirTemperatureManual() {
         airSource = .manual
     }
 
     mutating func markSkyConditionManual() {
         skySource = .manual
+    }
+
+    mutating func markSkyConditionFallback() {
+        guard skySource == nil else { return }
+        skySource = .fallback
     }
 
     mutating func apply(_ suggestion: WeatherSuggestion) -> AppliedConditionSuggestion {
@@ -159,7 +169,7 @@ struct ConditionEnrichmentDraft: Equatable, Sendable {
             airTemperatureF = suggestion.airTemperatureF
             airSource = .suggested
         }
-        if skySource == nil, let suggestedSky = suggestion.skyCondition {
+        if acceptsSuggestedSky, let suggestedSky = suggestion.skyCondition {
             skyCondition = suggestedSky
             skySource = .suggested
         }
@@ -167,6 +177,10 @@ struct ConditionEnrichmentDraft: Equatable, Sendable {
             airTemperatureF: airTemperatureF,
             skyCondition: skyCondition
         )
+    }
+
+    private var acceptsSuggestedSky: Bool {
+        skySource == nil || skySource == .fallback
     }
 }
 
