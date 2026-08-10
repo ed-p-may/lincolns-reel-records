@@ -91,6 +91,13 @@ _As an angler, I want to save favorites and share a catch image so I can show a 
 - **Decided (Q6):** Share renders the catch to a **composed image** (photo + species + weight/length +
   spot/date) and hands it to the iOS **share sheet** — a personal picture, **not** a social post.
 
+**B7 · Browse and inspect catch photos (P1)**
+_As an angler, I want a photo-first view of my catches so I can revisit the visual record quickly._
+- The Log opens a dedicated Photos screen showing every saved catch photo in a square tiled grid.
+- Photos are ordered by newest catch first and retain their saved order within each catch.
+- Tapping a grid tile or a Catch Detail photo opens a full-screen, swipeable viewer at that photo.
+- The viewer identifies the catch and current photo position and can be dismissed explicitly.
+
 ## Epic C — Dashboard & insight
 
 **C1 · See my logbook at a glance (P0)**

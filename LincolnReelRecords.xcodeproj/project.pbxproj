@@ -29,6 +29,7 @@
 		3B0617B13E642920DFA1331F /* TackleRepositorySupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 776161A8A0DFC05AFCAF4D52 /* TackleRepositorySupport.swift */; };
 		443EA186E7EC7BBA32D195F2 /* CatchLocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67F8F41A0512371ECC18F6AB /* CatchLocationService.swift */; };
 		4AFC15446FE19F38DCE48DBA /* TackleBoxUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7D141A6AE25E8E4A917AB711 /* TackleBoxUITests.swift */; };
+		52187B13B32D96199B8CCE06 /* CatchPhotoGallery.swift in Sources */ = {isa = PBXBuildFile; fileRef = 229545BB13B83B57D3C4BF01 /* CatchPhotoGallery.swift */; };
 		536BF1612E2BB57A9498C9C8 /* PrimaryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DE47DECA45D73AF0EB4E7FF /* PrimaryButton.swift */; };
 		5B588C0094387E48D7B7A093 /* ProfileTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C848454EC6736A0404DAA1D3 /* ProfileTests.swift */; };
 		5EA8C55A29DAA4A9FB1D4602 /* TackleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D2B2D3DD76BDEFD0A5F19C0 /* TackleTests.swift */; };
@@ -41,6 +42,7 @@
 		7B7602E11B5F4F0AC0FED883 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D23BC765920DD9DFBAB42A9 /* DashboardView.swift */; };
 		7DFB8CE29178AE46D91B274F /* AuthBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DDAE86ED1D2AE8E06A0B91 /* AuthBackend.swift */; };
 		879092C5467F9A7E4D17F1AD /* CatchDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798FBE5458AC3FD926D9B6DD /* CatchDetailView.swift */; };
+		8795914B69778DDD95645C75 /* PhotoGalleryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D507FA6DACD56BEAA1A5FCA3 /* PhotoGalleryUITests.swift */; };
 		87EA90297E973C0C9206F77A /* ConditionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B93E885658057151862F91 /* ConditionModels.swift */; };
 		87EE0A2FC0F8C4FA8675504A /* AddCatchView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 73AFC314FBBE0A2EBEFF1D2A /* AddCatchView.swift */; };
 		88C6A0C3C3CF7605C1B8698A /* ProfileInsights.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F218B4A6E8F310BE1E7E4E4 /* ProfileInsights.swift */; };
@@ -71,6 +73,7 @@
 		D54836A1A443C5B8318AA700 /* Supabase in Frameworks */ = {isa = PBXBuildFile; productRef = 2330B6A10F0EDCDE0088F482 /* Supabase */; };
 		D6DFA8229B0D5C9630319D57 /* TackleItemEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = A6F4D6EDAC04F93FD449CD07 /* TackleItemEditor.swift */; };
 		D74682B77578FF1C21879C28 /* AppShellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 987E097BF08486AC4CDAEB69 /* AppShellView.swift */; };
+		DB6B3E07E99FADB830F134BF /* CatchPhotoGalleryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 242F61F59B3F0AE44A674867 /* CatchPhotoGalleryTests.swift */; };
 		DFC644268D2E1EEA2DAC5617 /* UnitInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AF68293C10C2A4E188E97B5 /* UnitInput.swift */; };
 		E068CD122765A8CAB9949980 /* CatchLocationEditor.swift in Sources */ = {isa = PBXBuildFile; fileRef = E75A0561228AEF7D6A1A099E /* CatchLocationEditor.swift */; };
 		E9335A4D7E97026DC2B194E8 /* AuthenticationFlowView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2513386627DC7050E07AB13 /* AuthenticationFlowView.swift */; };
@@ -112,6 +115,8 @@
 		15E2BBA3219139FDD6E52B7F /* LincolnsReelRecordsApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LincolnsReelRecordsApp.swift; sourceTree = "<group>"; };
 		164548F21D10C427D983F0A5 /* TackleItemViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TackleItemViews.swift; sourceTree = "<group>"; };
 		17F14C9C8CF21631334C1AC7 /* TackleModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TackleModels.swift; sourceTree = "<group>"; };
+		229545BB13B83B57D3C4BF01 /* CatchPhotoGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoGallery.swift; sourceTree = "<group>"; };
+		242F61F59B3F0AE44A674867 /* CatchPhotoGalleryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoGalleryTests.swift; sourceTree = "<group>"; };
 		24BAE2D9BDF1C599368E859D /* LocationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTests.swift; sourceTree = "<group>"; };
 		2728A9C584315ED3C913E70B /* SelectionChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionChip.swift; sourceTree = "<group>"; };
 		32F3AE12ADFCAAAE2AF35E22 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
@@ -170,6 +175,7 @@
 		D13C431D11FE05755CB3D633 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		D2AF2DE72796313BAF55A618 /* AuthServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthServiceTests.swift; sourceTree = "<group>"; };
 		D3D8368B54DD948BAA631AC7 /* TackleSyncRegressionTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TackleSyncRegressionTests.swift; sourceTree = "<group>"; };
+		D507FA6DACD56BEAA1A5FCA3 /* PhotoGalleryUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoGalleryUITests.swift; sourceTree = "<group>"; };
 		D8D65117E1FE60166150F1BC /* CatchPhotoViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoViews.swift; sourceTree = "<group>"; };
 		DD98D5A388B178A2654ADF8E /* CatchSyncTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchSyncTests.swift; sourceTree = "<group>"; };
 		DE780B771489C92396544B77 /* ProfileModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileModels.swift; sourceTree = "<group>"; };
@@ -276,6 +282,7 @@
 			isa = PBXGroup;
 			children = (
 				FB6CA342B81BA8E34A959167 /* BetaHardeningUITests.swift */,
+				D507FA6DACD56BEAA1A5FCA3 /* PhotoGalleryUITests.swift */,
 				7B18FAB250BF4623DB4AE9EC /* ProfileUITests.swift */,
 				7D141A6AE25E8E4A917AB711 /* TackleBoxUITests.swift */,
 				8E2E9438AE2DE1AE57573856 /* TracerBulletUITests.swift */,
@@ -375,6 +382,7 @@
 		C17E9258A65E2DC5DE4E4D29 /* Photos */ = {
 			isa = PBXGroup;
 			children = (
+				229545BB13B83B57D3C4BF01 /* CatchPhotoGallery.swift */,
 				F36043304E7F65970C20AFA1 /* CatchPhotoModels.swift */,
 				688A166004E7F64DFB359A65 /* CatchPhotoRemoteStore.swift */,
 				4E421F41A4DE520309B1A7EE /* CatchPhotoRepository.swift */,
@@ -390,6 +398,7 @@
 			children = (
 				D2AF2DE72796313BAF55A618 /* AuthServiceTests.swift */,
 				A2F96EABC8DC1C4D991C710E /* CatchDiscoveryTests.swift */,
+				242F61F59B3F0AE44A674867 /* CatchPhotoGalleryTests.swift */,
 				BB1D66212FEC995C64FA8427 /* CatchPhotoTests.swift */,
 				05AA0ADC77F4E1A1922BD9FF /* CatchRepositoryTests.swift */,
 				357D8827DB6786E542225859 /* CatchShareTests.swift */,
@@ -559,6 +568,7 @@
 			files = (
 				1FFBB6E530FF20F2FC138C8C /* AuthServiceTests.swift in Sources */,
 				3181317F76C7F0FA64F0586F /* CatchDiscoveryTests.swift in Sources */,
+				DB6B3E07E99FADB830F134BF /* CatchPhotoGalleryTests.swift in Sources */,
 				1F71CDCE453DC30D0B520DE5 /* CatchPhotoTests.swift in Sources */,
 				7824E4378024C26E3362EA93 /* CatchRepositoryTests.swift in Sources */,
 				D45A5E4AA8E648052D45A7E1 /* CatchShareTests.swift in Sources */,
@@ -577,6 +587,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				FDDFF67E89A80F640BFEF163 /* BetaHardeningUITests.swift in Sources */,
+				8795914B69778DDD95645C75 /* PhotoGalleryUITests.swift in Sources */,
 				F7920B489AE20D9AB979777E /* ProfileUITests.swift in Sources */,
 				4AFC15446FE19F38DCE48DBA /* TackleBoxUITests.swift in Sources */,
 				92E0F55AAA42F17F2AFED640 /* TracerBulletUITests.swift in Sources */,
@@ -605,6 +616,7 @@
 				443EA186E7EC7BBA32D195F2 /* CatchLocationService.swift in Sources */,
 				B5D9DBE44925056F44AD4B45 /* CatchMapView.swift in Sources */,
 				C40F8E55C085EF85840F90D0 /* CatchModels.swift in Sources */,
+				52187B13B32D96199B8CCE06 /* CatchPhotoGallery.swift in Sources */,
 				01022AC90A7B0924A16D1172 /* CatchPhotoModels.swift in Sources */,
 				F02ECA92CFDF582F23AF3B86 /* CatchPhotoRemoteStore.swift in Sources */,
 				71729EAFE7EFAC2352AC01AB /* CatchPhotoRepository.swift in Sources */,

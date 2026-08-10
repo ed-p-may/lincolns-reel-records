@@ -225,7 +225,14 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval
 - **Navigation note:** the bottom tab bar is already full (Home / Log / + / Map / You), so Tackle Box is
   a **pushed screen**, not a 6th tab. Revisit if it deserves top-level status later.
 
-### 6.9 Screens still needing design (design debt)
+### 6.9 Photos
+- A dedicated screen, pushed from the Log, shows every saved catch photo in a dense square tile grid.
+- Grid order is newest catch first, preserving each catch's saved photo order.
+- Tapping a tile opens a dark, full-screen, swipeable viewer at that photo with catch/date context.
+- Tapping a photo in Catch Detail opens the same full-screen viewer for that catch's ordered photos.
+- The screen remains local-first and private; it reads the existing owner-scoped Catch/CatchPhoto cache.
+
+### 6.10 Screens still needing design (design debt)
 
 The Claude Design prototype predates our decisions, so these have **no mockup yet** and must be designed
 in the app's language (`design-system.md`) during implementation:
