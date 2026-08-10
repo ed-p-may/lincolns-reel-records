@@ -97,6 +97,37 @@ final class ConditionTests: XCTestCase {
         XCTAssertEqual(draft.airSource, .existing)
         XCTAssertEqual(draft.skySource, .existing)
     }
+
+    func testLastUsedSkyFallbackYieldsToWeatherUnlessEdited() {
+        let suggestion = WeatherSuggestion(
+            airTemperatureF: 72,
+            skyCondition: .sunny,
+            observedAt: .now
+        )
+        var fallback = ConditionEnrichmentDraft()
+        fallback.markAirTemperatureManual()
+        fallback.markSkyConditionFallback()
+
+        XCTAssertTrue(fallback.weatherSuggestionEligible)
+
+        let applied = fallback.apply(suggestion)
+
+        XCTAssertNil(applied.airTemperatureF)
+        XCTAssertEqual(applied.skyCondition, .sunny)
+        XCTAssertEqual(fallback.skySource, .suggested)
+        XCTAssertFalse(fallback.weatherSuggestionEligible)
+
+        var edited = ConditionEnrichmentDraft()
+        edited.markSkyConditionFallback()
+        edited.markSkyConditionManual()
+
+        XCTAssertTrue(edited.weatherSuggestionEligible)
+        let editedApplied = edited.apply(suggestion)
+        XCTAssertEqual(editedApplied.airTemperatureF, 72)
+        XCTAssertNil(editedApplied.skyCondition)
+        XCTAssertEqual(edited.skySource, .manual)
+        XCTAssertFalse(edited.weatherSuggestionEligible)
+    }
 }
 
 final class OpenMeteoClientTests: XCTestCase {

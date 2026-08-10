@@ -173,14 +173,48 @@ final class AppDependencies {
         photoRepository: SwiftDataCatchPhotoRepository,
         tackleRepository: SwiftDataTackleRepository
     ) throws {
-        guard isUITesting, ProcessInfo.processInfo.arguments.contains("--ui-testing-logbook") else {
+        guard isUITesting else {
             return
         }
+        if ProcessInfo.processInfo.arguments.contains("--ui-testing-last-used-defaults") {
+            try seedLastUsedDefaults(repository: repository, tackleRepository: tackleRepository)
+            return
+        }
+        guard ProcessInfo.processInfo.arguments.contains("--ui-testing-logbook") else { return }
         try seedLogbook(
             repository: repository,
             photoRepository: photoRepository,
             tackleRepository: tackleRepository
         )
+    }
+
+    private static func seedLastUsedDefaults(
+        repository: SwiftDataCatchRepository,
+        tackleRepository: SwiftDataTackleRepository
+    ) throws {
+        let senko = try seedTackle(repository: tackleRepository)
+        _ = try repository.create(NewCatch(
+            ownerID: uiTestOwnerID,
+            values: CatchValues(
+                species: "Smallmouth Bass",
+                weight: nil,
+                length: nil,
+                caughtAt: Calendar.current.startOfDay(for: .now).addingTimeInterval(12 * 60 * 60),
+                location: "Last Used Cove",
+                coordinate: CatchCoordinate(latitude: 42.3169, longitude: -73.3226),
+                conditions: CatchConditions(
+                    airTemperatureF: nil,
+                    skyCondition: .overcast,
+                    waterTemperatureF: nil,
+                    waterClarity: .muddy
+                ),
+                tackleItemID: senko.id,
+                lureText: "Black trailer",
+                rodReel: nil,
+                notes: nil,
+                released: true
+            )
+        ))
     }
 
     private static func seedLogbook(

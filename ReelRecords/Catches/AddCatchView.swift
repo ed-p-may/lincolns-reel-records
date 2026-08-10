@@ -44,6 +44,7 @@ struct AddCatchView: View {
     @State private var released: Bool
     @State private var photoSessionID = UUID()
     @State private var photos: [EditableCatchPhoto] = []
+    @State private var didLoadDefaults = false
     @State private var didLoadPhotos = false
     @State private var didCommitPhotos = false
     @State private var didNotifySaved = false
@@ -139,6 +140,7 @@ struct AddCatchView: View {
         .task {
             locationService.reset()
             loadPhotos()
+            loadNewCatchDefaults()
             loadTackleItems()
         }
         .task(id: weatherRequestKey) {
@@ -390,14 +392,39 @@ private extension AddCatchView {
         }
     }
 
+    private func loadNewCatchDefaults() {
+        guard !didLoadDefaults, editItem == nil else { return }
+        didLoadDefaults = true
+        do {
+            guard let latestCatch = try repository.latestSameDayCatch(
+                ownerID: ownerID,
+                caughtAt: caughtAt
+            ) else { return }
+            let defaults = NewCatchDefaults(catchItem: latestCatch)
+            location = defaults.location ?? ""
+            coordinate = nil
+            selectedTackleItemID = defaults.tackleItemID
+            lureText = defaults.lureText ?? ""
+            skyCondition = defaults.skyCondition
+            if defaults.skyCondition != nil {
+                conditionDraft.markSkyConditionFallback()
+            }
+            waterClarity = defaults.waterClarity
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
     private func loadTackleItems() {
         do {
             var loaded = try tackleRepository.items(ownerID: ownerID)
-            let historical = try selectedTackleItemID.flatMap {
-                try tackleRepository.item(id: $0, ownerID: ownerID)
-            }
-            if let historical, !loaded.contains(where: { $0.id == historical.id }) {
-                loaded.append(historical)
+            if let selectedTackleItemID {
+                let isLoaded = loaded.contains { $0.id == selectedTackleItemID }
+                if !isLoaded {
+                    if let historical = try tackleRepository.item(id: selectedTackleItemID, ownerID: ownerID) {
+                        loaded.append(historical)
+                    }
+                }
             }
             tackleItems = loaded
         } catch {
@@ -408,7 +435,7 @@ private extension AddCatchView {
     @MainActor
     private func suggestWeatherIfNeeded() async {
         guard let coordinate, let key = weatherRequestKey,
-              conditionDraft.airSource == nil || conditionDraft.skySource == nil,
+              conditionDraft.weatherSuggestionEligible,
               !completedWeatherKeys.contains(key)
         else {
             return

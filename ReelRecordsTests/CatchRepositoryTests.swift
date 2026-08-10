@@ -100,6 +100,51 @@ final class CatchRepositoryTests: XCTestCase {
         XCTAssertEqual(try store.repository.list(ownerID: ownerID).map(\.id), [older.id])
     }
 
+    func testLatestSameDayCatchIsOwnerScopedAndBoundedByLocalDay() throws {
+        let store = try makeStore()
+        let ownerID = UUID()
+        let otherOwnerID = UUID()
+        _ = try store.repository.create(NewCatch(
+            ownerID: ownerID,
+            species: "Previous-day Perch",
+            caughtAt: date(day: 19, hour: 23)
+        ))
+        _ = try store.repository.create(NewCatch(
+            ownerID: ownerID,
+            species: "Earlier Bass",
+            caughtAt: date(day: 20, hour: 8)
+        ))
+        let latest = try store.repository.create(NewCatch(
+            ownerID: ownerID,
+            species: "Latest Bass",
+            caughtAt: date(day: 20, hour: 10)
+        ))
+        _ = try store.repository.create(NewCatch(
+            ownerID: otherOwnerID,
+            species: "Other owner's Pike",
+            caughtAt: date(day: 20, hour: 11)
+        ))
+        let deleted = try store.repository.create(NewCatch(
+            ownerID: ownerID,
+            species: "Deleted Walleye",
+            caughtAt: date(day: 20, hour: 12)
+        ))
+        try store.repository.delete(id: deleted.id, ownerID: ownerID)
+
+        let result = try store.repository.latestSameDayCatch(
+            ownerID: ownerID,
+            caughtAt: date(day: 20, hour: 15),
+            calendar: calendar
+        )
+
+        XCTAssertEqual(result?.id, latest.id)
+        XCTAssertNil(try store.repository.latestSameDayCatch(
+            ownerID: ownerID,
+            caughtAt: date(day: 21, hour: 0),
+            calendar: calendar
+        ))
+    }
+
     func testValidationRejectsMissingSpeciesAndInvalidMeasurements() throws {
         let store = try makeStore()
         let ownerID = UUID()
@@ -218,6 +263,16 @@ final class CatchRepositoryTests: XCTestCase {
             configurations: ModelConfiguration(isStoredInMemoryOnly: true)
         )
         return TestStore(container: container)
+    }
+
+    private var calendar: Calendar {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.timeZone = TimeZone(secondsFromGMT: 0)!
+        return calendar
+    }
+
+    private func date(day: Int, hour: Int) -> Date {
+        calendar.date(from: DateComponents(year: 2026, month: 7, day: day, hour: hour))!
     }
 
     private func values(
