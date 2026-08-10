@@ -50,6 +50,10 @@ final class SwiftDataCatchPhotoRepository {
         try await fileStore.stageNormalizedAsync(data: data, sessionID: sessionID)
     }
 
+    func stageImportAsync(data: Data, sessionID: UUID) async throws -> StagedPhotoImport {
+        try await fileStore.stageImportAsync(data: data, sessionID: sessionID)
+    }
+
     func discardDrafts(sessionID: UUID) throws {
         try fileStore.discardDraftSession(sessionID)
     }

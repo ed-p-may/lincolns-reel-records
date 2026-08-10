@@ -154,7 +154,6 @@ private struct DashboardHeader: View {
         VStack(alignment: .leading, spacing: 4) {
             Text(now, format: .dateTime.weekday(.wide).month(.wide).day())
                 .font(ReelFont.metadata(.caption2, weight: .bold))
-                .tracking(1)
                 .textCase(.uppercase)
                 .foregroundStyle(ReelTheme.accent)
             Text("\(greeting), \(greetingName ?? account.username)")

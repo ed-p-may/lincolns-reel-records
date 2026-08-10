@@ -115,10 +115,10 @@ struct TackleItemEditor: View {
             Task { await importPickerItem(newItem) }
         }
         .sheet(isPresented: $isShowingCamera) {
-            CameraImagePicker { data in
+            CameraImagePicker { capture in
                 isShowingCamera = false
-                if let data {
-                    Task { await importData(data) }
+                if let capture {
+                    Task { await importData(capture.data) }
                 }
             } onCancel: {
                 isShowingCamera = false
