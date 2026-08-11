@@ -9,10 +9,12 @@ signing material, device identifiers, or tester addresses into logs or this repo
   metadata defaults on top of the verified build-5 baseline.
 - [x] Confirm `MARKETING_VERSION = 0.1.0` and `CURRENT_PROJECT_VERSION = 6` in `project.yml`.
 - [x] Regenerate the project and run `make ci` against the exact build-6 release-prep tree.
-- [ ] Confirm the privacy manifest is in the built app root.
+- [x] Confirm the privacy manifest is in the built app root.
 - [ ] Generate and inspect the archive privacy report.
-- [ ] Confirm the public privacy-policy URL, feedback contact, beta description, and updated What to Test copy.
-- [ ] Scan tracked files and the built/archive bundle for privileged keys, private keys, dev endpoints,
+- [x] Confirm the feedback contact, beta description, reviewer sign-in information, and updated What to
+  Test copy in App Store Connect.
+- [ ] Add and verify the public privacy-policy URL in App Store Connect.
+- [x] Scan tracked files and the built/archive bundle for privileged keys, private keys, dev endpoints,
   personal test data, and verbose sensitive logs.
 
 ## 2. Hosted beta migration
@@ -20,7 +22,7 @@ signing material, device identifiers, or tester addresses into logs or this repo
 - [x] Confirm no Supabase migration, Function, client configuration, or privacy-manifest change exists
   between the uploaded build-5 baseline and build 6.
 - [x] No hosted migration or Function deployment is required for this update.
-- [ ] Before device testing, verify App Store Connect build status and hosted project health without
+- [x] Before device testing, verify App Store Connect build status and hosted project health without
   mutating beta data.
 
 Rollback rule: additive schema changes stay in place unless a reviewed forward-fix migration says
@@ -29,11 +31,12 @@ availability, preserve evidence/backup, and ship no ad hoc destructive SQL.
 
 ## 3. Signed release candidate
 
-- [ ] In Xcode, verify the Apple account/team, automatic signing, bundle ID, and Beta archive config.
-- [ ] Archive the shared `LincolnReelRecords` scheme normally; do not disable signing for this gate.
-- [ ] Inspect validation/privacy reports and resolve every error before upload.
-- [ ] Upload `0.1.0 (6)` to App Store Connect; record processing and compliance results.
-- [ ] Add it to `Reel Records Internal`; install over build 5 and smoke-test existing data plus Issues #1–3.
+- [x] Verify the archive's Apple team, signing, bundle ID, and Beta configuration.
+- [x] Archive the shared `LincolnReelRecords` scheme normally; do not disable signing for this gate.
+- [x] Validate the signed archive and inspect its embedded privacy manifests before upload.
+- [x] Upload `0.1.0 (6)` to App Store Connect; processing completed with no compliance error.
+- [x] Add it to `Reel Records Internal`.
+- [ ] Install build 6 over build 5 and smoke-test existing data plus Issues #1–3.
 - [ ] Complete the build-6 physical/hosted acceptance rows before external submission.
 
 ## 4. External beta
@@ -47,3 +50,18 @@ availability, preserve evidence/backup, and ship no ad hoc destructive SQL.
 Stop-testing response: remove the affected build from group availability, notify invited testers through
 the configured feedback/contact route, preserve pending local data, document the incident, and issue a
 new incremented build after the fix passes this checklist.
+
+## Build-6 release evidence — 2026-08-10
+
+- App commit: `4819a10` (`Prepare TestFlight build 6 (#7)`); archive version `0.1.0 (6)`.
+- `make ci`: 0 formatting/lint violations across 85 Swift files, 96 unit tests, 19 UI tests, and 99
+  pgTAP assertions across 8 database files.
+- Signed archive validated and uploaded successfully. App Store Connect processed build 6 as
+  `Ready to Submit`; it is assigned only to `Reel Records Internal` pending the physical-device gate.
+- Archive inspection confirmed bundle ID `com.bldgtyp.LincolnsReelRecords`, Team ID `JPJ3AJ5U8A`,
+  minimum iOS 18, no non-exempt encryption, embedded privacy manifest, and no privileged-key or
+  development-endpoint scan hits.
+- Hosted Supabase project `ptoqkqisgyzypfpjvmvx` reported `ACTIVE_HEALTHY`; all eight migrations and
+  the authenticated `delete-account` Function remain present. No hosted mutation was performed.
+- App Store Connect Test Information is populated except for the public privacy-policy URL. External
+  group assignment and submission remain intentionally held until the install/smoke gate passes.

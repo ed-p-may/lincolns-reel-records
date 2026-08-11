@@ -151,11 +151,18 @@ notifications; full-logbook export; first-class Spots; post-v1 analytics.
   intact.
 - Build-5 automated gate: `make ci` passes with 0 formatting/lint violations across 75 Swift files,
   85 unit tests, 16 UI tests, and 99 pgTAP assertions across all 8 local migrations.
+- Build-6 release candidate on 2026-08-10: merged Issues #1–3 are packaged in `0.1.0 (6)` at app commit
+  `4819a10`. `make ci` passes with 0 formatting/lint violations across 85 Swift files, 96 unit tests,
+  19 UI tests, and 99 pgTAP assertions across all 8 local migrations. The normally signed archive
+  validated and uploaded successfully, App Store Connect processed it as `Ready to Submit`, and it is
+  assigned only to `Reel Records Internal`. Hosted Supabase remained `ACTIVE_HEALTHY` with all eight
+  migrations and the active authenticated account-deletion Function. Physical install/smoke, the public
+  privacy-policy URL, external assignment/review, and the remaining Phase 11 edge gates are still open.
 - External tester group: `Reel Records Friends & Family` was created early during Phase 01 and contains
   Lincoln Fisher by email. Superseded build `0.1.0 (3)` was removed from review and detached from the
   external group. Verified build `0.1.0 (5)` is assigned to the internal and external groups and is
-  `Waiting for Review` as live-verified in App Store Connect on 2026-07-20. The external tester has no
-  build until Apple approves it. Exact tester addresses remain authoritative in App Store Connect.
+  `Testing` as live-verified in App Store Connect on 2026-08-10. Build 6 is not assigned externally
+  until its internal smoke gate passes. Exact tester addresses remain authoritative in App Store Connect.
 - Acceptance matrix: [`../beta/acceptance-matrix.md`](../beta/acceptance-matrix.md)
 - Security/privacy evidence: [`../beta/privacy-inventory.md`](../beta/privacy-inventory.md)
 - Known limitations: [`../beta/known-limitations.md`](../beta/known-limitations.md)
