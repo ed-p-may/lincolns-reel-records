@@ -2,7 +2,7 @@
 
 Operational source of truth for the accounts and identifiers used to build, sign, distribute, and run
 Lincoln's Reel Records. Last reconciled against the repository and live Supabase project on
-**2026-07-20**. App Store Connect values were last reconciled against the setup completed 2026-07-19.
+**2026-08-10**. App Store Connect and hosted Supabase values were live-reconciled on that date.
 
 This GitHub repository is **public**. Record stable, non-secret identifiers here; never record passwords,
 Apple two-factor recovery information, signing private keys, device serials/UDIDs, Supabase secret keys,
@@ -46,18 +46,20 @@ Developer account. Do not copy them into this public repository.
 
 | Group | Type | Membership / current state |
 |---|---|---|
-| `Reel Records Internal` | Internal | Ed May; build `0.1.0 (5)` is installed and verified on the named iPhone |
-| `Reel Records Friends & Family` | External, email-only | Lincoln Fisher is added; build `0.1.0 (5)` is `Waiting for Review` as live-verified 2026-07-20 |
+| `Reel Records Internal` | Internal | Ed May; build `0.1.0 (6)` is assigned and awaiting installation over verified build 5 |
+| `Reel Records Friends & Family` | External, email-only | Lincoln Fisher is added; build `0.1.0 (5)` is `Testing`; build 6 is intentionally unassigned pending internal smoke |
 
 There is no public TestFlight link. Tester email addresses are authoritative in App Store Connect; the
 minor tester's address is intentionally not duplicated in this public repository.
 
-Build `0.1.0 (5)` is the final Phase 11 release candidate after password recovery was added. Build 4
+Build `0.1.0 (6)` is the current Phase 11 release candidate and packages Issues #1–3. It processed in
+App Store Connect on 2026-08-10 and is assigned only to the internal group pending installation and
+smoke testing. Build 5 remains available to the external group with live status `Testing`. Build 4
 passed a signed local archive, physical upgrade, and clean-install recovery, but was not uploaded and is
 superseded. Build 5 passed archive validation/privacy inspection, processed in App Store Connect, and was
 installed from internal TestFlight on the physical device on 2026-07-20. Ed confirmed the real password-
 recovery flow and that existing Home, Log/photos, Profile, Tackle Box, and Map data remained intact.
-Superseded build 3 is no longer assigned to the external group; build 5 is awaiting external review.
+Superseded build 3 is no longer assigned to the external group.
 
 The Phase 01 physical device is an iPhone 16 Pro on iOS 18.6, registered to the developer team with
 Developer Mode enabled. Its serial number and UDID are authoritative in Apple Developer > Devices and
@@ -73,9 +75,9 @@ Xcode > Devices and Simulators, not in Git.
 | Project reference | `ptoqkqisgyzypfpjvmvx` |
 | Region | `us-east-1` |
 | API URL | `https://ptoqkqisgyzypfpjvmvx.supabase.co` |
-| Live status | `ACTIVE_HEALTHY` when verified 2026-07-19 |
+| Live status | `ACTIVE_HEALTHY` when verified 2026-08-10 |
 | Database | PostgreSQL 17, hosted by Supabase |
-| Current hosted migration | `20260720033000_create_catch_bookmarks` (all 8 Git migrations applied) |
+| Current hosted migration | `20260720033000_phase_10_bookmarks` (all 8 Git migrations applied) |
 | Signup | Email/password enabled; email confirmation disabled for this invite-only beta |
 | Password-recovery redirect | `lincolnsreelrecords://reset-password` |
 | Account-deletion Function | `delete-account`, active with JWT verification |
