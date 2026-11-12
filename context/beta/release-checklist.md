@@ -65,3 +65,17 @@ new incremented build after the fix passes this checklist.
   the authenticated `delete-account` Function remain present. No hosted mutation was performed.
 - App Store Connect Test Information is populated except for the public privacy-policy URL. External
   group assignment and submission remain intentionally held until the install/smoke gate passes.
+
+## Build-7 expiry recovery — 2026-11-12
+
+- Cause: TestFlight builds expire 90 days after upload. Build 5 (external, ~2026-07-20) expired ~2026-10-18
+  and build 6 (internal, 2026-08-10) expired ~2026-11-08, leaving testers with "Beta Has Expired" and no
+  installable build. Upload a fresh build at least every 80 days.
+- Hosted Supabase project `ptoqkqisgyzypfpjvmvx` had been auto-paused (`INACTIVE`, Free plan inactivity)
+  and was restored; it reports `ACTIVE_HEALTHY` with all eight migrations, the `delete-account` Function,
+  existing users, and Storage objects intact.
+- `0.1.0 (7)` is build 6's app code with only the build number bumped (commit `037291b`). Archived with
+  Xcode 27.2 and uploaded via `xcodebuild -exportArchive` after Ed accepted the updated Apple Developer
+  Program License Agreement, which had blocked cloud distribution signing.
+- Build 7 goes to both groups at once, so Issues #1–3 reach external testers without the planned
+  internal smoke gate.
