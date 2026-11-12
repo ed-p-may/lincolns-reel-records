@@ -68,8 +68,8 @@ new incremented build after the fix passes this checklist.
 
 ## Build-7 expiry recovery — 2026-11-12
 
-- Cause: TestFlight builds expire 90 days after upload. Build 5 (external, ~2026-07-20) expired ~2026-10-18
-  and build 6 (internal, 2026-08-10) expired ~2026-11-08, leaving testers with "Beta Has Expired" and no
+- Cause: TestFlight builds expire 90 days after upload. Lincoln was running build 6 (installed 2026-08-11);
+  it expired ~2026-11-08 and build 5 ~2026-10-18, leaving testers with "Beta Has Expired" and no
   installable build. Upload a fresh build at least every 80 days.
 - Hosted Supabase project `ptoqkqisgyzypfpjvmvx` had been auto-paused (`INACTIVE`, Free plan inactivity)
   and was restored; it reports `ACTIVE_HEALTHY` with all eight migrations, the `delete-account` Function,
