@@ -47,6 +47,13 @@ enum CatchDiscovery {
         options.contains(species) ? (species, "") : ("", species)
     }
 
+    static func pinnedCatches(_ catches: [CatchItem], species: String? = nil) -> [CatchItem] {
+        let normalizedSpecies = species.map(normalized)
+        return catches.filter { catchItem in
+            catchItem.coordinate != nil && matches(catchItem, species: normalizedSpecies)
+        }
+    }
+
     static func results(
         in catches: [CatchItem],
         query: String,

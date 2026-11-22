@@ -2,14 +2,14 @@
 
 **Date:** 2026-11-22
 **Source:** [GitHub Issue #12](https://github.com/ed-p-may/lincolns-reel-records/issues/12)
-**Status:** Scoped
-**Current phase:** Ready for Phase 01 — all open decisions resolved (2026-11-22)
+**Status:** In progress
+**Current phase:** Phase 01 implemented on branch `feature/map-improvements-01`
 
 ## Phase inventory
 
 | Phase | Plan | Status |
 |---|---|---|
-| 01 | [Species filter and satellite map style](plans/phase-01-species-filter-and-satellite.md) | Scoped |
+| 01 | [Species filter and satellite map style](plans/phase-01-species-filter-and-satellite.md) | Implemented on branch |
 | 02 | [MA public boat and fishing access points](plans/phase-02-ma-public-access.md) | Scoped |
 | 03 | [MA lake depth overlay (bathymetry)](plans/phase-03-lake-depth-overlay.md) | Scoped |
 

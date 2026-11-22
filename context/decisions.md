@@ -9,6 +9,18 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-11-22 — Map style persistence and species filtering (Issue #12, Phase 01)
+- **Context:** Issue #12 requests species filtering on the Catch Map and a satellite map view.
+- **Decision:**
+  - Persist `CatchMapStyle` (`standard`, `hybrid`, `satellite`) in `@AppStorage("reelrecords.map.style")`
+    so `CatchMapView` and `ManualLocationPicker` share the selected basemap without backend changes;
+    keep `CatchDetailView`'s mini-map muted `.standard`.
+  - Reuse `CatchDiscovery` normalization (`pinnedCatches(_:species:)`) and `SelectionChip` for the
+    map species filter bar, shown only when 2+ distinct species are pinned, and clear an incompatible
+    filter whenever `focusCatchID` navigates to a catch.
+- **Consequences:** Zero schema, sync, or API-key changes. `CatchMapLayersSheet` establishes the
+  layers-sheet container that Phases 02 and 03 extend with MA Public Access and MA Lake Depths.
+
 ## 2026-11-22 — Water-body fishing info v1: client-only free sources and interactive empty map
 - **Context:** Issue #14 asks for a Google Maps-style card when tapping a body of water on the Map
   showing publicly available species, hot-spots, lures, blogs, and photos. Full web-grounded

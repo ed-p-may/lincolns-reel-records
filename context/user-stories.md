@@ -136,7 +136,12 @@ _As an angler, I want my catches on a map so I can see where I fish._
 
 **D2 · Jump from a catch to its spot (P1)**
 _As an angler, I want to go from a catch to its place on the map._
-- Catch Detail's mini-map opens the Map focused on that catch's pin.
+- Catch Detail's mini-map opens the Map focused on that catch's pin (clearing an incompatible species filter if active).
+
+**D3 · Filter map by species and switch map style (P1)**
+_As an angler, I want to filter map pins by species and switch between standard, hybrid, and satellite imagery._
+- Species chips derived from pinned catches filter map markers and update header counts when 2+ species are pinned.
+- Map style (`Standard`, `Hybrid`, `Satellite`) persists across launches and applies to both Catch Map and Manual Location Picker.
 
 ## Epic E — Account, data & settings
 
