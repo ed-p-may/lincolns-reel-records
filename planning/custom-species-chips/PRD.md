@@ -21,7 +21,9 @@ catches, so a regular catch outside the eight seed species never has to be retyp
   when its catch is corrected or deleted.
 - Editing a catch whose species text exactly matches a chip shows that chip selected and the "Other
   species" field empty. A case variant of a chip (stored "yellow perch", chip "Yellow Perch") stays in
-  the custom field, so saving it unchanged never rewrites the stored species text or queues a sync.
+  the custom field, so saving it unchanged never rewrites the stored species text. (Other fields can
+  still change on an unchanged save: the edit form rounds measurements to two decimals. That predates
+  this feature and is tracked as a follow-up.)
 - Species stays out of the last-used defaults: a new form still starts with no species selected.
 
 ## Acceptance criteria
