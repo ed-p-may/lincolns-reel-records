@@ -3,6 +3,7 @@ import SwiftUI
 
 struct ManualLocationPicker: View {
     @Environment(\.dismiss) private var dismiss
+    @AppStorage(CatchMapStyle.storageKey) private var mapStyle: CatchMapStyle = .standard
     @State private var selectedCoordinate: CatchCoordinate?
     @State private var cameraPosition: MapCameraPosition
     @State private var query = ""
@@ -49,6 +50,27 @@ struct ManualLocationPicker: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
                     Button("Cancel") { dismiss() }
+                }
+                ToolbarItem(placement: .topBarTrailing) {
+                    Menu {
+                        ForEach(CatchMapStyle.allCases) { style in
+                            Button {
+                                mapStyle = style
+                            } label: {
+                                if mapStyle == style {
+                                    Label(style.title, systemImage: "checkmark")
+                                } else {
+                                    Label(style.title, systemImage: style.systemImage)
+                                }
+                            }
+                            .accessibilityIdentifier("manual-location.style.\(style.rawValue)")
+                        }
+                    } label: {
+                        Image(systemName: mapStyle.systemImage)
+                    }
+                    .accessibilityLabel("Map Style")
+                    .accessibilityValue(mapStyle.title)
+                    .accessibilityIdentifier("manual-location.style.button")
                 }
             }
         }
@@ -121,7 +143,7 @@ struct ManualLocationPicker: View {
                     }
                 }
             }
-            .mapStyle(.standard(elevation: .flat, emphasis: .muted, pointsOfInterest: .excludingAll))
+            .mapStyle(mapStyle.mapStyle)
             .mapControls {
                 MapCompass()
                 MapScaleView()

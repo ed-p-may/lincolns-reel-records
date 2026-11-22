@@ -1,7 +1,7 @@
 # Phase 01 — Species filter and satellite map style
 
 **Date:** 2026-11-22
-**Status:** Scoped
+**Status:** Implemented on branch
 **Depends on:** Completed Map and Logbook discovery phases
 **Source:** [GitHub Issue #12](https://github.com/ed-p-may/lincolns-reel-records/issues/12)
 

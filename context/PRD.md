@@ -180,11 +180,16 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval
   Detail.
 
 ### 6.4 Map
-- Real **MapKit** map (dark-styled) with all of the user's catches as **pins at their true GPS
-  locations** (Q3). Selected pin enlarges + ripples (per the prototype's styling).
+- Real **MapKit** map with selectable **Standard** (dark muted default), **Hybrid** (satellite + labels),
+  and **Satellite** styles persisted device-locally (`@AppStorage`) and shared with the manual pin picker.
+  All of the user's catches render as **pins at their true GPS locations** (Q3). Selected pin enlarges +
+  ripples (per the prototype's styling).
+- **Species filter:** Horizontal chip bar derived from pinned catches (shown when 2+ species are pinned)
+  using `CatchDiscovery` normalization; filters pins and updates header counts while clearing cleanly
+  on focus navigation to an excluded catch.
 - **GPS** is captured at logging (location permission); **manual pin-drop / map-search fallback** when
   GPS is off/denied or a catch is logged later. Free-text named `location` is kept alongside coordinates.
-- Header: "N catches across M spots".
+- Header: "N catches across M spots" (or "X of N catches across M spots" when filtered).
 - Selected-catch card at bottom → Catch Detail.
 
 ### 6.5 Profile / You

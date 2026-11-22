@@ -4,9 +4,12 @@ import SwiftUI
 struct CatchMapView: View {
     @Environment(SwiftDataCatchRepository.self) private var repository
     @Environment(SyncCoordinator.self) private var syncCoordinator
+    @AppStorage(CatchMapStyle.storageKey) private var mapStyle: CatchMapStyle = .standard
     @State private var catches: [CatchItem] = []
+    @State private var selectedSpecies: String?
     @State private var selectedCatchID: UUID?
     @State private var cameraPosition: MapCameraPosition = .automatic
+    @State private var showingLayersSheet = false
     @State private var loadError: String?
 
     let ownerID: UUID
@@ -27,8 +30,26 @@ struct CatchMapView: View {
         .background(ReelTheme.background)
         .navigationTitle("Catch Map")
         .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    showingLayersSheet = true
+                } label: {
+                    Image(systemName: "square.3.layers.3d")
+                }
+                .accessibilityLabel("Map Layers")
+                .accessibilityValue(mapStyle.title)
+                .accessibilityIdentifier("map.style.button")
+            }
+        }
+        .sheet(isPresented: $showingLayersSheet) {
+            CatchMapLayersSheet(mapStyle: $mapStyle)
+        }
         .task(id: refreshToken + syncCoordinator.revision) { reload() }
         .onChange(of: focusRevision) { _, _ in focusRequestedCatch() }
+        .onChange(of: selectedSpecies) { _, _ in
+            selectedCatchID = CatchMapFilter.reconciledSelection(selectedCatchID, in: filteredCatches)
+        }
         .alert("Unable to open map", isPresented: errorBinding) {
             Button("Retry") { reload() }
         } message: {
@@ -38,7 +59,7 @@ struct CatchMapView: View {
 
     private var mapContent: some View {
         Map(position: $cameraPosition, selection: $selectedCatchID) {
-            ForEach(pinnedCatches) { catchItem in
+            ForEach(filteredCatches) { catchItem in
                 if let coordinate = catchItem.coordinate {
                     Marker(
                         catchItem.species,
@@ -50,7 +71,7 @@ struct CatchMapView: View {
                 }
             }
         }
-        .mapStyle(.standard(elevation: .flat, emphasis: .muted, pointsOfInterest: .excludingAll))
+        .mapStyle(mapStyle.mapStyle)
         .mapControls {
             MapCompass()
             MapScaleView()
@@ -60,22 +81,51 @@ struct CatchMapView: View {
     }
 
     private var mapHeader: some View {
-        let spotCount = SpotSummary.uniqueCount(in: pinnedCatches)
-        return VStack(alignment: .leading, spacing: 3) {
-            Text("\(pinnedCatches.count) CATCH\(pinnedCatches.count == 1 ? "" : "ES") ACROSS "
-                + "\(spotCount) SPOT\(spotCount == 1 ? "" : "S")")
-                .font(ReelFont.metadata(.caption2, weight: .bold))
-                .tracking(0.7)
-                .foregroundStyle(ReelTheme.primaryText)
-                .accessibilityIdentifier("map.counts")
-            Text(mapSubtitle)
-                .font(ReelFont.body(.caption2))
-                .foregroundStyle(ReelTheme.secondaryText)
+        let spotCount = SpotSummary.uniqueCount(in: filteredCatches)
+        let summary = CatchMapFilter.countSummary(
+            filteredCount: filteredCatches.count,
+            totalCount: pinnedCatches.count,
+            spotCount: spotCount,
+            isFiltered: selectedSpecies != nil
+        )
+        return VStack(alignment: .leading, spacing: 8) {
+            VStack(alignment: .leading, spacing: 3) {
+                Text(summary)
+                    .font(ReelFont.metadata(.caption2, weight: .bold))
+                    .tracking(0.7)
+                    .foregroundStyle(ReelTheme.primaryText)
+                    .accessibilityIdentifier("map.counts")
+                Text(mapSubtitle)
+                    .font(ReelFont.body(.caption2))
+                    .foregroundStyle(ReelTheme.secondaryText)
+            }
+            if availableSpecies.count > 1 {
+                speciesFilterBar
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(.ultraThinMaterial)
+    }
+
+    private var speciesFilterBar: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                SelectionChip(title: "All", isSelected: selectedSpecies == nil, sizing: .compact) {
+                    selectedSpecies = nil
+                }
+                .accessibilityIdentifier("map.species.All")
+
+                ForEach(availableSpecies, id: \.self) { species in
+                    SelectionChip(title: species, isSelected: selectedSpecies == species, sizing: .compact) {
+                        selectedSpecies = species
+                    }
+                    .accessibilityIdentifier("map.species.\(species)")
+                }
+            }
+        }
+        .accessibilityLabel("Filter map by species")
     }
 
     @ViewBuilder
@@ -129,12 +179,20 @@ struct CatchMapView: View {
     }
 
     private var pinnedCatches: [CatchItem] {
-        catches.filter { $0.coordinate != nil }
+        CatchDiscovery.pinnedCatches(catches)
+    }
+
+    private var availableSpecies: [String] {
+        CatchDiscovery.species(in: pinnedCatches)
+    }
+
+    private var filteredCatches: [CatchItem] {
+        CatchDiscovery.pinnedCatches(catches, species: selectedSpecies)
     }
 
     private var selectedCatch: CatchItem? {
         guard let selectedCatchID else { return nil }
-        return pinnedCatches.first { $0.id == selectedCatchID }
+        return filteredCatches.first { $0.id == selectedCatchID }
     }
 
     private var unmappedFocusName: String? {
@@ -176,9 +234,14 @@ struct CatchMapView: View {
         do {
             catches = try repository.list(ownerID: ownerID)
             loadError = nil
-            if selectedCatch == nil {
-                selectedCatchID = pinnedCatches.first?.id
-            }
+            selectedSpecies = CatchMapFilter.reconciledSpecies(
+                selectedSpecies,
+                availableSpecies: availableSpecies
+            )
+            selectedCatchID = CatchMapFilter.reconciledSelection(
+                selectedCatchID,
+                in: filteredCatches
+            )
             focusRequestedCatch()
         } catch {
             loadError = error.localizedDescription
@@ -196,6 +259,11 @@ struct CatchMapView: View {
             }
             return
         }
+        selectedSpecies = CatchMapFilter.speciesForFocus(
+            catchID: catchItem.id,
+            selectedSpecies: selectedSpecies,
+            in: pinnedCatches
+        )
         selectedCatchID = catchItem.id
         cameraPosition = .region(MKCoordinateRegion(
             center: coordinate.mapCoordinate,
