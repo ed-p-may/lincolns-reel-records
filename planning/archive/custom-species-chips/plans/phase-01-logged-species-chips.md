@@ -1,6 +1,6 @@
 # Phase 01 — Logged species as Add Catch chips
 
-**Status:** Implemented on branch
+**Status:** Complete
 **Depends on:** Completed Catch CRUD and Log discovery phases
 
 ## Goal
