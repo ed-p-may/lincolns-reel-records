@@ -48,7 +48,7 @@ struct CatchMapView: View {
             CatchMapLayersSheet(mapStyle: $mapStyle)
         }
         .task(id: refreshToken + syncCoordinator.revision) { reload() }
-        .onChange(of: focusRevision) { _, _ in applyPendingFocusIfNeeded() }
+        .onChange(of: focusRevision) { _, _ in reload() }
         .alert("Unable to open map", isPresented: errorBinding) {
             Button("Retry") { reload() }
         } message: {
@@ -115,6 +115,7 @@ struct CatchMapView: View {
                 SelectionChip(title: resetTitle, isSelected: selectedSpecies == nil, sizing: .compact) {
                     selectSpecies(nil)
                 }
+                .accessibilityLabel("Show all catches")
                 .accessibilityIdentifier("map.species.All")
 
                 ForEach(availableSpecies, id: \.self) { species in

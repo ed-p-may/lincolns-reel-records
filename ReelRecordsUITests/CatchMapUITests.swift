@@ -50,6 +50,23 @@ final class CatchMapUITests: XCTestCase {
         allChip.tap()
         XCTAssertEqual(counts.label, "2 CATCHES ACROSS 2 SPOTS")
         XCTAssertTrue(bassMarker.waitForExistence(timeout: 5))
+
+        troutChip.tap()
+        XCTAssertEqual(counts.label, "1 OF 2 CATCHES ACROSS 1 SPOT")
+
+        app.tabBars.buttons["Home"].tap()
+        let dashboard = app.scrollViews.firstMatch
+        XCTAssertTrue(dashboard.waitForExistence(timeout: 5))
+        dashboard.swipeUp()
+        dashboard.swipeUp()
+        let favoriteSpot = app.buttons["dashboard.spot.stockbridge bowl north shore by the old stone landing"]
+        XCTAssertTrue(favoriteSpot.waitForExistence(timeout: 3))
+        favoriteSpot.tap()
+
+        XCTAssertTrue(counts.waitForExistence(timeout: 5))
+        XCTAssertEqual(counts.label, "2 CATCHES ACROSS 2 SPOTS")
+        XCTAssertEqual(app.buttons["map.species.All"].value as? String, "Selected")
+        XCTAssertTrue(app.buttons["map.selected-catch"].label.contains("Largemouth Bass"))
     }
 
     func testMapStyleSharesWithManualPickerAndPersistsSatelliteAcrossRelaunch() {
