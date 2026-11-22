@@ -6,6 +6,34 @@ final class EditCatchWeatherUITests: XCTestCase {
         continueAfterFailure = false
     }
 
+    /// Positive control: a new catch's photo-metadata pin requests weather, so the fixture is wired in.
+    func testNewCatchPinRequestsFixtureWeather() {
+        let app = XCUIApplication()
+        app.launchArguments = [
+            "--ui-testing",
+            "--ui-testing-photo-metadata-defaults",
+            "--ui-testing-weather-fixture"
+        ]
+        app.launch()
+        let logTab = app.tabBars.buttons["Log"]
+        XCTAssertTrue(logTab.waitForExistence(timeout: 5))
+        logTab.tap()
+        let addCatch = app.buttons["Log a catch"]
+        XCTAssertTrue(addCatch.waitForExistence(timeout: 5))
+        addCatch.tap()
+
+        let choosePhotos = app.buttons["photo.choose-library"]
+        XCTAssertTrue(choosePhotos.waitForExistence(timeout: 3))
+        choosePhotos.tap()
+        let airTemperature = app.textFields["add.air-temperature"]
+        XCTAssertTrue(airTemperature.waitForExistence(timeout: 3))
+        let suggested = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "value CONTAINS %@", "72"),
+            object: airTemperature
+        )
+        XCTAssertEqual(XCTWaiter.wait(for: [suggested], timeout: 5), .completed)
+    }
+
     /// The seeded catch has a pin and no air temperature; the fixture provider would fill 72 °F if asked.
     func testUntouchedEditOfPinnedCatchRequestsNoWeather() {
         let app = XCUIApplication()

@@ -433,6 +433,7 @@ private extension AddCatchView {
 
     @MainActor
     private func suggestWeatherIfNeeded() async {
+        weatherSuggestionMessage = nil
         guard let coordinate, let key = weatherRequestKey,
               conditionDraft.shouldRequestWeather(for: key),
               !completedWeatherKeys.contains(key)
@@ -444,7 +445,6 @@ private extension AddCatchView {
             try await Task.sleep(for: .milliseconds(400))
             try Task.checkCancellation()
             fetchingWeatherKey = key
-            weatherSuggestionMessage = nil
             defer {
                 if fetchingWeatherKey == key {
                     fetchingWeatherKey = nil
