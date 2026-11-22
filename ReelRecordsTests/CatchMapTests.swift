@@ -66,6 +66,29 @@ final class CatchMapTests: XCTestCase {
         )
     }
 
+    func testFocusRevisionAppliesOnceUntilRevisionAdvances() {
+        XCTAssertTrue(
+            CatchMapFilter.shouldApplyFocus(focusRevision: 1, handledFocusRevision: nil, hasFocusTarget: true)
+        )
+        XCTAssertFalse(
+            CatchMapFilter.shouldApplyFocus(focusRevision: 1, handledFocusRevision: 1, hasFocusTarget: true)
+        )
+        XCTAssertTrue(
+            CatchMapFilter.shouldApplyFocus(focusRevision: 2, handledFocusRevision: 1, hasFocusTarget: true)
+        )
+        XCTAssertFalse(
+            CatchMapFilter.shouldApplyFocus(focusRevision: 2, handledFocusRevision: nil, hasFocusTarget: false)
+        )
+    }
+
+    func testAllSpeciesChipDisambiguatesFromResetChip() {
+        XCTAssertEqual(CatchMapFilter.resetChipTitle(availableSpecies: ["Bass", "Trout"]), "All")
+        XCTAssertEqual(CatchMapFilter.resetChipTitle(availableSpecies: ["All", "Trout"]), "All species")
+        XCTAssertEqual(CatchMapFilter.speciesChipIdentifier(for: "Rainbow Trout"), "map.species.Rainbow Trout")
+        XCTAssertEqual(CatchMapFilter.speciesChipIdentifier(for: "All"), "map.species.option.All")
+        XCTAssertEqual(CatchMapFilter.speciesChipIdentifier(for: "all"), "map.species.option.all")
+    }
+
     func testCountSummaryFormatsFilteredAndUnfilteredCounts() {
         XCTAssertEqual(
             CatchMapFilter.countSummary(filteredCount: 2, totalCount: 2, spotCount: 2, isFiltered: false),

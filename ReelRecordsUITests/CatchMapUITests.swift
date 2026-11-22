@@ -2,11 +2,13 @@ import XCTest
 
 @MainActor
 final class CatchMapUITests: XCTestCase {
+    private let seededBass = "Largemouth Bass With An Exceptionally Long Display Name"
+
     override func setUpWithError() throws {
         continueAfterFailure = false
     }
 
-    func testSpeciesFilterUpdatesMapCountsAndSelection() {
+    func testSpeciesFilterUpdatesMapMarkersCountsAndSelection() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-testing", "--ui-testing-logbook"]
         app.launch()
@@ -18,6 +20,17 @@ final class CatchMapUITests: XCTestCase {
         let counts = app.staticTexts["map.counts"]
         XCTAssertTrue(counts.waitForExistence(timeout: 5))
         XCTAssertEqual(counts.label, "2 CATCHES ACROSS 2 SPOTS")
+
+        let map = app.maps.firstMatch
+        XCTAssertTrue(map.waitForExistence(timeout: 5))
+        let bassMarker = map.descendants(matching: .any)
+            .matching(NSPredicate(format: "label CONTAINS %@", seededBass))
+            .firstMatch
+        let troutMarker = map.descendants(matching: .any)
+            .matching(NSPredicate(format: "label CONTAINS %@", "Rainbow Trout"))
+            .firstMatch
+        XCTAssertTrue(bassMarker.waitForExistence(timeout: 5))
+        XCTAssertTrue(troutMarker.waitForExistence(timeout: 5))
 
         let allChip = app.buttons["map.species.All"]
         XCTAssertTrue(allChip.waitForExistence(timeout: 3))
@@ -31,12 +44,15 @@ final class CatchMapUITests: XCTestCase {
         let selectedCatch = app.buttons["map.selected-catch"]
         XCTAssertTrue(selectedCatch.waitForExistence(timeout: 3))
         XCTAssertTrue(selectedCatch.label.contains("Rainbow Trout"))
+        XCTAssertTrue(troutMarker.waitForExistence(timeout: 3))
+        XCTAssertFalse(bassMarker.exists)
 
         allChip.tap()
         XCTAssertEqual(counts.label, "2 CATCHES ACROSS 2 SPOTS")
+        XCTAssertTrue(bassMarker.waitForExistence(timeout: 5))
     }
 
-    func testMapStylePersistsAcrossRelaunch() {
+    func testMapStyleSharesWithManualPickerAndPersistsSatelliteAcrossRelaunch() {
         let app = XCUIApplication()
         app.launchArguments = ["--ui-testing", "--ui-testing-logbook"]
         app.launch()
@@ -48,12 +64,31 @@ final class CatchMapUITests: XCTestCase {
         let styleButton = app.buttons["map.style.button"]
         XCTAssertTrue(styleButton.waitForExistence(timeout: 5))
         styleButton.tap()
-
         let hybridOption = app.buttons["map.style.hybrid"]
         XCTAssertTrue(hybridOption.waitForExistence(timeout: 3))
         hybridOption.tap()
         app.buttons["map.layers.done"].tap()
         XCTAssertEqual(styleButton.value as? String, "Hybrid")
+
+        app.tabBars.buttons["Log"].tap()
+        let addCatch = app.buttons["Log a catch"]
+        XCTAssertTrue(addCatch.waitForExistence(timeout: 5))
+        addCatch.tap()
+        let addScroll = app.scrollViews.firstMatch
+        addScroll.swipeUp()
+        addScroll.swipeUp()
+        let chooseOnMap = app.buttons["add.location.manual"]
+        XCTAssertTrue(chooseOnMap.waitForExistence(timeout: 3))
+        chooseOnMap.tap()
+
+        let pickerStyleButton = app.buttons["manual-location.style.button"]
+        XCTAssertTrue(pickerStyleButton.waitForExistence(timeout: 5))
+        XCTAssertEqual(pickerStyleButton.value as? String, "Hybrid")
+        pickerStyleButton.tap()
+        let satelliteChoice = app.buttons["manual-location.style.satellite"]
+        XCTAssertTrue(satelliteChoice.waitForExistence(timeout: 3))
+        satelliteChoice.tap()
+        XCTAssertEqual(pickerStyleButton.value as? String, "Satellite")
 
         app.terminate()
         app.launch()
@@ -62,7 +97,7 @@ final class CatchMapUITests: XCTestCase {
 
         let persistedStyleButton = app.buttons["map.style.button"]
         XCTAssertTrue(persistedStyleButton.waitForExistence(timeout: 5))
-        XCTAssertEqual(persistedStyleButton.value as? String, "Hybrid")
+        XCTAssertEqual(persistedStyleButton.value as? String, "Satellite")
 
         persistedStyleButton.tap()
         let standardOption = app.buttons["map.style.standard"]

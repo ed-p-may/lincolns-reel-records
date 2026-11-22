@@ -8,6 +8,8 @@ struct CatchMapView: View {
     @State private var catches: [CatchItem] = []
     @State private var selectedSpecies: String?
     @State private var selectedCatchID: UUID?
+    @State private var handledFocusRevision: Int?
+    @State private var hasLoadedCatches = false
     @State private var cameraPosition: MapCameraPosition = .automatic
     @State private var showingLayersSheet = false
     @State private var loadError: String?
@@ -46,10 +48,7 @@ struct CatchMapView: View {
             CatchMapLayersSheet(mapStyle: $mapStyle)
         }
         .task(id: refreshToken + syncCoordinator.revision) { reload() }
-        .onChange(of: focusRevision) { _, _ in focusRequestedCatch() }
-        .onChange(of: selectedSpecies) { _, _ in
-            selectedCatchID = CatchMapFilter.reconciledSelection(selectedCatchID, in: filteredCatches)
-        }
+        .onChange(of: focusRevision) { _, _ in applyPendingFocusIfNeeded() }
         .alert("Unable to open map", isPresented: errorBinding) {
             Button("Retry") { reload() }
         } message: {
@@ -110,18 +109,22 @@ struct CatchMapView: View {
     }
 
     private var speciesFilterBar: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
+        let resetTitle = CatchMapFilter.resetChipTitle(availableSpecies: availableSpecies)
+        return ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
-                SelectionChip(title: "All", isSelected: selectedSpecies == nil, sizing: .compact) {
-                    selectedSpecies = nil
+                SelectionChip(title: resetTitle, isSelected: selectedSpecies == nil, sizing: .compact) {
+                    selectSpecies(nil)
                 }
                 .accessibilityIdentifier("map.species.All")
 
                 ForEach(availableSpecies, id: \.self) { species in
                     SelectionChip(title: species, isSelected: selectedSpecies == species, sizing: .compact) {
-                        selectedSpecies = species
+                        selectSpecies(species)
                     }
-                    .accessibilityIdentifier("map.species.\(species)")
+                    .accessibilityLabel(
+                        CatchDiscovery.normalized(species) == "all" ? "Species \(species)" : species
+                    )
+                    .accessibilityIdentifier(CatchMapFilter.speciesChipIdentifier(for: species))
                 }
             }
         }
@@ -230,9 +233,16 @@ struct CatchMapView: View {
         )
     }
 
+    private func selectSpecies(_ species: String?) {
+        selectedSpecies = species
+        selectedCatchID = CatchMapFilter.reconciledSelection(selectedCatchID, in: filteredCatches)
+        cameraPosition = .automatic
+    }
+
     private func reload() {
         do {
             catches = try repository.list(ownerID: ownerID)
+            hasLoadedCatches = true
             loadError = nil
             selectedSpecies = CatchMapFilter.reconciledSpecies(
                 selectedSpecies,
@@ -242,10 +252,24 @@ struct CatchMapView: View {
                 selectedCatchID,
                 in: filteredCatches
             )
-            focusRequestedCatch()
+            applyPendingFocusIfNeeded()
         } catch {
             loadError = error.localizedDescription
         }
+    }
+
+    private func applyPendingFocusIfNeeded() {
+        guard hasLoadedCatches else { return }
+        let hasFocusTarget = focusCatchID != nil || focusSpotName != nil
+        guard CatchMapFilter.shouldApplyFocus(
+            focusRevision: focusRevision,
+            handledFocusRevision: handledFocusRevision,
+            hasFocusTarget: hasFocusTarget
+        ) else {
+            return
+        }
+        handledFocusRevision = focusRevision
+        focusRequestedCatch()
     }
 
     private func focusRequestedCatch() {

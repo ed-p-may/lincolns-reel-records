@@ -89,6 +89,27 @@ enum CatchMapFilter {
         return matchesSelected ? selectedSpecies : nil
     }
 
+    static func shouldApplyFocus(
+        focusRevision: Int,
+        handledFocusRevision: Int?,
+        hasFocusTarget: Bool
+    ) -> Bool {
+        guard hasFocusTarget else { return false }
+        return handledFocusRevision != focusRevision
+    }
+
+    static func resetChipTitle(availableSpecies: [String]) -> String {
+        let hasCollision = availableSpecies.contains { CatchDiscovery.normalized($0) == "all" }
+        return hasCollision ? "All species" : "All"
+    }
+
+    static func speciesChipIdentifier(for species: String) -> String {
+        if CatchDiscovery.normalized(species) == "all" {
+            return "map.species.option.\(species)"
+        }
+        return "map.species.\(species)"
+    }
+
     static func countSummary(
         filteredCount: Int,
         totalCount: Int,
