@@ -16,8 +16,8 @@ import urllib.parse
 import urllib.request
 
 ENDPOINT = (
-    "https://services.arcgis.com/2gdL2gxYNFY2TOUb/arcgis/rest/services/"
-    "MA_Office_of_Fishing_and_Boating_Access_Sites/FeatureServer/0/query"
+    "https://services1.arcgis.com/hGdibHYSPO59RG1h/arcgis/rest/services/"
+    "Office_of_Fishing_and_Boating_Access_Sites/FeatureServer/0/query"
 )
 SOURCE_LABEL = "MassGIS / MA Office of Fishing and Boating Access (OFBA)"
 OUTPUT_PATH = pathlib.Path(__file__).resolve().parents[1] / "ReelRecords" / "Resources" / "ma-public-access.json"
@@ -36,7 +36,7 @@ def clean_int(value: object) -> int | None:
     if value is None or isinstance(value, bool):
         return None
     try:
-        parsed = int(float(value))
+        parsed = int(float(str(value).strip()))
     except (TypeError, ValueError):
         return None
     return parsed if parsed > 0 else None
@@ -97,21 +97,29 @@ def normalize_feature(feature: dict) -> dict | None:
     if not (-90.0 <= lat_f <= 90.0 and -180.0 <= lon_f <= 180.0):
         return None
 
-    ofba_id = clean_str(attrs.get("OFBA_ID")) or clean_str(attrs.get("OBJECTID"))
+    ofba_id = clean_str(attrs.get("OFBA_ID"))
+    object_id = clean_str(attrs.get("OBJECTID"))
     name = clean_str(attrs.get("FACNAME"))
-    if not ofba_id or not name:
+    if not name or (not ofba_id and not object_id):
         return None
 
-    barrier_raw = clean_str(attrs.get("BARRIER_FR"))
+    site_id = f"MA-{ofba_id}" if ofba_id else f"MA-OBJ-{object_id}"
+    canonical_ofba_id = ofba_id or f"OBJ-{object_id}"
+
+    facility_raw = attrs.get("FACILITY_TYPE")
+    if facility_raw is None:
+        facility_raw = attrs.get("FACILITY_T")
+
+    barrier_raw = clean_str(attrs.get("BARRIER_FREE")) or clean_str(attrs.get("BARRIER_FR"))
     barrier_free = bool(barrier_raw and barrier_raw.lower() in {"yes", "y", "true", "1"})
 
     return {
-        "id": f"MA-{ofba_id}",
-        "ofbaId": ofba_id,
+        "id": site_id,
+        "ofbaId": canonical_ofba_id,
         "name": name,
         "town": clean_str(attrs.get("TOWN")),
         "state": "MA",
-        "facilityTypeCodes": parse_facility_codes(attrs.get("FACILITY_T")),
+        "facilityTypeCodes": parse_facility_codes(facility_raw),
         "rampType": clean_str(attrs.get("RAMPTYPE")),
         "parking": clean_str(attrs.get("PARKING")),
         "lanes": clean_int(attrs.get("NOLANES")),
@@ -128,7 +136,16 @@ def normalize_feature(feature: dict) -> dict | None:
 def main() -> int:
     features = fetch_features()
     sites = [site for f in features if (site := normalize_feature(f)) is not None]
-    sites.sort(key=lambda s: (s["ofbaId"], s["name"]))
+    sites.sort(key=lambda s: (s["id"], s["name"]))
+
+    seen_ids: set[str] = set()
+    duplicates: list[str] = []
+    for site in sites:
+        if site["id"] in seen_ids:
+            duplicates.append(site["id"])
+        seen_ids.add(site["id"])
+    if duplicates:
+        raise ValueError(f"Duplicate access site IDs detected: {sorted(set(duplicates))}")
 
     snapshot = {
         "source": SOURCE_LABEL,

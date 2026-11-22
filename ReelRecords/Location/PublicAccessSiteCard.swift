@@ -11,6 +11,30 @@ struct PublicAccessSiteCard: View {
             if !badgeLabels.isEmpty {
                 badgeRow
             }
+            if hasBodyDetails {
+                ViewThatFits(in: .vertical) {
+                    detailsBody
+                    ScrollView {
+                        detailsBody
+                    }
+                    .frame(maxHeight: 160)
+                }
+            }
+            directionsButton
+        }
+        .padding(14)
+        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
+        .padding(12)
+        .accessibilityElement(children: .contain)
+        .accessibilityIdentifier("map.access-site-card")
+    }
+
+    private var hasBodyDetails: Bool {
+        !detailLines.isEmpty || (site.comments?.isEmpty == false)
+    }
+
+    private var detailsBody: some View {
+        VStack(alignment: .leading, spacing: 6) {
             if !detailLines.isEmpty {
                 VStack(alignment: .leading, spacing: 4) {
                     ForEach(detailLines, id: \.self) { line in
@@ -25,15 +49,10 @@ struct PublicAccessSiteCard: View {
                 Text(comments)
                     .font(ReelFont.body(.caption))
                     .foregroundStyle(ReelTheme.tertiaryText)
-                    .lineLimit(3)
+                    .fixedSize(horizontal: false, vertical: true)
             }
-            directionsButton
         }
-        .padding(14)
-        .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
-        .padding(12)
-        .accessibilityElement(children: .contain)
-        .accessibilityIdentifier("map.access-site-card")
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var headerRow: some View {

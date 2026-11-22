@@ -16,6 +16,7 @@ struct CatchMapView: View {
     @State private var selection: CatchMapSelection?
     @State private var handledFocusRevision: Int?
     @State private var hasLoadedCatches = false
+    @State private var usingEmptyFallbackCamera = false
     @State private var cameraPosition: MapCameraPosition = .automatic
     @State private var showingLayersSheet = false
     @State private var loadError: String?
@@ -132,37 +133,17 @@ struct CatchMapView: View {
                 }
             }
             if availableSpecies.count > 1 {
-                speciesFilterBar
+                MapSpeciesFilterBar(
+                    availableSpecies: availableSpecies,
+                    selectedSpecies: selectedSpecies,
+                    onSelect: selectSpecies
+                )
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, 16)
         .padding(.vertical, 10)
         .background(.ultraThinMaterial)
-    }
-
-    private var speciesFilterBar: some View {
-        let resetTitle = CatchMapFilter.resetChipTitle(availableSpecies: availableSpecies)
-        return ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                SelectionChip(title: resetTitle, isSelected: selectedSpecies == nil, sizing: .compact) {
-                    selectSpecies(nil)
-                }
-                .accessibilityLabel("Show all catches")
-                .accessibilityIdentifier("map.species.All")
-
-                ForEach(availableSpecies, id: \.self) { species in
-                    SelectionChip(title: species, isSelected: selectedSpecies == species, sizing: .compact) {
-                        selectSpecies(species)
-                    }
-                    .accessibilityLabel(
-                        CatchDiscovery.normalized(species) == "all" ? "Species \(species)" : species
-                    )
-                    .accessibilityIdentifier(CatchMapFilter.speciesChipIdentifier(for: species))
-                }
-            }
-        }
-        .accessibilityLabel("Filter map by species")
     }
 
     @ViewBuilder
@@ -242,7 +223,12 @@ struct CatchMapView: View {
         } else {
             selection = nil
         }
-        cameraPosition = .automatic
+        usingEmptyFallbackCamera = false
+        if let region = CatchMapFilter.fittingRegion(for: filteredCatches) {
+            cameraPosition = .region(region)
+        } else {
+            cameraPosition = .automatic
+        }
     }
 
     private func reload() {
@@ -261,8 +247,16 @@ struct CatchMapView: View {
                     in: filteredCatches
                 ).map(CatchMapSelection.catchPin)
             }
-            if wasFirstLoad, pinnedCatches.isEmpty {
-                cameraPosition = .region(Self.defaultMassachusettsRegion)
+            if pinnedCatches.isEmpty {
+                if wasFirstLoad {
+                    cameraPosition = .region(Self.defaultMassachusettsRegion)
+                    usingEmptyFallbackCamera = true
+                }
+            } else if usingEmptyFallbackCamera {
+                usingEmptyFallbackCamera = false
+                if let region = CatchMapFilter.fittingRegion(for: filteredCatches) {
+                    cameraPosition = .region(region)
+                }
             }
             applyPendingFocusIfNeeded()
         } catch {
@@ -291,12 +285,17 @@ struct CatchMapView: View {
         else {
             if focusSpotName != nil {
                 selection = nil
-                cameraPosition = pinnedCatches.isEmpty
-                    ? .region(Self.defaultMassachusettsRegion)
-                    : .automatic
+                if let region = CatchMapFilter.fittingRegion(for: filteredCatches) {
+                    usingEmptyFallbackCamera = false
+                    cameraPosition = .region(region)
+                } else {
+                    usingEmptyFallbackCamera = true
+                    cameraPosition = .region(Self.defaultMassachusettsRegion)
+                }
             }
             return
         }
+        usingEmptyFallbackCamera = false
         selectedSpecies = CatchMapFilter.speciesForFocus(
             catchID: catchItem.id,
             selectedSpecies: selectedSpecies,
@@ -307,6 +306,36 @@ struct CatchMapView: View {
             center: coordinate.mapCoordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.035, longitudeDelta: 0.035)
         ))
+    }
+}
+
+private struct MapSpeciesFilterBar: View {
+    let availableSpecies: [String]
+    let selectedSpecies: String?
+    let onSelect: (String?) -> Void
+
+    var body: some View {
+        let resetTitle = CatchMapFilter.resetChipTitle(availableSpecies: availableSpecies)
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                SelectionChip(title: resetTitle, isSelected: selectedSpecies == nil, sizing: .compact) {
+                    onSelect(nil)
+                }
+                .accessibilityLabel("Show all catches")
+                .accessibilityIdentifier("map.species.All")
+
+                ForEach(availableSpecies, id: \.self) { species in
+                    SelectionChip(title: species, isSelected: selectedSpecies == species, sizing: .compact) {
+                        onSelect(species)
+                    }
+                    .accessibilityLabel(
+                        CatchDiscovery.normalized(species) == "all" ? "Species \(species)" : species
+                    )
+                    .accessibilityIdentifier(CatchMapFilter.speciesChipIdentifier(for: species))
+                }
+            }
+        }
+        .accessibilityLabel("Filter map by species")
     }
 }
 

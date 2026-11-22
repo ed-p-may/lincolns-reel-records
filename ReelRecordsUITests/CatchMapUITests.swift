@@ -149,11 +149,32 @@ final class CatchMapUITests: XCTestCase {
 
         XCTAssertEqual(counts.label, "2 CATCHES ACROSS 2 SPOTS")
 
-        layersButton.tap()
-        XCTAssertTrue(accessToggle.waitForExistence(timeout: 3))
-        XCTAssertEqual(accessToggle.value as? String, "1")
-        accessToggle.switches.firstMatch.tap()
+        let accessPin = app.buttons["map.access-site.MA-225"]
+        XCTAssertTrue(accessPin.waitForExistence(timeout: 5))
+        accessPin.tap()
+
+        let accessCard = app.otherElements["map.access-site-card"]
+        XCTAssertTrue(accessCard.waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["map.access-site-card.directions"].exists)
+        app.buttons["map.access-site-card.close"].tap()
+        XCTAssertFalse(accessCard.exists)
+
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["Map"].waitForExistence(timeout: 5))
+        app.tabBars.buttons["Map"].tap()
+        XCTAssertTrue(app.buttons["map.access-site.MA-225"].waitForExistence(timeout: 5))
+
+        let persistedLayersButton = app.buttons["map.style.button"]
+        XCTAssertTrue(persistedLayersButton.waitForExistence(timeout: 3))
+        persistedLayersButton.tap()
+        let persistedToggle = app.switches["map.layer.public-access"]
+        XCTAssertTrue(persistedToggle.waitForExistence(timeout: 3))
+        XCTAssertEqual(persistedToggle.value as? String, "1")
+        persistedToggle.switches.firstMatch.tap()
         app.buttons["map.layers.done"].tap()
+
+        XCTAssertFalse(app.buttons["map.access-site.MA-225"].exists)
     }
 
     func testZeroCatchMapShowsLiveMapCanvasWithCompactHeader() {

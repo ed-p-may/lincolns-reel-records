@@ -38,9 +38,14 @@ enum PublicAccessFacilityType: String, Codable, CaseIterable, Hashable, Sendable
 
     static func parseCodes(_ raw: String?) -> [PublicAccessFacilityType] {
         guard let raw else { return [] }
+        let tokens = raw.replacingOccurrences(of: ";", with: ",").split(separator: ",").map(String.init)
+        return parseCodes(tokens)
+    }
+
+    static func parseCodes(_ codes: [String]) -> [PublicAccessFacilityType] {
         var seen = Set<PublicAccessFacilityType>()
         var parsed: [PublicAccessFacilityType] = []
-        for token in raw.replacingOccurrences(of: ";", with: ",").split(separator: ",") {
+        for token in codes {
             let trimmed = token.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
             if let type = PublicAccessFacilityType(rawValue: trimmed), seen.insert(type).inserted {
                 parsed.append(type)
@@ -69,16 +74,7 @@ struct PublicAccessSite: Codable, Identifiable, Hashable, Sendable {
     let longitude: Double
 
     var facilityTypes: [PublicAccessFacilityType] {
-        var seen = Set<PublicAccessFacilityType>()
-        return facilityTypeCodes.compactMap { code in
-            let normalized = code.trimmingCharacters(in: .whitespacesAndNewlines).uppercased()
-            guard let type = PublicAccessFacilityType(rawValue: normalized),
-                  seen.insert(type).inserted
-            else {
-                return nil
-            }
-            return type
-        }
+        PublicAccessFacilityType.parseCodes(facilityTypeCodes)
     }
 
     var coordinate: CatchCoordinate? {
@@ -118,7 +114,7 @@ struct PublicAccessCatalog: Sendable {
     init(source: String, sites: [PublicAccessSite]) {
         self.source = source
         self.sites = sites
-        sitesByID = Dictionary(uniqueKeysWithValues: sites.map { ($0.id, $0) })
+        sitesByID = Dictionary(sites.map { ($0.id, $0) }, uniquingKeysWith: { first, _ in first })
     }
 
     static func decode(from data: Data) throws -> PublicAccessSnapshot {

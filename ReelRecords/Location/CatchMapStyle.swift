@@ -123,6 +123,37 @@ enum CatchMapFilter {
         }
         return "\(totalCount) \(catchWord) ACROSS \(spotCount) \(spotWord)"
     }
+
+    static func fittingRegion(for catches: [CatchItem]) -> MKCoordinateRegion? {
+        let coordinates = catches.compactMap(\.coordinate)
+        guard let first = coordinates.first else { return nil }
+        let minimumSpan = 0.035
+        if coordinates.count == 1 {
+            return MKCoordinateRegion(
+                center: first.mapCoordinate,
+                span: MKCoordinateSpan(latitudeDelta: minimumSpan, longitudeDelta: minimumSpan)
+            )
+        }
+        var minLat = first.latitude
+        var maxLat = first.latitude
+        var minLon = first.longitude
+        var maxLon = first.longitude
+        for coord in coordinates.dropFirst() {
+            minLat = min(minLat, coord.latitude)
+            maxLat = max(maxLat, coord.latitude)
+            minLon = min(minLon, coord.longitude)
+            maxLon = max(maxLon, coord.longitude)
+        }
+        let latSpan = max((maxLat - minLat) * 1.4, minimumSpan)
+        let lonSpan = max((maxLon - minLon) * 1.4, minimumSpan)
+        return MKCoordinateRegion(
+            center: CLLocationCoordinate2D(
+                latitude: (minLat + maxLat) / 2,
+                longitude: (minLon + maxLon) / 2
+            ),
+            span: MKCoordinateSpan(latitudeDelta: min(latSpan, 180), longitudeDelta: min(lonSpan, 360))
+        )
+    }
 }
 
 enum CatchMapLayerSettings {
