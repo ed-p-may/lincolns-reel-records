@@ -14,7 +14,8 @@ editing a catch that uses it.
    that normalize to a seed species.
 2. In `AddCatchView`, load the chip list once from `repository.list(ownerID:)` when the form opens,
    and move an edited catch's species from the custom field to its chip when an exact chip exists.
-3. Unit coverage for seed order, case-insensitive merging and seed exclusion.
+3. Unit coverage for seed order, case-insensitive merging, seed exclusion, and exact-match-only chip
+   selection when editing (`pickerSelection`).
 4. UI coverage: the logbook seed's custom species appears as an unselected chip on a new Log a Catch
    form and as the selected chip when its catch is edited. The test types nothing: typing with the
    software keyboard up left simulator predictive text that broke later Tracer Bullet typing.

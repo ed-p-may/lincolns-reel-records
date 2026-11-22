@@ -41,6 +41,12 @@ enum CatchDiscovery {
         return suggested + species(in: catches).filter { !suggestedKeys.contains(normalized($0)) }
     }
 
+    /// Splits a stored species into a chip selection or "Other species" text. Only an exact match selects a
+    /// chip, so a case variant keeps its stored spelling and an unchanged save never rewrites it.
+    static func pickerSelection(for species: String, options: [String]) -> (selected: String, custom: String) {
+        options.contains(species) ? (species, "") : ("", species)
+    }
+
     static func results(
         in catches: [CatchItem],
         query: String,

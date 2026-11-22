@@ -65,9 +65,9 @@ struct AddCatchView: View {
         self.onSaved = onSaved
 
         let values = editItem?.values
-        let species = values?.species ?? ""
-        _selectedSpecies = State(initialValue: Self.suggestedSpecies.contains(species) ? species : "")
-        _customSpecies = State(initialValue: Self.suggestedSpecies.contains(species) ? "" : species)
+        let species = CatchDiscovery.pickerSelection(for: values?.species ?? "", options: Self.suggestedSpecies)
+        _selectedSpecies = State(initialValue: species.selected)
+        _customSpecies = State(initialValue: species.custom)
         _weight = State(initialValue: CatchFormatting.input(values?.weight))
         _length = State(initialValue: CatchFormatting.input(values?.length))
         _caughtAt = State(initialValue: values?.caughtAt ?? .now)
@@ -358,9 +358,11 @@ private extension AddCatchView {
                 in: repository.list(ownerID: ownerID)
             )
             // An edited catch whose custom species is now a chip shows that chip selected.
-            if selectedSpecies.isEmpty, speciesOptions.contains(customSpecies) {
-                selectedSpecies = customSpecies
-                customSpecies = ""
+            if selectedSpecies.isEmpty {
+                (selectedSpecies, customSpecies) = CatchDiscovery.pickerSelection(
+                    for: customSpecies,
+                    options: speciesOptions
+                )
             }
         } catch {
             errorMessage = error.localizedDescription
