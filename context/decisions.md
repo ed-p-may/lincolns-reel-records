@@ -9,6 +9,16 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-11-22 — Custom species chips derive from logged catches
+- **Context:** Issue #13 asks that a species typed into "Other species" become a reusable picker chip.
+- **Decision:** Derive the Add Catch chips from the owner's visible catches: the eight seed species in
+  fixed order, then every other distinct logged species alphabetically, using the Log filter's
+  case-insensitive comparison. Nothing is stored.
+- **Alternatives considered:** a per-user `SpeciesItem` catalog like the Tackle Box. It would need a
+  hosted migration, sync and a management screen, and would keep typos forever.
+- **Consequences:** No schema, sync or backend change. A chip lasts only while a visible catch uses it,
+  so correcting or deleting a typo removes it. Renaming or hiding chips is out of scope.
+
 ## 2026-08-10 — Photo metadata as transient new-Catch defaults
 - **Context:** Camera and selected library photos may contain a capture timestamp and GPS coordinate, but
   the offline photo pipeline intentionally strips metadata during normalization. Broad Photo Library

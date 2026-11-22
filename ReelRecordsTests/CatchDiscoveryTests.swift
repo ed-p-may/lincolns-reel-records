@@ -26,6 +26,20 @@ final class CatchDiscoveryTests: XCTestCase {
         XCTAssertEqual(CatchDiscovery.species(in: catches), ["Bass", "Bluegill", "walleye"])
     }
 
+    func testPickerSpeciesKeepsSeedOrderThenAddsLoggedCustomSpecies() {
+        let catches = [
+            catchItem(species: "Yellow Perch"),
+            catchItem(species: "walleye"),
+            catchItem(species: "Brook Trout"),
+            catchItem(species: "yellow perch")
+        ]
+
+        XCTAssertEqual(
+            CatchDiscovery.pickerSpecies(suggested: ["Walleye", "Bluegill"], in: catches),
+            ["Walleye", "Bluegill", "Brook Trout", "Yellow Perch"]
+        )
+    }
+
     func testSearchSpeciesAndSortCompose() {
         let catches = [
             catchItem(species: "Bass", weight: 2, location: "Bowl", caughtAt: date(1)),

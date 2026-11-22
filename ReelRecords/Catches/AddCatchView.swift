@@ -21,6 +21,7 @@ struct AddCatchView: View {
     @Environment(\.weatherSuggestionProvider) private var weatherSuggestionProvider
     @State private var selectedSpecies: String
     @State private var customSpecies: String
+    @State private var speciesOptions = Self.suggestedSpecies
     @State private var weight: String
     @State private var length: String
     @State private var caughtAt: Date
@@ -46,6 +47,7 @@ struct AddCatchView: View {
     @State private var photos: [EditableCatchPhoto] = []
     @State private var photoMetadataDraft = PhotoMetadataDefaultsDraft()
     @State private var didLoadDefaults = false
+    @State private var didLoadSpeciesOptions = false
     @State private var didLoadPhotos = false
     @State private var didCommitPhotos = false
     @State private var didNotifySaved = false
@@ -94,7 +96,11 @@ struct AddCatchView: View {
                         onMetadata: applyPhotoMetadata,
                         onError: { errorMessage = $0 }
                     )
-                    speciesSection
+                    CatchSpeciesEditor(
+                        options: speciesOptions,
+                        selectedSpecies: $selectedSpecies,
+                        customSpecies: $customSpecies
+                    )
                     measurementSection
                     CatchDateEditor(caughtAt: caughtAtBinding)
                     CatchLocationEditor(
@@ -144,6 +150,7 @@ struct AddCatchView: View {
         .task {
             locationService.reset()
             loadPhotos()
+            loadSpeciesOptions()
             loadNewCatchDefaults()
             loadTackleItems()
         }
@@ -202,27 +209,6 @@ struct AddCatchView: View {
         }
     }
 
-    private var speciesSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            AddCatchFieldLabel("Species")
-            LazyVGrid(columns: [GridItem(.adaptive(minimum: 132))], spacing: 10) {
-                ForEach(Self.suggestedSpecies, id: \.self) { species in
-                    speciesButton(species)
-                }
-            }
-
-            TextField("Other species", text: $customSpecies)
-                .textInputAutocapitalization(.words)
-                .fieldInputStyle()
-                .accessibilityIdentifier("add.species.custom")
-                .onChange(of: customSpecies) {
-                    if !customSpecies.isEmpty {
-                        selectedSpecies = ""
-                    }
-                }
-        }
-    }
-
     private var measurementSection: some View {
         VStack(alignment: .leading, spacing: 12) {
             AddCatchFieldLabel("Measurements")
@@ -277,14 +263,6 @@ private extension AddCatchView {
                 coordinate = $0
             }
         )
-    }
-
-    private func speciesButton(_ species: String) -> some View {
-        SelectionChip(title: species, isSelected: selectedSpecies == species, sizing: .fillWidth) {
-            selectedSpecies = species
-            customSpecies = ""
-        }
-        .accessibilityIdentifier("add.species.\(species)")
     }
 
     private func measurementInput(
@@ -365,6 +343,24 @@ private extension AddCatchView {
                     source: .existing(photo),
                     fileURL: photoRepository.fileURL(for: photo)
                 )
+            }
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    private func loadSpeciesOptions() {
+        guard !didLoadSpeciesOptions else { return }
+        didLoadSpeciesOptions = true
+        do {
+            speciesOptions = try CatchDiscovery.pickerSpecies(
+                suggested: Self.suggestedSpecies,
+                in: repository.list(ownerID: ownerID)
+            )
+            // An edited catch whose custom species is now a chip shows that chip selected.
+            if selectedSpecies.isEmpty, speciesOptions.contains(customSpecies) {
+                selectedSpecies = customSpecies
+                customSpecies = ""
             }
         } catch {
             errorMessage = error.localizedDescription

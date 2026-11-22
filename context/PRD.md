@@ -78,8 +78,10 @@ Fields below come from the prototype's data model, updated by our decisions.
 **Stored types / enums (fixed for the schema):**
 - **`species`** — stored as **text**, not a DB enum (custom values allowed). The picker offers a **seed
   suggestion list** (Largemouth Bass, Smallmouth Bass, Northern Pike, Walleye, Crappie, Bluegill,
-  Channel Catfish, Rainbow Trout) + "Other → type your own". Species-filter chips (B3) and species stats
-  derive from the distinct text values a user has logged.
+  Channel Catfish, Rainbow Trout) + "Other → type your own". A typed species becomes a picker chip on
+  later catches: the picker shows the seed list, then every other species the user has logged. Picker
+  chips, species-filter chips (B3) and species stats all derive from the distinct text values a user
+  has logged; there is no stored species catalog.
 - **`skyCondition`** — closed enum, v1 values (each maps to one weather icon): `sunny` (fa-sun),
   `partly_cloudy` (fa-cloud-sun), `overcast` (fa-cloud), `rain` (fa-cloud-rain), `fog` (fa-smog),
   `clear_night` (fa-moon). Extensible later (e.g. snow). The Open-Meteo **WMO weather-code → value**

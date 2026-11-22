@@ -12,6 +12,7 @@ _As an angler, I want to log a catch in under a minute so I don't lose the momen
 - Given the app is open, when I tap the center **+** (or dashboard **Log a Catch**), the Add Catch
   sheet opens.
 - Species is pickable from chips in one tap; date defaults to **today**.
+- A species typed under "Other species" becomes a chip on later catches (Issue #13).
 - A new form carries the latest same-day catch's named spot, lure/bait, sky fallback, and water clarity;
   a new local calendar day resets them, and coordinates are always captured fresh.
 - Only **species + date** are required to save; everything else is optional.

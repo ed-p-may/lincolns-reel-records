@@ -35,6 +35,12 @@ enum CatchDiscovery {
         return displayValueByKey.values.sorted(by: alphabeticallyPrecedes)
     }
 
+    /// Add Catch chips: the seed list in its fixed order, then every other species the owner has logged.
+    static func pickerSpecies(suggested: [String], in catches: [CatchItem]) -> [String] {
+        let suggestedKeys = Set(suggested.map(normalized))
+        return suggested + species(in: catches).filter { !suggestedKeys.contains(normalized($0)) }
+    }
+
     static func results(
         in catches: [CatchItem],
         query: String,
