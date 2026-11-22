@@ -205,20 +205,12 @@ struct CatchPhotoViewer: View {
         ZStack {
             Color.black.ignoresSafeArea()
 
-            TabView(selection: $selectedPhotoID) {
-                ForEach(items) { item in
-                    LocalPhotoImage(
-                        url: photoRepository.fileURL(for: item.photo),
-                        maximumPixelSize: 2400,
-                        contentMode: .fit,
-                        placeholder: CatchPhotoPlaceholder(species: item.catchItem.species)
-                    )
-                    .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    .accessibilityLabel(item.accessibilityLabel)
-                    .tag(item.id)
-                }
-            }
-            .tabViewStyle(.page(indexDisplayMode: .never))
+            CatchPhotoPager(
+                items: items,
+                photoURL: { photoRepository.fileURL(for: $0) },
+                selectedPhotoID: $selectedPhotoID
+            )
+            .ignoresSafeArea()
 
             viewerChrome
         }
@@ -261,6 +253,7 @@ struct CatchPhotoViewer: View {
                 .padding(.vertical, 14)
                 .frame(maxWidth: .infinity)
                 .background(.ultraThinMaterial)
+                .allowsHitTesting(false)
             }
         }
     }
@@ -296,7 +289,7 @@ private struct CatchPhotoGalleryTile: View {
     }
 }
 
-private extension CatchPhotoGalleryItem {
+extension CatchPhotoGalleryItem {
     var accessibilityLabel: String {
         let catchPhotoCount = "Photo \(photo.position + 1)"
         return "\(catchPhotoCount) for \(catchItem.species), "

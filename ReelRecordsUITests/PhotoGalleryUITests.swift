@@ -20,7 +20,22 @@ final class PhotoGalleryUITests: XCTestCase {
         firstPhoto.tap()
         XCTAssertTrue(app.buttons["photo.viewer.close"].waitForExistence(timeout: 3))
         XCTAssertEqual(app.staticTexts["photo.viewer.position"].label, "1 OF 2")
-        app.swipeLeft()
+        let photo = app.images["photo.viewer.image"]
+        XCTAssertTrue(photo.waitForExistence(timeout: 3))
+        photo.pinch(withScale: 2, velocity: 1)
+        XCTAssertEqual(photo.value as? String, "Zoomed in")
+        photo.swipeLeft()
+        XCTAssertEqual(app.staticTexts["photo.viewer.position"].label, "1 OF 2")
+        photo.doubleTap()
+        let fitted = XCTNSPredicateExpectation(
+            predicate: NSPredicate(format: "value == %@", "Fit to screen"),
+            object: photo
+        )
+        XCTAssertEqual(XCTWaiter.wait(for: [fitted], timeout: 3), .completed)
+
+        let start = app.coordinate(withNormalizedOffset: CGVector(dx: 0.65, dy: 0.5))
+        let end = app.coordinate(withNormalizedOffset: CGVector(dx: 0.33, dy: 0.5))
+        start.press(forDuration: 0.01, thenDragTo: end, withVelocity: .fast, thenHoldForDuration: 0)
         XCTAssertTrue(app.staticTexts["2 OF 2"].waitForExistence(timeout: 3))
         app.buttons["photo.viewer.close"].tap()
 
