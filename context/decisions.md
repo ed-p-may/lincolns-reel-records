@@ -9,6 +9,35 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-11-22 — Water-body fishing info v1: client-only free sources and interactive empty map
+- **Context:** Issue #14 asks for a Google Maps-style card when tapping a body of water on the Map
+  showing publicly available species, hot-spots, lures, blogs, and photos. Full web-grounded
+  lure/blog synthesis requires a paid search-grounded LLM key and a server-side Supabase Edge
+  Function + shared cache table.
+- **Decision:**
+  - **Keep v1 strictly free:** Ship Phase 01 using free, keyless public APIs (OpenStreetMap Overpass
+    for water identity and boat ramps, Wikipedia REST for overview/hero photo, iNaturalist
+    `taxon_id=47178` for local fish species and attributed CC photos, USGS NWIS IV for live river
+    flow) plus the angler's own local SwiftData catch history and one-tap in-app Safari search links
+    for public fishing reports. Defer web-grounded LLM synthesis (lures, hot-spots, parsed blogs) to
+    a future Phase 02.
+  - **Client-only in v1:** Call the free public APIs directly from iOS behind a protocol-based
+    `WaterBodyInfoProviding` client (matching `OpenMeteoClient`) with an on-device disk cache and
+    polite `User-Agent` / per-source timeouts. No Supabase migration, Edge Function, or API secrets
+    in v1.
+  - **Interactive map with 0 pinned catches:** `CatchMapView` always renders the interactive MapKit
+    map (with a compact header hint when `pinnedCatches.isEmpty`) instead of a full-screen empty
+    state, so anglers can scout bodies of water before logging pinned catches.
+- **Alternatives considered:** Adding a Supabase Edge Function + 14-day shared Postgres cache now,
+  or adding Gemini/OpenAI search-grounded synthesis in v1. Both add backend/key/cost surface before
+  field-testing whether MapKit water selection + free structured sources + Safari report links
+  already meet the need.
+- **Consequences:** Zero backend, migration, RLS, or API-cost changes for Phase 01. Overpass and
+  iNaturalist rate limits are respected via on-device caching (14-day TTL for static water/species
+  info; fresh/15-min for USGS river gauges) and deliberate tap/long-press triggers. If web-grounded
+  lures/hot-spots are desired later, Phase 02 introduces the Edge Function and shared cache cleanly
+  behind the same `WaterBodyInfoProviding` protocol.
+
 ## 2026-11-22 — Weather suggestions on an edited catch need a changed time or location
 - **Context:** Issue #20. Edit Catch built the same condition draft as a new catch, so a stored catch
   with a pin but no air temperature or sky requested Open-Meteo on open and filled those fields; an

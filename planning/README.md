@@ -5,6 +5,8 @@ Canonical product intent remains in `context/`; each packet links back to the af
 
 | Feature | Source | Status |
 |---|---|---|
+| [Water-Body Fishing Info](water-body-fishing-info/README.md) | [GitHub Issue #14](https://github.com/ed-p-may/lincolns-reel-records/issues/14) | Scoped |
+| [Map Improvements](map-improvements/README.md) | [GitHub Issue #12](https://github.com/ed-p-may/lincolns-reel-records/issues/12) | Scoped |
 | [Custom Species Chips](archive/custom-species-chips/PRD.md) | [GitHub Issue #13](https://github.com/ed-p-may/lincolns-reel-records/issues/13) | Complete |
 | [Photo Metadata Defaults](archive/photo-metadata-defaults/PRD.md) | [GitHub Issue #3](https://github.com/ed-p-may/lincolns-reel-records/issues/3) | Complete |
 | [Last-used Catch Defaults](archive/last-used-catch-defaults/PRD.md) | [GitHub Issue #2](https://github.com/ed-p-may/lincolns-reel-records/issues/2) | Complete |
