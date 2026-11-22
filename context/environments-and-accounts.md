@@ -46,8 +46,8 @@ Developer account. Do not copy them into this public repository.
 
 | Group | Type | Membership / current state |
 |---|---|---|
-| `Reel Records Internal` | Internal | Ed May; build `0.1.0 (6)` is assigned and awaiting installation over verified build 5 |
-| `Reel Records Friends & Family` | External, email-only | Lincoln Fisher is added; build `0.1.0 (5)` is `Testing`; build 6 is intentionally unassigned pending internal smoke |
+| `Reel Records Internal` | Internal | Ed May; build `0.1.0 (7)` (uploaded 2026-11-12) replaces expired builds 5 and 6 |
+| `Reel Records Friends & Family` | External, email-only | Lincoln Fisher is added; build `0.1.0 (7)` replaces expired build 6 (his last install) |
 
 There is no public TestFlight link. Tester email addresses are authoritative in App Store Connect; the
 minor tester's address is intentionally not duplicated in this public repository.
