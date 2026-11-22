@@ -121,7 +121,10 @@ final class AppDependencies {
     private static func makeWeatherSuggestionProvider(
         isUITesting: Bool
     ) -> any WeatherSuggestionProviding {
-        isUITesting ? UnavailableWeatherSuggestionProvider() : OpenMeteoClient()
+        guard isUITesting else { return OpenMeteoClient() }
+        return ProcessInfo.processInfo.arguments.contains("--ui-testing-weather-fixture")
+            ? FixtureWeatherSuggestionProvider()
+            : UnavailableWeatherSuggestionProvider()
     }
 
     private static func makePhotoMetadataDefaultsFixture(

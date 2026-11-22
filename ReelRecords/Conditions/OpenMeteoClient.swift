@@ -43,6 +43,17 @@ struct UnavailableWeatherSuggestionProvider: WeatherSuggestionProviding {
     }
 }
 
+/// UI-test provider that always suggests 72 °F and sunny, so tests can see whether a request ran.
+struct FixtureWeatherSuggestionProvider: WeatherSuggestionProviding {
+    func suggestion(
+        at _: CatchCoordinate,
+        caughtAt: Date,
+        now _: Date
+    ) async throws -> WeatherSuggestion? {
+        WeatherSuggestion(airTemperatureF: 72, skyCondition: .sunny, observedAt: caughtAt)
+    }
+}
+
 extension EnvironmentValues {
     @Entry var weatherSuggestionProvider: any WeatherSuggestionProviding = UnavailableWeatherSuggestionProvider()
 }
