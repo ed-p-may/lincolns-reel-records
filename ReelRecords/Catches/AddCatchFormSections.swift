@@ -19,6 +19,37 @@ struct CatchDateEditor: View {
     }
 }
 
+struct CatchSpeciesEditor: View {
+    let options: [String]
+    @Binding var selectedSpecies: String
+    @Binding var customSpecies: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            AddCatchFieldLabel("Species")
+            LazyVGrid(columns: [GridItem(.adaptive(minimum: 132))], spacing: 10) {
+                ForEach(options, id: \.self) { species in
+                    SelectionChip(title: species, isSelected: selectedSpecies == species, sizing: .fillWidth) {
+                        selectedSpecies = species
+                        customSpecies = ""
+                    }
+                    .accessibilityIdentifier("add.species.\(species)")
+                }
+            }
+
+            TextField("Other species", text: $customSpecies)
+                .textInputAutocapitalization(.words)
+                .fieldInputStyle()
+                .accessibilityIdentifier("add.species.custom")
+                .onChange(of: customSpecies) {
+                    if !customSpecies.isEmpty {
+                        selectedSpecies = ""
+                    }
+                }
+        }
+    }
+}
+
 struct CatchDetailsEditor: View {
     @Binding var rodReel: String
     @Binding var notes: String

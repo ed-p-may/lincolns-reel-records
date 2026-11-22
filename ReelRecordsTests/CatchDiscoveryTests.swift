@@ -26,6 +26,31 @@ final class CatchDiscoveryTests: XCTestCase {
         XCTAssertEqual(CatchDiscovery.species(in: catches), ["Bass", "Bluegill", "walleye"])
     }
 
+    func testPickerSpeciesKeepsSeedOrderThenAddsLoggedCustomSpecies() {
+        let catches = [
+            catchItem(species: "Yellow Perch"),
+            catchItem(species: "walleye"),
+            catchItem(species: "Brook Trout"),
+            catchItem(species: "yellow perch")
+        ]
+
+        XCTAssertEqual(
+            CatchDiscovery.pickerSpecies(suggested: ["Walleye", "Bluegill"], in: catches),
+            ["Walleye", "Bluegill", "Brook Trout", "Yellow Perch"]
+        )
+    }
+
+    func testPickerSelectionSelectsOnlyAnExactChipMatch() {
+        let options = CatchDiscovery.pickerSpecies(
+            suggested: ["Walleye"],
+            in: [catchItem(species: "Yellow Perch"), catchItem(species: "yellow perch")]
+        )
+
+        XCTAssertTrue(CatchDiscovery.pickerSelection(for: "Yellow Perch", options: options) == ("Yellow Perch", ""))
+        XCTAssertTrue(CatchDiscovery.pickerSelection(for: "yellow perch", options: options) == ("", "yellow perch"))
+        XCTAssertTrue(CatchDiscovery.pickerSelection(for: "", options: options) == ("", ""))
+    }
+
     func testSearchSpeciesAndSortCompose() {
         let catches = [
             catchItem(species: "Bass", weight: 2, location: "Bowl", caughtAt: date(1)),
