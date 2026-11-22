@@ -70,15 +70,16 @@ struct AddCatchView: View {
         let species = CatchDiscovery.pickerSelection(for: values?.species ?? "", options: Self.suggestedSpecies)
         _selectedSpecies = State(initialValue: species.selected)
         _customSpecies = State(initialValue: species.custom)
-        _weight = State(initialValue: CatchFormatting.input(values?.weight))
-        _length = State(initialValue: CatchFormatting.input(values?.length))
+        let numbers = CatchNumberInputs(loading: values)
+        _weight = State(initialValue: numbers.weight)
+        _length = State(initialValue: numbers.length)
         _caughtAt = State(initialValue: values?.caughtAt ?? .now)
         _location = State(initialValue: values?.location ?? "")
         _coordinate = State(initialValue: values?.coordinate)
         let conditions = values?.conditions ?? .empty
-        _airTemperature = State(initialValue: CatchFormatting.input(conditions.airTemperatureF))
+        _airTemperature = State(initialValue: numbers.airTemperature)
         _skyCondition = State(initialValue: conditions.skyCondition)
-        _waterTemperature = State(initialValue: CatchFormatting.input(conditions.waterTemperatureF))
+        _waterTemperature = State(initialValue: numbers.waterTemperature)
         _waterClarity = State(initialValue: conditions.waterClarity)
         _conditionDraft = State(initialValue: ConditionEnrichmentDraft(conditions: conditions))
         _selectedTackleItemID = State(initialValue: values?.tackleItemID)
@@ -282,38 +283,36 @@ private extension AddCatchView {
         )
     }
 
-    private func parsedConditions() throws -> CatchConditions {
-        try CatchConditions(
-            airTemperatureF: CatchFormatting.parseOptionalTemperature(
-                airTemperature, unchangedFrom: initialValues?.conditions.airTemperatureF
+    private func formValues() throws -> CatchValues {
+        let numbers = try CatchNumberInputs(
+            weight: weight, length: length, airTemperature: airTemperature, waterTemperature: waterTemperature
+        ).parsed(unchangedFrom: initialValues)
+        return CatchValues(
+            species: finalSpecies,
+            weight: numbers.weight,
+            length: numbers.length,
+            caughtAt: caughtAt,
+            location: location,
+            coordinate: coordinate,
+            conditions: CatchConditions(
+                airTemperatureF: numbers.airTemperatureF,
+                skyCondition: skyCondition,
+                waterTemperatureF: numbers.waterTemperatureF,
+                waterClarity: waterClarity
             ),
-            skyCondition: skyCondition,
-            waterTemperatureF: CatchFormatting.parseOptionalTemperature(
-                waterTemperature, unchangedFrom: initialValues?.conditions.waterTemperatureF
-            ),
-            waterClarity: waterClarity
+            tackleItemID: selectedTackleItemID,
+            lureText: lureText,
+            rodReel: rodReel,
+            notes: notes,
+            released: released,
+            bookmarked: editItem?.bookmarked ?? false
         )
     }
 
     private func save() {
         locationService.reset()
         do {
-            let prior = initialValues
-            let values = try CatchValues(
-                species: finalSpecies,
-                weight: CatchFormatting.parseOptionalMeasurement(weight, field: .weight, unchangedFrom: prior?.weight),
-                length: CatchFormatting.parseOptionalMeasurement(length, field: .length, unchangedFrom: prior?.length),
-                caughtAt: caughtAt,
-                location: location,
-                coordinate: coordinate,
-                conditions: parsedConditions(),
-                tackleItemID: selectedTackleItemID,
-                lureText: lureText,
-                rodReel: rodReel,
-                notes: notes,
-                released: released,
-                bookmarked: editItem?.bookmarked ?? false
-            )
+            let values = try formValues()
             let catchItem: CatchItem
             if let catchID = editItem?.id ?? persistedCatchID {
                 catchItem = try repository.update(id: catchID, ownerID: ownerID, values: values)

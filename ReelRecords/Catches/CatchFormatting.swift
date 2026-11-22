@@ -70,6 +70,51 @@ enum CatchFormatting {
     }
 }
 
+/// The catch form's number fields as text. Edit Catch loads them with `init(loading:)` and Save Changes
+/// builds its values with `parsed(unchangedFrom:)`, so an untouched field keeps its stored value unrounded.
+struct CatchNumberInputs: Equatable {
+    var weight: String
+    var length: String
+    var airTemperature: String
+    var waterTemperature: String
+
+    struct Parsed: Equatable {
+        let weight: Double?
+        let length: Double?
+        let airTemperatureF: Double?
+        let waterTemperatureF: Double?
+    }
+
+    init(weight: String, length: String, airTemperature: String, waterTemperature: String) {
+        self.weight = weight
+        self.length = length
+        self.airTemperature = airTemperature
+        self.waterTemperature = waterTemperature
+    }
+
+    init(loading values: CatchValues?) {
+        self.init(
+            weight: CatchFormatting.input(values?.weight),
+            length: CatchFormatting.input(values?.length),
+            airTemperature: CatchFormatting.input(values?.conditions.airTemperatureF),
+            waterTemperature: CatchFormatting.input(values?.conditions.waterTemperatureF)
+        )
+    }
+
+    func parsed(unchangedFrom initial: CatchValues?) throws -> Parsed {
+        try Parsed(
+            weight: CatchFormatting.parseOptionalMeasurement(weight, field: .weight, unchangedFrom: initial?.weight),
+            length: CatchFormatting.parseOptionalMeasurement(length, field: .length, unchangedFrom: initial?.length),
+            airTemperatureF: CatchFormatting.parseOptionalTemperature(
+                airTemperature, unchangedFrom: initial?.conditions.airTemperatureF
+            ),
+            waterTemperatureF: CatchFormatting.parseOptionalTemperature(
+                waterTemperature, unchangedFrom: initial?.conditions.waterTemperatureF
+            )
+        )
+    }
+}
+
 extension CatchSyncState {
     var label: String {
         switch self {

@@ -28,25 +28,15 @@ final class CatchEditRoundTripTests: XCTestCase {
         await coordinator.sync(ownerID: ownerID)
         let stored = try XCTUnwrap(repository.item(id: created.id, ownerID: ownerID)).values
 
-        // The Edit Catch form loads each number through `CatchFormatting.input` and reparses it on save.
+        let numbers = try CatchNumberInputs(loading: stored).parsed(unchangedFrom: stored)
         let saved = try repository.update(id: created.id, ownerID: ownerID, values: values(
             species: stored.species,
-            weight: CatchFormatting.parseOptionalMeasurement(
-                CatchFormatting.input(stored.weight), field: .weight, unchangedFrom: stored.weight
-            ),
-            length: CatchFormatting.parseOptionalMeasurement(
-                CatchFormatting.input(stored.length), field: .length, unchangedFrom: stored.length
-            ),
+            weight: numbers.weight,
+            length: numbers.length,
             conditions: CatchConditions(
-                airTemperatureF: CatchFormatting.parseOptionalTemperature(
-                    CatchFormatting.input(stored.conditions.airTemperatureF),
-                    unchangedFrom: stored.conditions.airTemperatureF
-                ),
+                airTemperatureF: numbers.airTemperatureF,
                 skyCondition: nil,
-                waterTemperatureF: CatchFormatting.parseOptionalTemperature(
-                    CatchFormatting.input(stored.conditions.waterTemperatureF),
-                    unchangedFrom: stored.conditions.waterTemperatureF
-                ),
+                waterTemperatureF: numbers.waterTemperatureF,
                 waterClarity: nil
             )
         ))
@@ -56,6 +46,27 @@ final class CatchEditRoundTripTests: XCTestCase {
         XCTAssertEqual(saved.values.conditions, precise)
         XCTAssertEqual(saved.syncState, .synced)
         XCTAssertEqual(try repository.pendingCount(ownerID: ownerID), 0)
+    }
+
+    func testEditingOneNumberKeepsTheOthersExact() throws {
+        let stored = values(
+            species: "Bass",
+            weight: 4.257,
+            length: 18.333,
+            conditions: CatchConditions(
+                airTemperatureF: 61.875,
+                skyCondition: nil,
+                waterTemperatureF: 54.125,
+                waterClarity: nil
+            )
+        )
+        var form = CatchNumberInputs(loading: stored)
+        form.weight = CatchFormatting.input(5.5)
+
+        XCTAssertEqual(
+            try form.parsed(unchangedFrom: stored),
+            CatchNumberInputs.Parsed(weight: 5.5, length: 18.333, airTemperatureF: 61.875, waterTemperatureF: 54.125)
+        )
     }
 
     private func values(

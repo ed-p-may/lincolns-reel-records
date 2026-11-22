@@ -325,20 +325,17 @@ final class CatchFormattingTests: XCTestCase {
     }
 
     func testUnchangedFieldTextKeepsOriginalValue() throws {
-        XCTAssertEqual(
-            try CatchFormatting.parseOptionalMeasurement("4.26", field: .weight, unchangedFrom: 4.257),
-            4.257
-        )
+        let shown = CatchFormatting.input(4.257)
         let airText = CatchFormatting.input(61.875)
+        XCTAssertEqual(try CatchFormatting.parseOptionalMeasurement(shown, field: .weight, unchangedFrom: 4.257), 4.257)
         XCTAssertEqual(try CatchFormatting.parseOptionalTemperature(airText, unchangedFrom: 61.875), 61.875)
     }
 
     func testEditedFieldTextIsParsedAndValidated() throws {
-        XCTAssertEqual(try CatchFormatting.parseOptionalMeasurement("4.3", field: .weight, unchangedFrom: 4.257), 4.3)
-        XCTAssertEqual(
-            try CatchFormatting.parseOptionalMeasurement("4.26 ", field: .weight, unchangedFrom: 4.257),
-            4.26
-        )
+        let edited = CatchFormatting.input(4.3)
+        let padded = CatchFormatting.input(4.26) + " "
+        XCTAssertEqual(try CatchFormatting.parseOptionalMeasurement(edited, field: .weight, unchangedFrom: 4.257), 4.3)
+        XCTAssertEqual(try CatchFormatting.parseOptionalMeasurement(padded, field: .weight, unchangedFrom: 4.257), 4.26)
         XCTAssertNil(try CatchFormatting.parseOptionalMeasurement("", field: .length, unchangedFrom: 18.333))
         XCTAssertEqual(try CatchFormatting.parseOptionalTemperature("-2", unchangedFrom: 61.875), -2)
         XCTAssertThrowsError(
