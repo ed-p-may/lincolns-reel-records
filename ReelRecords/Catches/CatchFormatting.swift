@@ -1,8 +1,17 @@
 import Foundation
 
 enum CatchFormatting {
-    static func parseOptionalMeasurement(_ text: String, field: MeasurementField) throws -> Double? {
-        try parseOptionalNumber(
+    /// Parses a form field. When `text` still equals `input(original)` the user did not edit the field,
+    /// so `original` is returned unrounded instead of the 2-decimal value the form displayed.
+    static func parseOptionalMeasurement(
+        _ text: String,
+        field: MeasurementField,
+        unchangedFrom original: Double? = nil
+    ) throws -> Double? {
+        if text == input(original) {
+            return original
+        }
+        return try parseOptionalNumber(
             text,
             isValid: { $0 >= 0 },
             error: field == .weight ? .invalidWeight : .invalidLength
@@ -14,8 +23,11 @@ enum CatchFormatting {
         return value.formatted(.number.precision(.fractionLength(0 ... 2)))
     }
 
-    static func parseOptionalTemperature(_ text: String) throws -> Double? {
-        try parseOptionalNumber(text, isValid: { _ in true }, error: .invalidTemperature)
+    static func parseOptionalTemperature(_ text: String, unchangedFrom original: Double? = nil) throws -> Double? {
+        if text == input(original) {
+            return original
+        }
+        return try parseOptionalNumber(text, isValid: { _ in true }, error: .invalidTemperature)
     }
 
     private static func parseOptionalNumber(
@@ -55,6 +67,51 @@ enum CatchFormatting {
     enum MeasurementField {
         case weight
         case length
+    }
+}
+
+/// The catch form's number fields as text. Edit Catch loads them with `init(loading:)` and Save Changes
+/// builds its values with `parsed(unchangedFrom:)`, so an untouched field keeps its stored value unrounded.
+struct CatchNumberInputs: Equatable {
+    var weight: String
+    var length: String
+    var airTemperature: String
+    var waterTemperature: String
+
+    struct Parsed: Equatable {
+        let weight: Double?
+        let length: Double?
+        let airTemperatureF: Double?
+        let waterTemperatureF: Double?
+    }
+
+    init(weight: String, length: String, airTemperature: String, waterTemperature: String) {
+        self.weight = weight
+        self.length = length
+        self.airTemperature = airTemperature
+        self.waterTemperature = waterTemperature
+    }
+
+    init(loading values: CatchValues?) {
+        self.init(
+            weight: CatchFormatting.input(values?.weight),
+            length: CatchFormatting.input(values?.length),
+            airTemperature: CatchFormatting.input(values?.conditions.airTemperatureF),
+            waterTemperature: CatchFormatting.input(values?.conditions.waterTemperatureF)
+        )
+    }
+
+    func parsed(unchangedFrom initial: CatchValues?) throws -> Parsed {
+        try Parsed(
+            weight: CatchFormatting.parseOptionalMeasurement(weight, field: .weight, unchangedFrom: initial?.weight),
+            length: CatchFormatting.parseOptionalMeasurement(length, field: .length, unchangedFrom: initial?.length),
+            airTemperatureF: CatchFormatting.parseOptionalTemperature(
+                airTemperature, unchangedFrom: initial?.conditions.airTemperatureF
+            ),
+            waterTemperatureF: CatchFormatting.parseOptionalTemperature(
+                waterTemperature, unchangedFrom: initial?.conditions.waterTemperatureF
+            )
+        )
     }
 }
 

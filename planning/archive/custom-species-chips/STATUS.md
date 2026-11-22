@@ -1,15 +1,16 @@
 # Custom Species Chips status
 
 **Source:** [GitHub Issue #13](https://github.com/ed-p-may/lincolns-reel-records/issues/13)
-**Status:** Implemented on branch
-**Current phase:** Phase 01 — Logged species as Add Catch chips
+**Status:** Complete
+**Current phase:** Phase 01 — Logged species as Add Catch chips (complete)
+**Merged:** to main in [PR #17](https://github.com/ed-p-may/lincolns-reel-records/pull/17) (`395e20e`)
 **Branch:** `feature/issue-13-custom-species-chips`
 
 ## Phase inventory
 
 | Phase | Plan | Status |
 |---|---|---|
-| 01 | [Logged species as Add Catch chips](plans/phase-01-logged-species-chips.md) | Implemented on branch |
+| 01 | [Logged species as Add Catch chips](plans/phase-01-logged-species-chips.md) | Complete |
 
 ## Current state
 

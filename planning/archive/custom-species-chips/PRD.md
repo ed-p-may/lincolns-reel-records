@@ -1,7 +1,7 @@
 # Custom Species Chips
 
 **Source:** [GitHub Issue #13](https://github.com/ed-p-may/lincolns-reel-records/issues/13)
-**Status:** Implemented on branch
+**Status:** Complete
 **Owner:** Reel Records iOS app
 
 ## Goal
