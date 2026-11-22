@@ -9,6 +9,20 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-11-22 — Weather suggestions on an edited catch need a changed time or location
+- **Context:** Issue #20. Edit Catch built the same condition draft as a new catch, so a stored catch
+  with a pin but no air temperature or sky requested Open-Meteo on open and filled those fields; an
+  untouched Save Changes then wrote them and queued an outbox update (the no-op-save class of #18).
+- **Decision:** On an existing catch, request a weather suggestion only when the current request key
+  (coordinate to four decimals, about 10 m; time to the nearest hour) differs from the stored catch's
+  key, i.e. after the angler moves the pin, adds one, or moves the time into a different weather hour. The suggestion still fills only empty, untouched
+  fields, as in the 2026-07-19 precedence contract. New catches are unchanged.
+- **Alternatives considered:** never suggesting on edits. It would leave an offline-logged catch with
+  no way to get weather after the angler corrects its time or pin.
+- **Consequences:** Opening and saving a catch untouched never changes its conditions. A catch logged
+  offline no longer backfills weather just by opening Edit; changing its weather hour or pin does. Reverting the
+  time and pin to the stored values stops further requests but keeps any value already filled.
+
 ## 2026-11-22 — Custom species chips derive from logged catches
 - **Context:** Issue #13 asks that a species typed into "Other species" become a reusable picker chip.
 - **Decision:** Derive the Add Catch chips from the owner's visible catches: the eight seed species in

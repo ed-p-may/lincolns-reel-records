@@ -128,6 +128,61 @@ final class ConditionTests: XCTestCase {
         XCTAssertEqual(edited.skySource, .manual)
         XCTAssertFalse(edited.weatherSuggestionEligible)
     }
+
+    func testOpeningAnUnchangedExistingCatchDoesNotRequestWeather() throws {
+        let coordinate = try XCTUnwrap(CatchCoordinate(latitude: 42.3169, longitude: -73.3226))
+        let caughtAt = Date(timeIntervalSince1970: 1_784_000_000)
+        let storedKey = WeatherRequestKey(coordinate: coordinate, caughtAt: caughtAt)
+        let movedKey = try WeatherRequestKey(
+            coordinate: XCTUnwrap(CatchCoordinate(latitude: 42.4, longitude: -73.3226)),
+            caughtAt: caughtAt
+        )
+        let laterKey = WeatherRequestKey(coordinate: coordinate, caughtAt: caughtAt.addingTimeInterval(3 * 3600))
+        let airOnly = CatchConditions(airTemperatureF: 61, skyCondition: nil, waterTemperatureF: nil, waterClarity: nil)
+
+        for conditions in [CatchConditions.empty, airOnly] {
+            let edit = ConditionEnrichmentDraft(loading: storedCatch(caughtAt, coordinate, conditions))
+            XCTAssertFalse(edit.shouldRequestWeather(for: storedKey))
+            XCTAssertTrue(edit.shouldRequestWeather(for: movedKey))
+            XCTAssertTrue(edit.shouldRequestWeather(for: laterKey))
+        }
+
+        let sameHourKey = WeatherRequestKey(coordinate: coordinate, caughtAt: caughtAt.addingTimeInterval(60))
+        XCTAssertEqual(sameHourKey, storedKey)
+        let filled = CatchConditions(
+            airTemperatureF: 61,
+            skyCondition: .sunny,
+            waterTemperatureF: nil,
+            waterClarity: nil
+        )
+        let filledEdit = ConditionEnrichmentDraft(loading: storedCatch(caughtAt, coordinate, filled))
+        XCTAssertFalse(filledEdit.shouldRequestWeather(for: movedKey))
+
+        let unpinned = ConditionEnrichmentDraft(loading: storedCatch(caughtAt, nil, .empty))
+        XCTAssertTrue(unpinned.shouldRequestWeather(for: storedKey))
+
+        XCTAssertTrue(ConditionEnrichmentDraft(loading: nil).shouldRequestWeather(for: storedKey))
+    }
+
+    private func storedCatch(
+        _ caughtAt: Date,
+        _ coordinate: CatchCoordinate?,
+        _ conditions: CatchConditions
+    ) -> CatchValues {
+        CatchValues(
+            species: "Brook Trout",
+            weight: nil,
+            length: nil,
+            caughtAt: caughtAt,
+            location: nil,
+            coordinate: coordinate,
+            conditions: conditions,
+            lureText: nil,
+            rodReel: nil,
+            notes: nil,
+            released: true
+        )
+    }
 }
 
 final class OpenMeteoClientTests: XCTestCase {
