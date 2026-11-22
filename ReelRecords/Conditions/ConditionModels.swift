@@ -137,16 +137,42 @@ enum SuggestedConditionSource: Equatable, Sendable {
 }
 
 struct ConditionEnrichmentDraft: Equatable, Sendable {
+    private enum Origin: Equatable, Sendable {
+        case newCatch
+        case existingCatch(storedWeatherKey: WeatherRequestKey?)
+    }
+
     private(set) var airSource: SuggestedConditionSource?
     private(set) var skySource: SuggestedConditionSource?
+    private let origin: Origin
 
     init(conditions: CatchConditions = .empty) {
+        self.init(conditions: conditions, origin: .newCatch)
+    }
+
+    /// A draft for editing a stored catch, whose weather request key (`nil` when it has no pin) marks
+    /// the time and location the angler has not changed.
+    init(editing conditions: CatchConditions, storedWeatherKey: WeatherRequestKey?) {
+        self.init(conditions: conditions, origin: .existingCatch(storedWeatherKey: storedWeatherKey))
+    }
+
+    private init(conditions: CatchConditions, origin: Origin) {
         airSource = conditions.airTemperatureF == nil ? nil : .existing
         skySource = conditions.skyCondition == nil ? nil : .existing
+        self.origin = origin
     }
 
     var weatherSuggestionEligible: Bool {
         airSource == nil || acceptsSuggestedSky
+    }
+
+    /// An existing catch requests weather only after its time or location changes, so opening and
+    /// saving it untouched never fills a condition.
+    func shouldRequestWeather(for key: WeatherRequestKey) -> Bool {
+        if case let .existingCatch(storedWeatherKey) = origin, storedWeatherKey == key {
+            return false
+        }
+        return weatherSuggestionEligible
     }
 
     mutating func markAirTemperatureManual() {
@@ -181,6 +207,20 @@ struct ConditionEnrichmentDraft: Equatable, Sendable {
 
     private var acceptsSuggestedSky: Bool {
         skySource == nil || skySource == .fallback
+    }
+}
+
+extension ConditionEnrichmentDraft {
+    /// The draft for a new catch (`nil`) or for editing the stored `values`.
+    init(loading values: CatchValues?) {
+        guard let values else {
+            self.init()
+            return
+        }
+        self.init(
+            editing: values.conditions,
+            storedWeatherKey: values.coordinate.map { WeatherRequestKey(coordinate: $0, caughtAt: values.caughtAt) }
+        )
     }
 }
 

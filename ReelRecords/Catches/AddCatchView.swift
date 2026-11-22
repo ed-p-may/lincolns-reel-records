@@ -81,7 +81,7 @@ struct AddCatchView: View {
         _skyCondition = State(initialValue: conditions.skyCondition)
         _waterTemperature = State(initialValue: numbers.waterTemperature)
         _waterClarity = State(initialValue: conditions.waterClarity)
-        _conditionDraft = State(initialValue: ConditionEnrichmentDraft(conditions: conditions))
+        _conditionDraft = State(initialValue: ConditionEnrichmentDraft(loading: values))
         _selectedTackleItemID = State(initialValue: values?.tackleItemID)
         _lureText = State(initialValue: values?.lureText ?? "")
         _rodReel = State(initialValue: values?.rodReel ?? "")
@@ -434,7 +434,7 @@ private extension AddCatchView {
     @MainActor
     private func suggestWeatherIfNeeded() async {
         guard let coordinate, let key = weatherRequestKey,
-              conditionDraft.weatherSuggestionEligible,
+              conditionDraft.shouldRequestWeather(for: key),
               !completedWeatherKeys.contains(key)
         else {
             return

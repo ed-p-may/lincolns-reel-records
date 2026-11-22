@@ -208,7 +208,10 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval
   record a lure via `lureText`.
 - A new form reuses the latest same-local-day catch's named spot, lure/bait, sky, and water clarity.
   The spot name carries forward without its GPS coordinate; weather may replace the carried sky, and
-  a new local calendar day returns to the normal empty defaults. Existing-catch editing is unchanged.
+  a new local calendar day returns to the normal empty defaults. Existing-catch editing never applies
+  these defaults.
+- Editing an existing Catch suggests weather only after its pin or weather hour changes, and only
+  into empty, untouched condition fields; opening and saving it untouched changes nothing.
 - For a new Catch, each field's first available photo metadata may prefill the caught date/time and GPS
   pin before the source photo is normalized. Explicit date/pin edits win; missing or malformed metadata
   falls back to the existing defaults/manual controls. Photo GPS does not reverse-geocode a named spot,
