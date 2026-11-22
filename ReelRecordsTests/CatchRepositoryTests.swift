@@ -324,6 +324,16 @@ final class CatchFormattingTests: XCTestCase {
         XCTAssertNil(try CatchFormatting.parseOptionalMeasurement("   ", field: .length))
     }
 
+    func testEditedFieldParsesTextInsteadOfKeepingOriginal() throws {
+        XCTAssertEqual(
+            try CatchFormatting.parseOptionalMeasurement("4.26", field: .weight, unchangedFrom: 4.257),
+            4.257
+        )
+        XCTAssertEqual(try CatchFormatting.parseOptionalMeasurement("4.3", field: .weight, unchangedFrom: 4.257), 4.3)
+        XCTAssertNil(try CatchFormatting.parseOptionalMeasurement("", field: .length, unchangedFrom: 18.333))
+        XCTAssertEqual(try CatchFormatting.parseOptionalTemperature("-2", unchangedFrom: 61.875), -2)
+    }
+
     func testImperialDisplayFormatting() {
         XCTAssertEqual(CatchFormatting.weight(12.54), "12.5 lb")
         XCTAssertEqual(CatchFormatting.length(18.5), "18.5 in")

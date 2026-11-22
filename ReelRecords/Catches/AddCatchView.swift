@@ -54,6 +54,7 @@ struct AddCatchView: View {
     @State private var persistedCatchID: UUID?
     @State private var isChoosingLocation = false
     @State private var errorMessage: String?
+    @State private var initialValues: CatchValues?
 
     let ownerID: UUID
     let editItem: CatchItem?
@@ -65,6 +66,7 @@ struct AddCatchView: View {
         self.onSaved = onSaved
 
         let values = editItem?.values
+        _initialValues = State(initialValue: values)
         let species = CatchDiscovery.pickerSelection(for: values?.species ?? "", options: Self.suggestedSpecies)
         _selectedSpecies = State(initialValue: species.selected)
         _customSpecies = State(initialValue: species.custom)
@@ -280,22 +282,31 @@ private extension AddCatchView {
         )
     }
 
+    private func parsedConditions() throws -> CatchConditions {
+        try CatchConditions(
+            airTemperatureF: CatchFormatting.parseOptionalTemperature(
+                airTemperature, unchangedFrom: initialValues?.conditions.airTemperatureF
+            ),
+            skyCondition: skyCondition,
+            waterTemperatureF: CatchFormatting.parseOptionalTemperature(
+                waterTemperature, unchangedFrom: initialValues?.conditions.waterTemperatureF
+            ),
+            waterClarity: waterClarity
+        )
+    }
+
     private func save() {
         locationService.reset()
         do {
+            let prior = initialValues
             let values = try CatchValues(
                 species: finalSpecies,
-                weight: CatchFormatting.parseOptionalMeasurement(weight, field: .weight),
-                length: CatchFormatting.parseOptionalMeasurement(length, field: .length),
+                weight: CatchFormatting.parseOptionalMeasurement(weight, field: .weight, unchangedFrom: prior?.weight),
+                length: CatchFormatting.parseOptionalMeasurement(length, field: .length, unchangedFrom: prior?.length),
                 caughtAt: caughtAt,
                 location: location,
                 coordinate: coordinate,
-                conditions: CatchConditions(
-                    airTemperatureF: CatchFormatting.parseOptionalTemperature(airTemperature),
-                    skyCondition: skyCondition,
-                    waterTemperatureF: CatchFormatting.parseOptionalTemperature(waterTemperature),
-                    waterClarity: waterClarity
-                ),
+                conditions: parsedConditions(),
                 tackleItemID: selectedTackleItemID,
                 lureText: lureText,
                 rodReel: rodReel,

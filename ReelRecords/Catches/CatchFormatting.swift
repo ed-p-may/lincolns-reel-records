@@ -1,8 +1,17 @@
 import Foundation
 
 enum CatchFormatting {
-    static func parseOptionalMeasurement(_ text: String, field: MeasurementField) throws -> Double? {
-        try parseOptionalNumber(
+    /// Parses a form field. When `text` still equals `input(original)` the user did not edit the field,
+    /// so `original` is returned unrounded instead of the 2-decimal value the form displayed.
+    static func parseOptionalMeasurement(
+        _ text: String,
+        field: MeasurementField,
+        unchangedFrom original: Double? = nil
+    ) throws -> Double? {
+        if text == input(original) {
+            return original
+        }
+        return try parseOptionalNumber(
             text,
             isValid: { $0 >= 0 },
             error: field == .weight ? .invalidWeight : .invalidLength
@@ -14,8 +23,11 @@ enum CatchFormatting {
         return value.formatted(.number.precision(.fractionLength(0 ... 2)))
     }
 
-    static func parseOptionalTemperature(_ text: String) throws -> Double? {
-        try parseOptionalNumber(text, isValid: { _ in true }, error: .invalidTemperature)
+    static func parseOptionalTemperature(_ text: String, unchangedFrom original: Double? = nil) throws -> Double? {
+        if text == input(original) {
+            return original
+        }
+        return try parseOptionalNumber(text, isValid: { _ in true }, error: .invalidTemperature)
     }
 
     private static func parseOptionalNumber(
