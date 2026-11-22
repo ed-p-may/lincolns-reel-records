@@ -125,9 +125,34 @@ enum CatchMapFilter {
     }
 }
 
+enum CatchMapLayerSettings {
+    static let showPublicAccessKey = "reelrecords.map.showPublicAccess"
+}
+
+enum CatchMapSelection: Hashable, Sendable {
+    case catchPin(UUID)
+    case accessSite(String)
+
+    var catchID: UUID? {
+        if case let .catchPin(id) = self {
+            return id
+        }
+        return nil
+    }
+
+    var accessSiteID: String? {
+        if case let .accessSite(id) = self {
+            return id
+        }
+        return nil
+    }
+}
+
 struct CatchMapLayersSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var mapStyle: CatchMapStyle
+    @Binding var showPublicAccess: Bool
+    let publicAccessSiteCount: Int
 
     var body: some View {
         NavigationStack {
@@ -166,6 +191,25 @@ struct CatchMapLayersSheet: View {
                         .accessibilityValue(mapStyle == style ? "Selected" : "Not selected")
                         .accessibilityIdentifier("map.style.\(style.rawValue)")
                     }
+                }
+
+                Section {
+                    Toggle(isOn: $showPublicAccess) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("MA Boat & Fishing Access")
+                                .font(ReelFont.body(.body, weight: .semibold))
+                                .foregroundStyle(ReelTheme.primaryText)
+                            Text("\(publicAccessSiteCount) official MassGIS ramps, launches, and shore spots (offline)")
+                                .font(ReelFont.body(.caption))
+                                .foregroundStyle(ReelTheme.secondaryText)
+                        }
+                    }
+                    .tint(ReelTheme.accessPin)
+                    .accessibilityIdentifier("map.layer.public-access")
+                } header: {
+                    Text("Layers")
+                } footer: {
+                    Text("Public access data sourced from MassGIS / MA Office of Fishing and Boating Access.")
                 }
             }
             .scrollContentBackground(.hidden)

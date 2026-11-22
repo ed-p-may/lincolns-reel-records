@@ -1,7 +1,7 @@
 # Phase 02 — MA public boat and fishing access points
 
 **Date:** 2026-11-22
-**Status:** Scoped
+**Status:** Implemented on branch
 **Depends on:** [Phase 01](phase-01-species-filter-and-satellite.md) (map layers menu/sheet)
 **Source:** [GitHub Issue #12](https://github.com/ed-p-may/lincolns-reel-records/issues/12)
 

@@ -187,6 +187,11 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval
 - **Species filter:** Horizontal chip bar derived from pinned catches (shown when 2+ species are pinned)
   using `CatchDiscovery` normalization; filters pins and updates header counts while clearing cleanly
   on focus navigation to an excluded catch.
+- **MA Boat & Fishing Access layer:** Toggleable offline layer (off by default, persisted in
+  `@AppStorage`) bundling 282 MassGIS / MA OFBA public ramps, launches, piers, and shore access sites;
+  tapping a site opens a detail card with ramp/parking/restriction info and Apple Maps directions.
+  The live map canvas renders even with 0 pinned catches (with a compact empty header) so anglers can
+  browse access sites before logging pins.
 - **GPS** is captured at logging (location permission); **manual pin-drop / map-search fallback** when
   GPS is off/denied or a catch is logged later. Free-text named `location` is kept alongside coordinates.
 - Header: "N catches across M spots" (or "X of N catches across M spots" when filtered).

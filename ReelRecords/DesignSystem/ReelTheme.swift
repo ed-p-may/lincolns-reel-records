@@ -7,6 +7,7 @@ enum ReelTheme {
     static let raisedSurface = Color(red: 24 / 255, green: 28 / 255, blue: 24 / 255)
     static let accent = Color(red: 55 / 255, green: 226 / 255, blue: 123 / 255)
     static let accentHighlight = Color(red: 95 / 255, green: 242 / 255, blue: 155 / 255)
+    static let accessPin = Color(red: 92 / 255, green: 184 / 255, blue: 199 / 255)
     static let accentInk = Color(red: 4 / 255, green: 34 / 255, blue: 15 / 255)
     static let primaryText = Color(red: 241 / 255, green: 244 / 255, blue: 240 / 255)
     static let secondaryText = Color(red: 154 / 255, green: 163 / 255, blue: 156 / 255)

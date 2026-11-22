@@ -123,4 +123,50 @@ final class CatchMapUITests: XCTestCase {
         app.buttons["map.layers.done"].tap()
         XCTAssertEqual(persistedStyleButton.value as? String, "Standard")
     }
+
+    func testPublicAccessLayerTogglesWithoutChangingCatchCounts() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--ui-testing-logbook"]
+        app.launch()
+
+        let mapTab = app.tabBars.buttons["Map"]
+        XCTAssertTrue(mapTab.waitForExistence(timeout: 5))
+        mapTab.tap()
+
+        let counts = app.staticTexts["map.counts"]
+        XCTAssertTrue(counts.waitForExistence(timeout: 5))
+        XCTAssertEqual(counts.label, "2 CATCHES ACROSS 2 SPOTS")
+
+        let layersButton = app.buttons["map.style.button"]
+        XCTAssertTrue(layersButton.waitForExistence(timeout: 5))
+        layersButton.tap()
+
+        let accessToggle = app.switches["map.layer.public-access"]
+        XCTAssertTrue(accessToggle.waitForExistence(timeout: 3))
+        XCTAssertEqual(accessToggle.value as? String, "0")
+        accessToggle.switches.firstMatch.tap()
+        app.buttons["map.layers.done"].tap()
+
+        XCTAssertEqual(counts.label, "2 CATCHES ACROSS 2 SPOTS")
+
+        layersButton.tap()
+        XCTAssertTrue(accessToggle.waitForExistence(timeout: 3))
+        XCTAssertEqual(accessToggle.value as? String, "1")
+        accessToggle.switches.firstMatch.tap()
+        app.buttons["map.layers.done"].tap()
+    }
+
+    func testZeroCatchMapShowsLiveMapCanvasWithCompactHeader() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing"]
+        app.launch()
+
+        let mapTab = app.tabBars.buttons["Map"]
+        XCTAssertTrue(mapTab.waitForExistence(timeout: 5))
+        mapTab.tap()
+
+        XCTAssertTrue(app.staticTexts["map.empty"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.maps.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.buttons["map.style.button"].waitForExistence(timeout: 3))
+    }
 }

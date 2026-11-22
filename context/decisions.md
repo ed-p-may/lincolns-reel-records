@@ -9,6 +9,21 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-11-22 — Bundled MassGIS OFBA public access catalog and live empty map (Issue #12, Phase 02)
+- **Context:** Issue #12 requests Massachusetts public boat ramps and shore fishing access sites on
+  the Catch Map without runtime API fragility or paid services.
+- **Decision:**
+  - Bundle a normalized offline JSON snapshot (`ReelRecords/Resources/ma-public-access.json`, 282
+    sites) generated reproducibly from the official MassGIS OFBA FeatureServer via
+    `scripts/fetch_ma_access_sites.py`, with a `state` + `source` envelope extensible to NY/CT later.
+  - Gate rendering behind `@AppStorage("reelrecords.map.showPublicAccess")` (default `false`) and
+    make catch-pin and access-site selection mutually exclusive via `CatchMapSelection`.
+  - Always render the live map canvas in `CatchMapView` (showing a compact `"NO CATCHES PINNED YET"`
+    header when `pinnedCatches.isEmpty`) so anglers with 0 pinned catches can still browse public
+    access sites and (in Phase 03) lake depths.
+- **Consequences:** Zero runtime network dependency for access sites, zero backend/schema changes,
+  and private catch pins remain visually dominant.
+
 ## 2026-11-22 — Map style persistence and species filtering (Issue #12, Phase 01)
 - **Context:** Issue #12 requests species filtering on the Catch Map and a satellite map view.
 - **Decision:**
