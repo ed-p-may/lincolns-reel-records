@@ -154,6 +154,12 @@ _As an angler, I want to toggle Massachusetts pond depth maps over standard or s
 - Toggleable layer in Map Layers (off by default, persisted) overlays MassGIS / MassWildlife bathymetry contours over surveyed MA ponds on Standard, Hybrid, and Satellite styles.
 - Out-of-state tiles and offline/404 responses degrade silently with zero error alerts.
 
+**D6 · Scout a body of water on the map (P1)**
+_As an angler, I want to tap a lake, pond, or river on the map and see publicly available species, access points, river flow, and fishing reports alongside my own catch history._
+- Tapping a labeled Apple Maps physical water feature or long-pressing a small pond opens a Google Maps-style sheet (peek/medium/large detents) while keeping catch pins prioritized.
+- Displays the owner's own local catch history at that water immediately (offline) and free public sources (Wikipedia overview, OSM boat ramps, iNaturalist fish species & CC photos, USGS live river flow, and in-app Safari links) with an on-device cache.
+- Sparse ponds, dry-land long-presses, and offline mode degrade cleanly without fabricated placeholders or crashes.
+
 ## Epic E — Account, data & settings
 
 **E1 · Get into the app (P0)**

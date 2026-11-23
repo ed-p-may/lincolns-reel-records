@@ -16,6 +16,7 @@ struct LincolnsReelRecordsApp: App {
                 .environment(dependencies.locationService)
                 .environment(dependencies.syncCoordinator)
                 .environment(\.weatherSuggestionProvider, dependencies.weatherSuggestionProvider)
+                .environment(\.waterBodyInfoProvider, dependencies.waterBodyInfoProvider)
                 .environment(\.photoMetadataDefaultsFixture, dependencies.photoMetadataDefaultsFixture)
                 .modelContainer(dependencies.modelContainer)
                 .preferredColorScheme(.dark)
