@@ -6,6 +6,7 @@ enum CatchRepositoryError: LocalizedError, Equatable {
     case missingCatch(UUID)
     case missingOutboxOperation(UUID)
     case deletedCatch(UUID)
+    case concurrentChange(UUID)
 
     var errorDescription: String? {
         switch self {
@@ -15,6 +16,8 @@ enum CatchRepositoryError: LocalizedError, Equatable {
             "The sync queue operation \(id.uuidString) is missing."
         case let .deletedCatch(id):
             "Catch \(id.uuidString) has already been deleted."
+        case .concurrentChange:
+            "This catch changed while you were editing. Close and reopen it to see the latest version."
         }
     }
 }
@@ -110,22 +113,50 @@ final class SwiftDataCatchRepository {
     }
 
     @discardableResult
-    func update(id: UUID, ownerID: UUID, values proposedValues: CatchValues) throws -> CatchItem {
+    func update(
+        id: UUID,
+        ownerID: UUID,
+        values proposedValues: CatchValues,
+        expectedValues: CatchValues? = nil,
+        allowTimestampNormalization: Bool = false
+    ) throws -> CatchItem {
         guard let record = try record(id: id, ownerID: ownerID) else {
             throw CatchRepositoryError.missingCatch(id)
         }
-        return try update(record: record, ownerID: ownerID, proposedValues: proposedValues)
+        return try update(
+            record: record,
+            ownerID: ownerID,
+            proposedValues: proposedValues,
+            expectedValues: expectedValues,
+            allowTimestampNormalization: allowTimestampNormalization
+        )
     }
 
     private func update(
         record: CatchRecord,
         ownerID: UUID,
-        proposedValues: CatchValues
+        proposedValues: CatchValues,
+        expectedValues: CatchValues? = nil,
+        allowTimestampNormalization: Bool = false
     ) throws -> CatchItem {
         let id = record.id
         guard record.deletedAt == nil else { throw CatchRepositoryError.deletedCatch(id) }
 
-        let values = try validated(proposedValues)
+        var values = try validated(proposedValues)
+        if let expectedValues {
+            let normalizedExpected = try validated(expectedValues)
+            guard values != normalizedExpected else { return record.item }
+            guard Self.matchesExpected(
+                record.item,
+                expectedValues: expectedValues,
+                allowTimestampNormalization: allowTimestampNormalization
+            ) else {
+                throw CatchRepositoryError.concurrentChange(id)
+            }
+            if values.caughtAt == expectedValues.caughtAt {
+                values = values.withCaughtAt(record.caughtAt)
+            }
+        }
         guard values != record.values else { return record.item }
         apply(values, to: record)
         record.updatedAt = .now
@@ -304,6 +335,12 @@ final class SwiftDataCatchRepository {
             try modelContext.save()
         }
         return didChange
+    }
+}
+
+extension SwiftDataCatchRepository {
+    func normalizedValues(_ proposedValues: CatchValues) throws -> CatchValues {
+        try validated(proposedValues)
     }
 }
 

@@ -9,6 +9,33 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-11-23 — Snapshot-guarded Edit Catch saves against concurrent background sync (Issue #22)
+- **Context:** Issue #22. Edit Catch snapshotted catch fields and photos at open and unconditionally
+  submitted them on Save Changes. If a background sync merged a newer catch version or photo while
+  the form was open, an untouched save overwrote the merged catch (queuing stale values against the
+  newer version with no conflict) or deleted the newly synced photo.
+- **Decision:**
+  - Snapshot the opening `CatchItem` and loaded `[CatchPhotoSnapshot]` (`id`, `position`) in
+    `AddCatchView`'s `@State` (`CatchEditSnapshot`), including `bookmarked` so sheet re-evaluation
+    does not leak a synced change into the form.
+  - Route Edit Catch saves through `CatchEditSave.persist`: skip `SwiftDataCatchRepository.update`
+    when normalized submitted values equal the opening snapshot, and skip
+    `SwiftDataCatchPhotoRepository.saveOrder` when no drafts were added and the ordered photo IDs
+    match the opening snapshot.
+  - When the angler did edit catch fields or photos, verify preconditions before mutating either
+    store: catch-field edits verify the live catch matches its opening values using
+    `hasSameMutationPayload` (preserving the live server timestamp when `caughtAt` was not edited);
+    photo-only edits verify the parent catch is still active; and photo edits verify the live photo
+    snapshot matches its opening `(id, position)` list. When both stores are edited, both
+    preconditions must pass before either write runs, throwing `.concurrentChange` instead of
+    silently overwriting merged remote edits or partially saving. Comparing payload values and
+    `(id, position)` rather than `remoteVersion` allows this device's own offline create/upload
+    (including server timestamp precision normalization) to complete in the background without
+    blocking a subsequent edit.
+- **Consequences:** Zero schema, migration, or sync protocol changes. Untouched saves are strict
+  no-ops; catch-only edits preserve concurrently synced photos and photo-only edits preserve
+  concurrently synced catch fields; genuine concurrent edits fail safely with the form kept open.
+
 ## 2026-11-23 — Derived Tackle Box recency strip, full-screen gallery picker, and expanded search (Issue #11, Phase 01)
 - **Context:** Issue #11 asks to speed up lure selection on Log a Catch once an angler's Tackle Box
   grows past a handful of items, without adding schema migrations or sync changes.

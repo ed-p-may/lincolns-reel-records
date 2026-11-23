@@ -8,6 +8,7 @@ enum CatchPhotoRepositoryError: LocalizedError, Equatable {
     case missingDraft(UUID)
     case invalidOperation(UUID)
     case invalidOrder
+    case concurrentChange(UUID)
 
     var errorDescription: String? {
         switch self {
@@ -21,7 +22,24 @@ enum CatchPhotoRepositoryError: LocalizedError, Equatable {
             "Photo queue operation \(id.uuidString) has an invalid persisted state."
         case .invalidOrder:
             "The photo order contains duplicate or unknown items."
+        case .concurrentChange:
+            "This catch's photos changed while you were editing. Close and reopen it to see the latest photos."
         }
+    }
+}
+
+struct CatchPhotoSnapshot: Equatable, Sendable {
+    let id: UUID
+    let position: Int
+
+    init(id: UUID, position: Int) {
+        self.id = id
+        self.position = position
+    }
+
+    init(_ item: CatchPhotoItem) {
+        id = item.id
+        position = item.position
     }
 }
 
@@ -115,8 +133,15 @@ final class SwiftDataCatchPhotoRepository {
         catchID: UUID,
         ownerID: UUID,
         orderedIDs: [UUID],
-        drafts: [DraftPhoto]
+        drafts: [DraftPhoto],
+        expectedSnapshot: [CatchPhotoSnapshot]? = nil
     ) throws {
+        if let expectedSnapshot {
+            guard !drafts.isEmpty || orderedIDs != expectedSnapshot.map(\.id) else {
+                return
+            }
+            try verifyUnchanged(catchID: catchID, ownerID: ownerID, expectedSnapshot: expectedSnapshot)
+        }
         let plan = try makeOrderPlan(
             catchID: catchID,
             ownerID: ownerID,
@@ -138,7 +163,7 @@ final class SwiftDataCatchPhotoRepository {
             throw error
         }
         for path in localFilesToRemove {
-            try fileStore.remove(relativePath: path)
+            try? fileStore.remove(relativePath: path)
         }
     }
 
@@ -152,7 +177,7 @@ final class SwiftDataCatchPhotoRepository {
         }
         try modelContext.save()
         for path in localFilesToRemove {
-            try fileStore.remove(relativePath: path)
+            try? fileStore.remove(relativePath: path)
         }
     }
 

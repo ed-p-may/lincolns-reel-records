@@ -303,21 +303,3 @@ private extension RemoteCatch {
             && (deletedAt == nil) == (other.deletedAt == nil)
     }
 }
-
-private extension CatchValues {
-    func hasSameMutationPayload(as other: CatchValues) -> Bool {
-        species == other.species
-            && weight == other.weight
-            && length == other.length
-            && abs(caughtAt.timeIntervalSince(other.caughtAt)) < 0.01
-            && location == other.location
-            && coordinate == other.coordinate
-            && conditions == other.conditions
-            && tackleItemID == other.tackleItemID
-            && lureText == other.lureText
-            && rodReel == other.rodReel
-            && notes == other.notes
-            && released == other.released
-            && bookmarked == other.bookmarked
-    }
-}

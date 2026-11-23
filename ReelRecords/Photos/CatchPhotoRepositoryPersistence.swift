@@ -13,6 +13,20 @@ extension SwiftDataCatchPhotoRepository {
         PhotoFileStore.remoteStoragePath(ownerID: ownerID, parentID: catchID, photoID: photoID)
     }
 
+    func currentSnapshot(catchID: UUID, ownerID: UUID) throws -> [CatchPhotoSnapshot] {
+        try photos(catchID: catchID, ownerID: ownerID).map(CatchPhotoSnapshot.init)
+    }
+
+    func verifyUnchanged(
+        catchID: UUID,
+        ownerID: UUID,
+        expectedSnapshot: [CatchPhotoSnapshot]
+    ) throws {
+        guard try currentSnapshot(catchID: catchID, ownerID: ownerID) == expectedSnapshot else {
+            throw CatchPhotoRepositoryError.concurrentChange(catchID)
+        }
+    }
+
     func makeOrderPlan(
         catchID: UUID,
         ownerID: UUID,
