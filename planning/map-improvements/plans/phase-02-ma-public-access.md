@@ -11,10 +11,10 @@ Plot official Massachusetts public boat ramps, cartop/canoe launches, fishing pi
 
 ## Data source (verified)
 
-- **Service:** MassGIS `MA_Office_of_Fishing_and_Boating_Access_Sites` (ArcGIS Online Item `3c6cd66d299347c9aac128c57157334c`)
-- **Endpoint:** `https://services.arcgis.com/2gdL2gxYNFY2TOUb/arcgis/rest/services/MA_Office_of_Fishing_and_Boating_Access_Sites/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json`
-- **Count:** 282 sites statewide (unauthenticated public government data).
-- **Facility type codes (`FACILITY_T`, may be comma-separated like `A,E`):**
+- **Service:** MassGIS `Office_of_Fishing_and_Boating_Access_Sites` (`hGdibHYSPO59RG1h`)
+- **Endpoint:** `https://services1.arcgis.com/hGdibHYSPO59RG1h/arcgis/rest/services/Office_of_Fishing_and_Boating_Access_Sites/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=json`
+- **Count:** 282 sites statewide (unauthenticated public government data; snapshot fetched 2026-11-22).
+- **Facility type codes (`FACILITY_TYPE`, may be comma-separated like `A,E`; `BARRIER_FREE` for accessibility):**
   - `A`: General Access (concrete ramp + trailer parking)
   - `B`: Fisherman Access (smaller ramp + trailer parking)
   - `C`: Cartop Access (small boats, kayaks, canoes)

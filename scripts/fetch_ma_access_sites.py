@@ -57,22 +57,36 @@ def parse_facility_codes(raw: object) -> list[str]:
 
 
 def fetch_features() -> list[dict]:
-    params = urllib.parse.urlencode(
-        {
-            "where": "1=1",
-            "outFields": "*",
-            "outSR": "4326",
-            "f": "json",
-            "resultRecordCount": "2000",
-        }
-    )
-    url = f"{ENDPOINT}?{params}"
-    req = urllib.request.Request(url, headers={"User-Agent": "ReelRecords/1.0 (MassGIS OFBA snapshot)"})
-    with urllib.request.urlopen(req, timeout=30) as resp:
-        payload = json.loads(resp.read().decode("utf-8"))
-    if "error" in payload:
-        raise RuntimeError(f"ArcGIS error: {payload['error']}")
-    return payload.get("features", [])
+    all_features: list[dict] = []
+    offset = 0
+    page_size = 1000
+    while True:
+        params = urllib.parse.urlencode(
+            {
+                "where": "1=1",
+                "outFields": "*",
+                "outSR": "4326",
+                "f": "json",
+                "resultOffset": str(offset),
+                "resultRecordCount": str(page_size),
+            }
+        )
+        url = f"{ENDPOINT}?{params}"
+        req = urllib.request.Request(url, headers={"User-Agent": "ReelRecords/1.0 (MassGIS OFBA snapshot)"})
+        with urllib.request.urlopen(req, timeout=30) as resp:
+            payload = json.loads(resp.read().decode("utf-8"))
+        if "error" in payload:
+            raise RuntimeError(f"ArcGIS error: {payload['error']}")
+        batch = payload.get("features")
+        if not isinstance(batch, list):
+            raise RuntimeError("ArcGIS response missing 'features' list")
+        all_features.extend(batch)
+        if not payload.get("exceededTransferLimit"):
+            break
+        if not batch:
+            raise RuntimeError("ArcGIS exceededTransferLimit set with empty batch")
+        offset += len(batch)
+    return all_features
 
 
 def normalize_feature(feature: dict) -> dict | None:
@@ -136,6 +150,8 @@ def normalize_feature(feature: dict) -> dict | None:
 def main() -> int:
     features = fetch_features()
     sites = [site for f in features if (site := normalize_feature(f)) is not None]
+    if not sites:
+        raise RuntimeError("No valid MA public access sites returned; refusing to overwrite catalog")
     sites.sort(key=lambda s: (s["id"], s["name"]))
 
     seen_ids: set[str] = set()

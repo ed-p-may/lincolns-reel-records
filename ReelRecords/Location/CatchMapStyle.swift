@@ -136,23 +136,45 @@ enum CatchMapFilter {
         }
         var minLat = first.latitude
         var maxLat = first.latitude
-        var minLon = first.longitude
-        var maxLon = first.longitude
         for coord in coordinates.dropFirst() {
             minLat = min(minLat, coord.latitude)
             maxLat = max(maxLat, coord.latitude)
-            minLon = min(minLon, coord.longitude)
-            maxLon = max(maxLon, coord.longitude)
         }
+        let (centerLon, rawLonSpan) = shortestLongitudeInterval(coordinates.map(\.longitude))
         let latSpan = max((maxLat - minLat) * 1.4, minimumSpan)
-        let lonSpan = max((maxLon - minLon) * 1.4, minimumSpan)
+        let lonSpan = max(rawLonSpan * 1.4, minimumSpan)
         return MKCoordinateRegion(
             center: CLLocationCoordinate2D(
                 latitude: (minLat + maxLat) / 2,
-                longitude: (minLon + maxLon) / 2
+                longitude: centerLon
             ),
             span: MKCoordinateSpan(latitudeDelta: min(latSpan, 180), longitudeDelta: min(lonSpan, 360))
         )
+    }
+
+    private static func shortestLongitudeInterval(_ longitudes: [Double]) -> (center: Double, span: Double) {
+        let sorted = longitudes.sorted()
+        guard let first = sorted.first, let last = sorted.last else {
+            return (0, 0)
+        }
+        var maxGap = (first + 360) - last
+        var gapStart = last
+        for index in 0 ..< (sorted.count - 1) {
+            let gap = sorted[index + 1] - sorted[index]
+            if gap > maxGap {
+                maxGap = gap
+                gapStart = sorted[index]
+            }
+        }
+        let span = max(0, 360 - maxGap)
+        var center = gapStart + maxGap + span / 2
+        while center > 180 {
+            center -= 360
+        }
+        while center < -180 {
+            center += 360
+        }
+        return (center, span)
     }
 }
 

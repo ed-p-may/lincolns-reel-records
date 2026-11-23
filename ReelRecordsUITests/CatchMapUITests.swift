@@ -186,8 +186,28 @@ final class CatchMapUITests: XCTestCase {
         XCTAssertTrue(mapTab.waitForExistence(timeout: 5))
         mapTab.tap()
 
-        XCTAssertTrue(app.staticTexts["map.empty"].waitForExistence(timeout: 5))
+        let emptyHeader = app.staticTexts["map.empty"]
+        XCTAssertTrue(emptyHeader.waitForExistence(timeout: 5))
         XCTAssertTrue(app.maps.firstMatch.waitForExistence(timeout: 5))
-        XCTAssertTrue(app.buttons["map.style.button"].waitForExistence(timeout: 3))
+        let layersButton = app.buttons["map.style.button"]
+        XCTAssertTrue(layersButton.waitForExistence(timeout: 3))
+
+        layersButton.tap()
+        let accessToggle = app.switches["map.layer.public-access"]
+        XCTAssertTrue(accessToggle.waitForExistence(timeout: 3))
+        accessToggle.switches.firstMatch.tap()
+        app.buttons["map.layers.done"].tap()
+
+        let accessPin = app.buttons["map.access-site.MA-225"]
+        XCTAssertTrue(accessPin.waitForExistence(timeout: 5))
+        accessPin.tap()
+        XCTAssertTrue(app.otherElements["map.access-site-card"].waitForExistence(timeout: 3))
+        XCTAssertTrue(emptyHeader.exists)
+        app.buttons["map.access-site-card.close"].tap()
+
+        layersButton.tap()
+        XCTAssertTrue(accessToggle.waitForExistence(timeout: 3))
+        accessToggle.switches.firstMatch.tap()
+        app.buttons["map.layers.done"].tap()
     }
 }

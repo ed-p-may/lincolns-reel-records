@@ -248,11 +248,11 @@ struct CatchMapView: View {
                 ).map(CatchMapSelection.catchPin)
             }
             if pinnedCatches.isEmpty {
-                if wasFirstLoad {
+                if wasFirstLoad || !usingEmptyFallbackCamera {
                     cameraPosition = .region(Self.defaultMassachusettsRegion)
                     usingEmptyFallbackCamera = true
                 }
-            } else if usingEmptyFallbackCamera {
+            } else if wasFirstLoad || usingEmptyFallbackCamera {
                 usingEmptyFallbackCamera = false
                 if let region = CatchMapFilter.fittingRegion(for: filteredCatches) {
                     cameraPosition = .region(region)

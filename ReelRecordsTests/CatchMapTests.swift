@@ -103,6 +103,12 @@ final class CatchMapTests: XCTestCase {
         XCTAssertEqual(pair.center.latitude, 42.25, accuracy: 0.0001)
         XCTAssertGreaterThan(pair.span.latitudeDelta, 0.12)
         XCTAssertLessThan(pair.span.latitudeDelta, 0.5)
+
+        let eastOfDateLine = catchItem(id: 3, species: "Tuna", latitude: 10.0, longitude: 179.9)
+        let westOfDateLine = catchItem(id: 4, species: "Tuna", latitude: 10.0, longitude: -179.9)
+        let antimeridian = try XCTUnwrap(CatchMapFilter.fittingRegion(for: [eastOfDateLine, westOfDateLine]))
+        XCTAssertLessThan(antimeridian.span.longitudeDelta, 1.0)
+        XCTAssertGreaterThan(abs(antimeridian.center.longitude), 179.0)
     }
 
     func testCountSummaryFormatsFilteredAndUnfilteredCounts() {
