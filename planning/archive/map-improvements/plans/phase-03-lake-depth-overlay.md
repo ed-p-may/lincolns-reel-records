@@ -1,7 +1,7 @@
 # Phase 03 — MA lake depth overlay (bathymetry)
 
 **Date:** 2026-11-22
-**Status:** Implemented on branch
+**Status:** Merged to main
 **Depends on:** [Phase 01](phase-01-species-filter-and-satellite.md) and [Phase 02](phase-02-ma-public-access.md)
 **Source:** [GitHub Issue #12](https://github.com/ed-p-may/lincolns-reel-records/issues/12)
 
