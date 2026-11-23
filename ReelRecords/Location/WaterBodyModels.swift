@@ -1,6 +1,23 @@
 import CoreLocation
 import Foundation
 
+extension URL {
+    /// Returns a URL only when it is an absolute HTTP or HTTPS URL with a non-empty host.
+    static func validatedWebURL(_ rawString: String?) -> URL? {
+        guard let trimmed = rawString?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !trimmed.isEmpty,
+              let url = URL(string: trimmed),
+              let scheme = url.scheme?.lowercased(),
+              scheme == "https" || scheme == "http",
+              let host = url.host,
+              !host.isEmpty
+        else {
+            return nil
+        }
+        return url
+    }
+}
+
 enum WaterBodyType: String, Codable, Hashable, Sendable {
     case lake
     case pond
@@ -191,6 +208,7 @@ struct WaterBodyInfo: Codable, Hashable, Sendable {
     let fetchedAt: Date
     let gaugeFetchedAt: Date?
     var isFromOfflineCache: Bool
+    var isRiverGaugeStale: Bool
 
     init(
         waterID: String,
@@ -206,7 +224,8 @@ struct WaterBodyInfo: Codable, Hashable, Sendable {
         riverGauge: RiverGaugeReading?,
         fetchedAt: Date,
         gaugeFetchedAt: Date?,
-        isFromOfflineCache: Bool = false
+        isFromOfflineCache: Bool = false,
+        isRiverGaugeStale: Bool = false
     ) {
         self.waterID = waterID
         self.name = name
@@ -222,6 +241,26 @@ struct WaterBodyInfo: Codable, Hashable, Sendable {
         self.fetchedAt = fetchedAt
         self.gaugeFetchedAt = gaugeFetchedAt
         self.isFromOfflineCache = isFromOfflineCache
+        self.isRiverGaugeStale = isRiverGaugeStale
+    }
+
+    init(from decoder: any Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        waterID = try container.decode(String.self, forKey: .waterID)
+        name = try container.decode(String.self, forKey: .name)
+        waterType = try container.decode(WaterBodyType.self, forKey: .waterType)
+        regionSubtitle = try container.decodeIfPresent(String.self, forKey: .regionSubtitle)
+        coordinate = try container.decode(CatchCoordinate.self, forKey: .coordinate)
+        overview = try container.decodeIfPresent(String.self, forKey: .overview)
+        wikipediaURL = try container.decodeIfPresent(URL.self, forKey: .wikipediaURL)
+        accessPoints = try container.decode([WaterBodyAccessPoint].self, forKey: .accessPoints)
+        species = try container.decode([WaterBodySpecies].self, forKey: .species)
+        photos = try container.decode([WaterBodyPhoto].self, forKey: .photos)
+        riverGauge = try container.decodeIfPresent(RiverGaugeReading.self, forKey: .riverGauge)
+        fetchedAt = try container.decode(Date.self, forKey: .fetchedAt)
+        gaugeFetchedAt = try container.decodeIfPresent(Date.self, forKey: .gaugeFetchedAt)
+        isFromOfflineCache = try container.decodeIfPresent(Bool.self, forKey: .isFromOfflineCache) ?? false
+        isRiverGaugeStale = try container.decodeIfPresent(Bool.self, forKey: .isRiverGaugeStale) ?? false
     }
 
     var hasPublicContent: Bool {
@@ -307,31 +346,46 @@ struct LocalWaterHistory: Equatable, Sendable {
         )
     }
 
+    private static let conflictingCoordinateMeters: CLLocationDistance = 5000
+
     private static func matches(
         _ catchItem: CatchItem,
         normalizedWaterName: String,
         targetLocation: CLLocation,
         proximityMeters: CLLocationDistance
     ) -> Bool {
+        var coordinateDistance: CLLocationDistance?
+        if let coordinate = catchItem.coordinate {
+            let catchLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+            let distance = catchLocation.distance(from: targetLocation)
+            coordinateDistance = distance
+            if distance <= proximityMeters {
+                return true
+            }
+            if distance > conflictingCoordinateMeters {
+                return false
+            }
+        }
         if normalizedWaterName.count >= 3, let rawLocation = catchItem.location {
             let location = rawLocation.trimmingCharacters(in: .whitespacesAndNewlines)
             if !location.isEmpty {
-                let normalizedCatchLocation = CatchDiscovery.normalized(location)
-                let canReverseContain = normalizedCatchLocation.count >= 4
-                    && !WaterBodyNameClassifier.isGenericWaterTerm(normalizedCatchLocation)
-                let isMatch = normalizedCatchLocation == normalizedWaterName
-                    || normalizedCatchLocation.contains(normalizedWaterName)
-                    || (canReverseContain && normalizedWaterName.contains(normalizedCatchLocation))
-                if isMatch {
+                let normalizedCatch = CatchDiscovery.normalized(location)
+                if matchesWaterName(normalizedCatch, waterName: normalizedWaterName) {
                     return true
                 }
             }
         }
-        if let coordinate = catchItem.coordinate {
-            let catchLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
-            if catchLocation.distance(from: targetLocation) <= proximityMeters {
-                return true
-            }
+        _ = coordinateDistance
+        return false
+    }
+
+    private static func matchesWaterName(_ catchLocation: String, waterName: String) -> Bool {
+        if catchLocation == waterName {
+            return true
+        }
+        let separators = [" ", ",", "-", "(", "/"]
+        for sep in separators where catchLocation.hasPrefix(waterName + sep) {
+            return true
         }
         return false
     }

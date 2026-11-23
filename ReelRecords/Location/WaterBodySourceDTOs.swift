@@ -35,6 +35,7 @@ struct WikipediaSummaryResponse: Decodable {
     let thumbnail: WikipediaImage?
     let originalImage: WikipediaImage?
     let contentURLs: WikipediaContentURLs?
+    let coordinates: WikipediaCoordinates?
 
     enum CodingKeys: String, CodingKey {
         case type
@@ -43,7 +44,13 @@ struct WikipediaSummaryResponse: Decodable {
         case thumbnail
         case originalImage = "originalimage"
         case contentURLs = "content_urls"
+        case coordinates
     }
+}
+
+struct WikipediaCoordinates: Decodable {
+    let lat: Double
+    let lon: Double
 }
 
 struct WikipediaImage: Decodable {

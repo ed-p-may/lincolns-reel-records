@@ -89,6 +89,7 @@ final class WaterBodyInfoUITests: XCTestCase {
         let app = XCUIApplication()
         app.launchArguments = [
             "--ui-testing",
+            "--ui-testing-logbook",
             "--ui-testing-water-info-empty"
         ]
         app.launch()
@@ -97,6 +98,12 @@ final class WaterBodyInfoUITests: XCTestCase {
         XCTAssertTrue(mapTab.waitForExistence(timeout: 5))
         mapTab.tap()
 
+        // Even when a catch card is visible, the dry-land notice still renders above it.
+        let troutChip = app.buttons["map.species.Rainbow Trout"]
+        XCTAssertTrue(troutChip.waitForExistence(timeout: 3))
+        troutChip.tap()
+        XCTAssertTrue(app.buttons["map.selected-catch"].waitForExistence(timeout: 3))
+
         let map = app.maps.firstMatch
         XCTAssertTrue(map.waitForExistence(timeout: 5))
         map.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).press(forDuration: 0.8)
@@ -104,5 +111,9 @@ final class WaterBodyInfoUITests: XCTestCase {
         let notice = app.otherElements["map.water-notice"]
         XCTAssertTrue(notice.waitForExistence(timeout: 5))
         XCTAssertFalse(app.staticTexts["water-sheet.title"].exists)
+
+        // Tapping the selected catch card still navigates cleanly to Catch Detail.
+        app.buttons["map.selected-catch"].tap()
+        XCTAssertTrue(app.staticTexts["Rainbow Trout"].waitForExistence(timeout: 5))
     }
 }

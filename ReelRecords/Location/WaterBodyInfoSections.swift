@@ -100,9 +100,10 @@ struct WaterBodyHeaderView: View {
             ))
         }
         if let flow = info?.riverGauge?.compactFlowLabel {
+            let isStale = info?.isRiverGaugeStale == true || info?.isFromOfflineCache == true
             pills.append(WaterBodyPeekPill(
                 id: "river-flow",
-                label: flow,
+                label: isStale ? "\(flow) (saved)" : flow,
                 icon: "water.waves",
                 tint: ReelTheme.accessPin
             ))
@@ -224,10 +225,15 @@ struct WaterBodyOverviewSection: View {
 
 struct RiverGaugeSection: View {
     let gauge: RiverGaugeReading
+    let isStale: Bool
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            waterSectionHeader("LIVE RIVER CONDITIONS · USGS", icon: "water.waves", tint: ReelTheme.accessPin)
+            waterSectionHeader(
+                isStale ? "LAST KNOWN RIVER CONDITIONS · USGS" : "LIVE RIVER CONDITIONS · USGS",
+                icon: "water.waves",
+                tint: ReelTheme.accessPin
+            )
             Text(gauge.siteName)
                 .font(ReelFont.body(.caption, weight: .semibold))
                 .foregroundStyle(ReelTheme.secondaryText)
@@ -270,10 +276,11 @@ struct RiverGaugeSection: View {
 
 struct WaterBodyAccessSection: View {
     let accessPoints: [WaterBodyAccessPoint]
+    let onOpenURL: (URL) -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            waterSectionHeader("PUBLIC ACCESS & BOAT RAMPS", icon: "sailboat.fill", tint: ReelTheme.accessPin)
+            waterSectionHeader("BOAT RAMPS & ACCESS · OPENSTREETMAP", icon: "sailboat.fill", tint: ReelTheme.accessPin)
             ForEach(accessPoints) { point in
                 HStack(spacing: 10) {
                     VStack(alignment: .leading, spacing: 2) {
@@ -302,6 +309,16 @@ struct WaterBodyAccessSection: View {
                     .accessibilityLabel("Directions to \(point.name)")
                 }
             }
+            Button {
+                if let url = URL.validatedWebURL("https://www.openstreetmap.org/copyright") {
+                    onOpenURL(url)
+                }
+            } label: {
+                Text("Source: OpenStreetMap contributors (ODbL)")
+                    .font(ReelFont.metadata(.caption2))
+                    .foregroundStyle(ReelTheme.tertiaryText)
+            }
+            .buttonStyle(.plain)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(14)
@@ -316,7 +333,14 @@ struct WaterBodySpeciesSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            waterSectionHeader("REPORTED FISH SPECIES · INATURALIST", icon: "fish.fill", tint: ReelTheme.accent)
+            waterSectionHeader(
+                "NEARBY FISH OBSERVATIONS (3 KM) · INATURALIST",
+                icon: "fish.fill",
+                tint: ReelTheme.accent
+            )
+            Text("From recent iNaturalist sample within 3 km; verify for this specific water.")
+                .font(ReelFont.body(.caption2))
+                .foregroundStyle(ReelTheme.tertiaryText)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
                     ForEach(species) { item in
@@ -349,38 +373,11 @@ struct WaterBodyPhotosSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            waterSectionHeader("PUBLIC PHOTOS", icon: "photo.on.rectangle.angled", tint: ReelTheme.accessPin)
+            waterSectionHeader("NEARBY PUBLIC PHOTOS", icon: "photo.on.rectangle.angled", tint: ReelTheme.accessPin)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 10) {
                     ForEach(photos) { photo in
-                        Button {
-                            onOpenURL(photo.fullURL ?? photo.thumbnailURL)
-                        } label: {
-                            VStack(alignment: .leading, spacing: 4) {
-                                AsyncImage(url: photo.thumbnailURL) { phase in
-                                    switch phase {
-                                    case let .success(image):
-                                        image.resizable().scaledToFill()
-                                    default:
-                                        Rectangle()
-                                            .fill(ReelTheme.raisedSurface)
-                                            .overlay {
-                                                Image(systemName: "photo")
-                                                    .foregroundStyle(ReelTheme.tertiaryText)
-                                            }
-                                    }
-                                }
-                                .frame(width: 150, height: 100)
-                                .clipShape(RoundedRectangle(cornerRadius: 10))
-
-                                Text(photo.caption)
-                                    .font(ReelFont.metadata(.caption2))
-                                    .foregroundStyle(ReelTheme.tertiaryText)
-                                    .lineLimit(2)
-                                    .frame(width: 150, alignment: .leading)
-                            }
-                        }
-                        .buttonStyle(.plain)
+                        CachedWaterPhotoTile(photo: photo, onOpenURL: onOpenURL)
                     }
                 }
             }

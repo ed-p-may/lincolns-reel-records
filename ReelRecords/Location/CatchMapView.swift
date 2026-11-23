@@ -71,7 +71,7 @@ struct CatchMapView: View {
                 WaterBodyInfoSheet(
                     selection: water,
                     localHistory: LocalWaterHistory.summarize(
-                        catches: catches,
+                        catches: catches.filter { $0.ownerID == ownerID },
                         tackleNames: tackleNames,
                         for: water
                     ),
@@ -86,7 +86,10 @@ struct CatchMapView: View {
                     onDismiss: { selectedWaterBody = nil }
                 )
             }
-            .task(id: refreshToken + syncCoordinator.revision) { reload() }
+            .task(id: MapReloadKey(ownerID: ownerID, revision: refreshToken + syncCoordinator.revision)) { reload() }
+            .onChange(of: ownerID) { _, _ in
+                resetForOwnerChange()
+            }
             .onChange(of: focusRevision) { _, _ in reload() }
             .onChange(of: selection) { _, newValue in
                 if newValue != nil {
@@ -178,19 +181,21 @@ struct CatchMapView: View {
         .background(.ultraThinMaterial)
     }
 
-    @ViewBuilder
     private var bottomDetailCard: some View {
-        if let selectedCatch {
-            SelectedCatchCard(selectedCatch: selectedCatch) {
-                onOpenCatch(selectedCatch)
+        VStack(spacing: 0) {
+            if let waterLookupNotice {
+                WaterLookupNoticeBanner(message: waterLookupNotice) {
+                    self.waterLookupNotice = nil
+                }
             }
-        } else if let selectedAccessSite {
-            PublicAccessSiteCard(site: selectedAccessSite) {
-                selection = nil
-            }
-        } else if let waterLookupNotice {
-            WaterLookupNoticeBanner(message: waterLookupNotice) {
-                self.waterLookupNotice = nil
+            if let selectedCatch {
+                SelectedCatchCard(selectedCatch: selectedCatch) {
+                    onOpenCatch(selectedCatch)
+                }
+            } else if let selectedAccessSite {
+                PublicAccessSiteCard(site: selectedAccessSite) {
+                    selection = nil
+                }
             }
         }
     }
@@ -424,4 +429,25 @@ private extension CatchMapView {
         isLoadingWaterInfo = false
         isWaterInfoOffline = false
     }
+
+    func resetForOwnerChange() {
+        waterResolveTask?.cancel()
+        waterFetchTask?.cancel()
+        noticeDismissTask?.cancel()
+        catches = []
+        tackleNames = [:]
+        selection = nil
+        selectedSpecies = nil
+        selectedWaterBody = nil
+        waterBodyInfo = nil
+        isLoadingWaterInfo = false
+        isWaterInfoOffline = false
+        waterLookupNotice = nil
+        hasLoadedCatches = false
+    }
+}
+
+private struct MapReloadKey: Equatable {
+    let ownerID: UUID
+    let revision: Int
 }

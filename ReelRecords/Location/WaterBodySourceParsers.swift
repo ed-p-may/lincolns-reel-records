@@ -13,7 +13,7 @@ struct WikipediaSummaryResult: Equatable, Sendable {
     let title: String
     let extract: String
     let pageURL: URL?
-    let photo: WaterBodyPhoto?
+    let coordinate: CatchCoordinate?
 }
 
 struct INaturalistResult: Equatable, Sendable {
@@ -34,11 +34,8 @@ enum WaterBodySourceRequests {
         (
           area.a["natural"="water"]["name"];
           area.a["landuse"="reservoir"]["name"];
-          way(around:100,\(lat),\(lon))["natural"="water"]["name"];
-          relation(around:100,\(lat),\(lon))["natural"="water"]["name"];
-          way(around:100,\(lat),\(lon))["waterway"~"^(river|stream)$"]["name"];
-          relation(around:100,\(lat),\(lon))["waterway"~"^(river|stream)$"]["name"];
-          way(around:100,\(lat),\(lon))["landuse"="reservoir"]["name"];
+          way(around:35,\(lat),\(lon))["waterway"~"^(river|stream)$"]["name"];
+          relation(around:35,\(lat),\(lon))["waterway"~"^(river|stream)$"]["name"];
         );
         out center tags 10;
         """
@@ -109,6 +106,7 @@ enum WaterBodySourceRequests {
             URLQueryItem(name: "format", value: "json"),
             URLQueryItem(name: "bBox", value: bBox),
             URLQueryItem(name: "parameterCd", value: "00060,00065,00010"),
+            URLQueryItem(name: "siteType", value: "ST,LK"),
             URLQueryItem(name: "siteStatus", value: "active")
         ]
         guard let url = components.url else { return nil }
@@ -194,34 +192,44 @@ enum WaterBodySourceParsers {
         else {
             return nil
         }
-        let isWater = tags["natural"] == "water"
-            || tags["landuse"] == "reservoir"
-            || tags["waterway"] == "river"
-            || tags["waterway"] == "stream"
-        guard isWater else { return nil }
+        let isPolygonWater = tags["natural"] == "water" || tags["landuse"] == "reservoir"
+        let isLinearWaterway = tags["waterway"] == "river" || tags["waterway"] == "stream"
+        guard isPolygonWater || isLinearWaterway else { return nil }
 
-        let coord = element.resolvedCoordinate ?? fallback
+        // On unlabeled long-presses, require polygon water to come from area containment (`is_in`).
+        if hint == nil, isPolygonWater, !isLinearWaterway, element.type != "area" {
+            return nil
+        }
+
+        let normalizedRaw = CatchDiscovery.normalized(rawName)
+        if let hint, normalizedRaw != hint {
+            return nil
+        }
+
         let waterTag = tags["water"] ?? (tags["landuse"] == "reservoir" ? "reservoir" : nil)
         let type = WaterBodyNameClassifier.classify(
             name: rawName,
             osmWaterTag: waterTag,
             osmWaterwayTag: tags["waterway"]
         )
+        // Preserve the tapped/inspected coordinate so nearby queries and local history stay at the selected reach.
         let candidate = OverpassWaterCandidate(
             osmID: "osm-\(element.type)-\(element.id)",
             name: rawName,
             waterType: type,
-            coordinate: coord,
+            coordinate: fallback,
             wikipediaTag: tags["wikipedia"]
         )
         var score = element.type == "area" ? 20 : 10
-        if let hint, CatchDiscovery.normalized(rawName) == hint {
+        if hint != nil {
             score += 100
         }
         if tags["wikipedia"] != nil {
             score += 5
         }
-        let distance = CLLocation(latitude: coord.latitude, longitude: coord.longitude).distance(from: target)
+        let featureCoord = element.resolvedCoordinate ?? fallback
+        let distance = CLLocation(latitude: featureCoord.latitude, longitude: featureCoord.longitude)
+            .distance(from: target)
         return RankedCandidate(candidate: candidate, score: score, distance: distance)
     }
 
@@ -238,11 +246,11 @@ enum WaterBodySourceParsers {
             guard let coord = element.resolvedCoordinate else { continue }
             let tags = element.tags ?? [:]
             let rawName = tags["name"]?.trimmingCharacters(in: .whitespacesAndNewlines)
-            let name = rawName?.isEmpty == false ? rawName! : "Public Boat Ramp"
+            let name = rawName?.isEmpty == false ? rawName! : "Boat Ramp"
             let key = "\(CatchDiscovery.normalized(name))-\(Int(coord.latitude * 1000))-\(Int(coord.longitude * 1000))"
             guard seenKeys.insert(key).inserted else { continue }
 
-            let kind = tags["access"] == "private" ? "Boat Ramp (Private)" : "Boat Ramp"
+            let kind = accessKind(for: tags["access"])
             let point = WaterBodyAccessPoint(
                 id: "osm-\(element.type)-\(element.id)",
                 name: name,
@@ -263,20 +271,20 @@ enum WaterBodySourceParsers {
         else {
             return nil
         }
-        let pageURL = payload.contentURLs?.desktop?.page.flatMap(URL.init(string:))
-        var photo: WaterBodyPhoto?
-        if let thumbString = payload.thumbnail?.source, let thumbURL = URL(string: thumbString) {
-            let fullURL = payload.originalImage.flatMap { URL(string: $0.source) } ?? thumbURL
-            photo = WaterBodyPhoto(
-                id: "wiki-\(payload.title)",
-                thumbnailURL: thumbURL,
-                fullURL: fullURL,
-                attribution: "Wikimedia Commons / Wikipedia",
-                license: "CC BY-SA",
-                source: "Wikipedia"
-            )
+        let pageURL = URL.validatedWebURL(payload.contentURLs?.desktop?.page)
+        let coord = payload.coordinates.flatMap { CatchCoordinate(latitude: $0.lat, longitude: $0.lon) }
+        return WikipediaSummaryResult(title: payload.title, extract: extract, pageURL: pageURL, coordinate: coord)
+    }
+
+    private static func accessKind(for accessTag: String?) -> String {
+        switch accessTag?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased() {
+        case "yes", "public", "permissive":
+            "Public Boat Ramp"
+        case "private", "no", "customers", "permit":
+            "Restricted Boat Ramp"
+        default:
+            "Boat Ramp (Access Unverified)"
         }
-        return WikipediaSummaryResult(title: payload.title, extract: extract, pageURL: pageURL, photo: photo)
     }
 
     static func parseINaturalistObservations(from data: Data) throws -> INaturalistResult {
@@ -337,13 +345,13 @@ enum WaterBodySourceParsers {
             guard let license = obsPhoto.licenseCode?.trimmingCharacters(in: .whitespacesAndNewlines),
                   !license.isEmpty,
                   let rawURL = obsPhoto.url,
-                  let thumbURL = URL(string: rawURL.replacingOccurrences(of: "square", with: "medium"))
+                  let thumbURL = URL.validatedWebURL(rawURL.replacingOccurrences(of: "square", with: "medium"))
             else {
                 continue
             }
             let photoID = "inat-\(obsPhoto.id)"
             guard seenIDs.insert(photoID).inserted else { continue }
-            let fullURL = URL(string: rawURL.replacingOccurrences(of: "square", with: "large")) ?? thumbURL
+            let fullURL = URL.validatedWebURL(rawURL.replacingOccurrences(of: "square", with: "large")) ?? thumbURL
             let rawAttr = obsPhoto.attribution?.trimmingCharacters(in: .whitespacesAndNewlines)
             let userName = nonEmptyTrimmed(observation.user?.name)
             let userLogin = nonEmptyTrimmed(observation.user?.login)
@@ -359,10 +367,15 @@ enum WaterBodySourceParsers {
             ))
         }
     }
+}
+
+extension WaterBodySourceParsers {
+    static let maximumGaugeDistanceMeters: CLLocationDistance = 2000
 
     static func parseUSGSGaugeReading(
         from data: Data,
-        near coordinate: CatchCoordinate
+        near coordinate: CatchCoordinate,
+        waterName: String? = nil
     ) throws -> RiverGaugeReading? {
         let payload = try JSONDecoder().decode(USGSResponse.self, from: data)
         let origin = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
@@ -373,7 +386,11 @@ enum WaterBodySourceParsers {
         }
 
         let best = sites.values
-            .filter(\.hasMeasurement)
+            .filter { site in
+                site.hasMeasurement
+                    && site.distance <= maximumGaugeDistanceMeters
+                    && gaugeMatchesWater(siteName: site.siteName, waterName: waterName)
+            }
             .min { first, second in
                 if (first.dischargeCFS != nil) != (second.dischargeCFS != nil) {
                     return first.dischargeCFS != nil
@@ -390,6 +407,21 @@ enum WaterBodySourceParsers {
             waterTemperatureF: best.waterTemperatureF,
             observedAt: best.observedAt
         )
+    }
+
+    private static func gaugeMatchesWater(siteName: String, waterName: String?) -> Bool {
+        guard let waterName = nonEmptyTrimmed(waterName) else { return true }
+        let normalizedSite = CatchDiscovery.normalized(siteName)
+        let normalizedWater = CatchDiscovery.normalized(waterName)
+        if normalizedSite.contains(normalizedWater) {
+            return true
+        }
+        let coreTokens = normalizedWater
+            .split(whereSeparator: { !$0.isLetter && !$0.isNumber })
+            .map(String.init)
+            .filter { $0.count >= 3 && !WaterBodyNameClassifier.isGenericWaterTerm($0) }
+        guard !coreTokens.isEmpty else { return false }
+        return coreTokens.allSatisfy { normalizedSite.contains($0) }
     }
 
     private static func mergeUSGSSeries(

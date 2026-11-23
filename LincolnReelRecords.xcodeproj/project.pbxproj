@@ -19,6 +19,7 @@
 		19C7A8C7995DF274F7839619 /* SyncCoordinatorProfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0AA177D26198C3722AC42C7D /* SyncCoordinatorProfile.swift */; };
 		1BE47FC840AFC4B09DF0CA5E /* ProfileRemoteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4DD6C0EED8EFFB753CD7592B /* ProfileRemoteStore.swift */; };
 		1C3E90A3C4B12C6D8B77C4BF /* ProfileModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = DE780B771489C92396544B77 /* ProfileModels.swift */; };
+		1C73B7F9B1580B4677841392 /* WaterBodyInfoClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 235661E1741DE0C3E6A4E230 /* WaterBodyInfoClientTests.swift */; };
 		1E292BF35DC0CC215EE3E268 /* CatchRemoteStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 443D168C66E5CA508B55F834 /* CatchRemoteStore.swift */; };
 		1F2F45F5AEF61C13FE68A03A /* WaterBodyInfoSections.swift in Sources */ = {isa = PBXBuildFile; fileRef = 071FB24B73BA560E8FBFC6B4 /* WaterBodyInfoSections.swift */; };
 		1F71CDCE453DC30D0B520DE5 /* CatchPhotoTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB1D66212FEC995C64FA8427 /* CatchPhotoTests.swift */; };
@@ -151,6 +152,7 @@
 		164548F21D10C427D983F0A5 /* TackleItemViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TackleItemViews.swift; sourceTree = "<group>"; };
 		17F14C9C8CF21631334C1AC7 /* TackleModels.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TackleModels.swift; sourceTree = "<group>"; };
 		229545BB13B83B57D3C4BF01 /* CatchPhotoGallery.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoGallery.swift; sourceTree = "<group>"; };
+		235661E1741DE0C3E6A4E230 /* WaterBodyInfoClientTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WaterBodyInfoClientTests.swift; sourceTree = "<group>"; };
 		242F61F59B3F0AE44A674867 /* CatchPhotoGalleryTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoGalleryTests.swift; sourceTree = "<group>"; };
 		24BAE2D9BDF1C599368E859D /* LocationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationTests.swift; sourceTree = "<group>"; };
 		2728A9C584315ED3C913E70B /* SelectionChip.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SelectionChip.swift; sourceTree = "<group>"; };
@@ -504,6 +506,7 @@
 				C17F489A9C6398D5FB41C6E7 /* PublicAccessCatalogTests.swift */,
 				D3D8368B54DD948BAA631AC7 /* TackleSyncRegressionTests.swift */,
 				8D2B2D3DD76BDEFD0A5F19C0 /* TackleTests.swift */,
+				235661E1741DE0C3E6A4E230 /* WaterBodyInfoClientTests.swift */,
 				42415F26D3C005D0853FB3E7 /* WaterBodyInfoTests.swift */,
 			);
 			path = ReelRecordsTests;
@@ -682,6 +685,7 @@
 				B2AA67824306B77705DEE3C9 /* PublicAccessCatalogTests.swift in Sources */,
 				6A6C83B498729BFB4BA61F08 /* TackleSyncRegressionTests.swift in Sources */,
 				5EA8C55A29DAA4A9FB1D4602 /* TackleTests.swift in Sources */,
+				1C73B7F9B1580B4677841392 /* WaterBodyInfoClientTests.swift in Sources */,
 				AC49020A11555D44DB38076F /* WaterBodyInfoTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

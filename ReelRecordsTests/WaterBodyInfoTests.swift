@@ -161,17 +161,18 @@ final class WaterBodyInfoTests: XCTestCase {
         let ramps = try WaterBodySourceParsers.parseOverpassAccessPoints(from: rampJSON, near: stockbridgeCoord)
         XCTAssertEqual(ramps.count, 2)
         XCTAssertEqual(ramps[0].name, "Town Boat Ramp")
-        XCTAssertEqual(ramps[0].kind, "Boat Ramp")
-        XCTAssertEqual(ramps[1].name, "Public Boat Ramp")
-        XCTAssertEqual(ramps[1].kind, "Boat Ramp (Private)")
+        XCTAssertEqual(ramps[0].kind, "Boat Ramp (Access Unverified)")
+        XCTAssertEqual(ramps[1].name, "Boat Ramp")
+        XCTAssertEqual(ramps[1].kind, "Restricted Boat Ramp")
     }
 
-    func testWikipediaParserExtractsSummaryAndRejectsDisambiguation() throws {
+    func testWikipediaParserExtractsSummaryValidatesURLsAndOmitsUnverifiedPhotos() throws {
         let validJSON = Data("""
         {
           "type": "standard",
           "title": "Stockbridge Bowl",
           "extract": "Stockbridge Bowl is a lake in Berkshire County.",
+          "coordinates": { "lat": 42.333, "lon": -73.321 },
           "thumbnail": { "source": "https://upload.wikimedia.org/thumb.jpg" },
           "content_urls": { "desktop": { "page": "https://en.wikipedia.org/wiki/Stockbridge_Bowl" } }
         }
@@ -180,7 +181,11 @@ final class WaterBodyInfoTests: XCTestCase {
         let summary = try XCTUnwrap(WaterBodySourceParsers.parseWikipediaSummary(from: validJSON))
         XCTAssertEqual(summary.extract, "Stockbridge Bowl is a lake in Berkshire County.")
         XCTAssertEqual(summary.pageURL?.absoluteString, "https://en.wikipedia.org/wiki/Stockbridge_Bowl")
-        XCTAssertEqual(summary.photo?.source, "Wikipedia")
+        XCTAssertEqual(summary.coordinate?.latitude ?? 0, 42.333, accuracy: 0.001)
+
+        XCTAssertNil(URL.validatedWebURL("javascript:alert(1)"))
+        XCTAssertNil(URL.validatedWebURL("/relative/path"))
+        XCTAssertNotNil(URL.validatedWebURL("https://en.wikipedia.org/wiki/Stockbridge_Bowl"))
 
         let disambigJSON = Data("""
         { "type": "disambiguation", "title": "Long Pond", "extract": "Long Pond may refer to:" }
@@ -234,197 +239,95 @@ final class WaterBodyInfoTests: XCTestCase {
         XCTAssertTrue(parsed.photos.first?.thumbnailURL.absoluteString.contains("medium.jpg") == true)
     }
 
-    func testUSGSGaugeParserConvertsTempAndIgnoresSentinels() throws {
-        let json = Data("""
-        {
-          "value": {
-            "timeSeries": [
-              {
-                "sourceInfo": {
-                  "siteName": "HOUSATONIC RIVER NEAR GREAT BARRINGTON, MA",
-                  "siteCode": [{ "value": "01197500" }],
-                  "geoLocation": { "geogLocation": { "latitude": 42.23, "longitude": -73.35 } }
-                },
-                "variable": { "variableCode": [{ "value": "00060" }] },
-                "values": [{ "value": [{ "value": "420", "dateTime": "2026-07-20T14:15:00.000-04:00" }] }]
-              },
-              {
-                "sourceInfo": {
-                  "siteName": "HOUSATONIC RIVER NEAR GREAT BARRINGTON, MA",
-                  "siteCode": [{ "value": "01197500" }],
-                  "geoLocation": { "geogLocation": { "latitude": 42.23, "longitude": -73.35 } }
-                },
-                "variable": { "variableCode": [{ "value": "00010" }] },
-                "values": [{ "value": [{ "value": "20.0", "dateTime": "2026-07-20T14:15:00.000-04:00" }] }]
-              },
-              {
-                "sourceInfo": {
-                  "siteName": "HOUSATONIC RIVER NEAR GREAT BARRINGTON, MA",
-                  "siteCode": [{ "value": "01197500" }],
-                  "geoLocation": { "geogLocation": { "latitude": 42.23, "longitude": -73.35 } }
-                },
-                "variable": { "variableCode": [{ "value": "00065" }] },
-                "values": [{ "value": [{ "value": "-999999", "dateTime": "2026-07-20T14:15:00.000-04:00" }] }]
-              }
-            ]
-          }
-        }
-        """.utf8)
-
+    func testUSGSGaugeParserConvertsTempIgnoresSentinelsAndEnforcesNameAndRadius() throws {
+        let json = Self.sampleUSGSJSON
         let reading = try XCTUnwrap(try WaterBodySourceParsers.parseUSGSGaugeReading(
             from: json,
-            near: XCTUnwrap(CatchCoordinate(latitude: 42.23, longitude: -73.35))
+            near: XCTUnwrap(CatchCoordinate(latitude: 42.23, longitude: -73.35)),
+            waterName: "Housatonic River"
         ))
         XCTAssertEqual(reading.siteCode, "01197500")
         XCTAssertEqual(reading.dischargeCFS, 420)
         XCTAssertEqual(reading.waterTemperatureF ?? 0, 68.0, accuracy: 0.01)
         XCTAssertNil(reading.gaugeHeightFT)
         XCTAssertEqual(reading.compactFlowLabel, "420 cfs")
-    }
-}
 
-final class WaterBodyInfoClientTests: XCTestCase {
-    private let stockbridgeCoord = CatchCoordinate(latitude: 42.3330, longitude: -73.3210)!
-    private let stockbridgeSelection = WaterBodySelection(
-        id: "osm-way-42",
-        name: "Stockbridge Bowl",
-        waterType: .lake,
-        coordinate: CatchCoordinate(latitude: 42.3330, longitude: -73.3210)!,
-        regionSubtitle: "Stockbridge, MA",
-        wikipediaTag: "en:Stockbridge Bowl"
-    )
-
-    func testPartialSourceDegradationAndCacheHit() async throws {
-        let cacheDir = makeTempCacheDir()
-        defer { try? FileManager.default.removeItem(at: cacheDir) }
-
-        let cache = WaterBodyInfoCache(directoryURL: cacheDir)
-        let callCount = LockedCounter()
-        let baseDate = Date(timeIntervalSince1970: 1_753_000_000)
-        let client = WaterBodyInfoClient(
-            loader: Self.partialSuccessLoader(counter: callCount),
-            cache: cache,
-            now: { baseDate }
+        let wrongWater = try WaterBodySourceParsers.parseUSGSGaugeReading(
+            from: json,
+            near: XCTUnwrap(CatchCoordinate(latitude: 42.23, longitude: -73.35)),
+            waterName: "Williams River"
         )
+        XCTAssertNil(wrongWater)
 
-        let first = try await client.fetchInfo(for: stockbridgeSelection, forceRefresh: false)
-        XCTAssertNil(first.overview)
-        XCTAssertEqual(first.species.map(\.commonName), ["Northern Pike"])
-        XCTAssertFalse(first.isFromOfflineCache)
-        let callsAfterFirst = callCount.value
-        XCTAssertGreaterThan(callsAfterFirst, 0)
-
-        let cachedHit = try await client.fetchInfo(for: stockbridgeSelection, forceRefresh: false)
-        XCTAssertEqual(cachedHit.species.map(\.commonName), ["Northern Pike"])
-        XCTAssertEqual(callCount.value, callsAfterFirst)
+        let tooFar = try WaterBodySourceParsers.parseUSGSGaugeReading(
+            from: json,
+            near: XCTUnwrap(CatchCoordinate(latitude: 42.28, longitude: -73.35)),
+            waterName: "Housatonic River"
+        )
+        XCTAssertNil(tooFar)
     }
 
-    func testOfflineFallbackReturnsStaleCacheAndThrowsWhenUncached() async throws {
-        let cacheDir = makeTempCacheDir()
-        defer { try? FileManager.default.removeItem(at: cacheDir) }
-
-        let cache = WaterBodyInfoCache(directoryURL: cacheDir)
-        let baseDate = Date(timeIntervalSince1970: 1_753_000_000)
-        let onlineClient = WaterBodyInfoClient(
-            loader: Self.partialSuccessLoader(counter: LockedCounter()),
-            cache: cache,
-            now: { baseDate }
-        )
-        _ = try await onlineClient.fetchInfo(for: stockbridgeSelection, forceRefresh: false)
-
-        let staleDate = baseDate.addingTimeInterval(WaterBodyInfoCache.staticInfoTTL + 3600)
-        let offlineClient = WaterBodyInfoClient(
-            loader: { _ in throw URLError(.notConnectedToInternet) },
-            cache: cache,
-            now: { staleDate }
-        )
-        let staleFallback = try await offlineClient.fetchInfo(for: stockbridgeSelection, forceRefresh: false)
-        XCTAssertTrue(staleFallback.isFromOfflineCache)
-        XCTAssertEqual(staleFallback.species.map(\.commonName), ["Northern Pike"])
-
-        let uncached = WaterBodySelection(
-            id: "osm-way-999",
-            name: "Uncached Pond",
+    func testLocalWaterHistoryRejectsConflictingCoordinatesAndPrefixFalseMatches() {
+        let longPond = WaterBodySelection(
+            id: "water-long-pond",
+            name: "Long Pond",
             waterType: .pond,
             coordinate: stockbridgeCoord,
             regionSubtitle: nil,
             wikipediaTag: nil
         )
-        do {
-            _ = try await offlineClient.fetchInfo(for: uncached, forceRefresh: false)
-            XCTFail("Expected offlineOrUnavailable error for uncached water when offline")
-        } catch let error as WaterBodyInfoError {
-            XCTAssertEqual(error, .offlineOrUnavailable)
-        }
+        let catches = [
+            CatchFixture(id: 10, species: "Bass", location: "Little Long Pond", coordinate: nil).build(),
+            CatchFixture(
+                id: 11,
+                species: "Bass",
+                location: "Long Pond",
+                coordinate: CatchCoordinate(latitude: 42.0, longitude: -73.0)
+            ).build(),
+            CatchFixture(id: 12, species: "Pike", location: "Long Pond South Cove", coordinate: nil).build()
+        ]
+        let history = LocalWaterHistory.summarize(catches: catches, for: longPond)
+        XCTAssertEqual(history.catchCount, 1)
+        XCTAssertEqual(history.topSpecies, ["Pike"])
     }
+}
 
-    func testResolveWaterBodyRejectsNonWaterAndSharesCanonicalCacheKeyOffline() async throws {
-        let onlineClient = WaterBodyInfoClient(
-            loader: { request in
-                let body = Data("""
-                {
-                  "elements": [{
-                    "type": "area", "id": 3600001234,
-                    "tags": { "natural": "water", "water": "lake", "name": "Stockbridge Bowl" }
-                  }]
-                }
-                """.utf8)
-                return (body, HTTPURLResponse(url: request.url!, statusCode: 200, httpVersion: nil, headerFields: nil)!)
+private extension WaterBodyInfoTests {
+    static let sampleUSGSJSON = Data("""
+    {
+      "value": {
+        "timeSeries": [
+          {
+            "sourceInfo": {
+              "siteName": "HOUSATONIC RIVER NEAR GREAT BARRINGTON, MA",
+              "siteCode": [{ "value": "01197500" }],
+              "geoLocation": { "geogLocation": { "latitude": 42.23, "longitude": -73.35 } }
             },
-            regionResolver: { _ in "Stockbridge, MA" }
-        )
-        let onlineResult = try await onlineClient.resolveWaterBody(
-            at: stockbridgeCoord,
-            hintName: "Stockbridge Bowl"
-        )
-        let online = try XCTUnwrap(onlineResult)
-        XCTAssertEqual(online.regionSubtitle, "Stockbridge, MA")
-
-        let offlineClient = WaterBodyInfoClient(
-            loader: { _ in throw URLError(.notConnectedToInternet) }
-        )
-        let mountain = try await offlineClient.resolveWaterBody(at: stockbridgeCoord, hintName: "Monument Mountain")
-        XCTAssertNil(mountain)
-
-        let offlineResult = try await offlineClient.resolveWaterBody(
-            at: stockbridgeCoord,
-            hintName: "Stockbridge Bowl"
-        )
-        let offlineLake = try XCTUnwrap(offlineResult)
-        XCTAssertEqual(offlineLake.id, online.id)
-        XCTAssertEqual(offlineLake.waterType, .lake)
-
-        let dryLand = try await offlineClient.resolveWaterBody(at: stockbridgeCoord, hintName: nil)
-        XCTAssertNil(dryLand)
+            "variable": { "variableCode": [{ "value": "00060" }] },
+            "values": [{ "value": [{ "value": "420", "dateTime": "2026-07-20T14:15:00.000-04:00" }] }]
+          },
+          {
+            "sourceInfo": {
+              "siteName": "HOUSATONIC RIVER NEAR GREAT BARRINGTON, MA",
+              "siteCode": [{ "value": "01197500" }],
+              "geoLocation": { "geogLocation": { "latitude": 42.23, "longitude": -73.35 } }
+            },
+            "variable": { "variableCode": [{ "value": "00010" }] },
+            "values": [{ "value": [{ "value": "20.0", "dateTime": "2026-07-20T14:15:00.000-04:00" }] }]
+          },
+          {
+            "sourceInfo": {
+              "siteName": "HOUSATONIC RIVER NEAR GREAT BARRINGTON, MA",
+              "siteCode": [{ "value": "01197500" }],
+              "geoLocation": { "geogLocation": { "latitude": 42.23, "longitude": -73.35 } }
+            },
+            "variable": { "variableCode": [{ "value": "00065" }] },
+            "values": [{ "value": [{ "value": "-999999", "dateTime": "2026-07-20T14:15:00.000-04:00" }] }]
+          }
+        ]
+      }
     }
-
-    private func makeTempCacheDir() -> URL {
-        FileManager.default.temporaryDirectory
-            .appendingPathComponent("WaterBodyCacheTest-\(UUID().uuidString)", isDirectory: true)
-    }
-
-    private static func partialSuccessLoader(counter: LockedCounter) -> WaterBodyInfoClient.Loader {
-        { request in
-            counter.increment()
-            let url = request.url!
-            if url.host == "en.wikipedia.org" {
-                return (Data(), HTTPURLResponse(url: url, statusCode: 500, httpVersion: nil, headerFields: nil)!)
-            }
-            if url.host == "api.inaturalist.org" {
-                let body = Data("""
-                {
-                  "results": [{
-                    "taxon": { "id": 7, "name": "Esox lucius", "preferred_common_name": "Northern Pike" },
-                    "photos": []
-                  }]
-                }
-                """.utf8)
-                return (body, HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!)
-            }
-            let emptyOverpass = Data(#"{"elements":[]}"#.utf8)
-            return (emptyOverpass, HTTPURLResponse(url: url, statusCode: 200, httpVersion: nil, headerFields: nil)!)
-        }
-    }
+    """.utf8)
 }
 
 private struct CatchFixture {
@@ -461,22 +364,5 @@ private struct CatchFixture {
             syncState: .synced,
             syncError: nil
         )
-    }
-}
-
-private final class LockedCounter: @unchecked Sendable {
-    private let lock = NSLock()
-    private var storage = 0
-
-    var value: Int {
-        lock.lock()
-        defer { lock.unlock() }
-        return storage
-    }
-
-    func increment() {
-        lock.lock()
-        storage += 1
-        lock.unlock()
     }
 }

@@ -28,6 +28,7 @@ ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/14
   - `LincolnReelRecordsUITests`: 30 tests, 0 failures (includes `WaterBodyInfoUITests` 3/3 and `CatchMapUITests` 5/5).
   - `supabase test db --local`: 8/8 files, 99/99 tests PASS.
 - Residual physical-device check (deferred to TestFlight hardware smoke pass): real Berkshire waters tap hit-rate (Stockbridge Bowl, Lake Mansfield, Housatonic River, Lake Buel, and a small local pond) comparing Apple `MKMapFeatureAnnotation` taps vs. long-press Overpass fallback.
+- Follow-up migration (before January 2027): migrate USGS live river gauge lookup from legacy `waterservices.usgs.gov/nwis/iv/` (scheduled for phased outages Jan 2027 and retirement Feb 22, 2027) to the replacement USGS Water Data API.
 
 ## Resolved decisions (2026-11-22)
 

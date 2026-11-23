@@ -42,7 +42,7 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
 
     init(
         session: URLSession = .shared,
-        cache: WaterBodyInfoCache = WaterBodyInfoCache(),
+        cache: WaterBodyInfoCache = .shared,
         now: @escaping Clock = { .now },
         regionResolver: @escaping RegionResolver = WaterBodyInfoClient.reverseGeocodeRegion
     ) {
@@ -74,17 +74,27 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
         let nonEmptyHint = trimmedHint?.isEmpty == false ? trimmedHint : nil
 
         if let nonEmptyHint, !WaterBodyNameClassifier.looksLikeWaterName(nonEmptyHint) {
-            return await resolveNonKeywordHint(nonEmptyHint, at: coordinate)
+            if let resolved = await resolveNonKeywordHint(nonEmptyHint, at: coordinate) {
+                cache.saveSelection(resolved)
+                return resolved
+            }
+            return cache.findSelection(near: coordinate, hintName: nonEmptyHint)
         }
 
         async let regionSubtitle = regionResolver(coordinate)
 
         if let candidate = await fetchOverpassWaterCandidate(at: coordinate, hintName: nonEmptyHint) {
-            return await selection(from: candidate, regionSubtitle: regionSubtitle)
+            let resolved = await selection(from: candidate, regionSubtitle: regionSubtitle)
+            cache.saveSelection(resolved)
+            return resolved
+        }
+
+        if let cachedSelection = cache.findSelection(near: coordinate, hintName: nonEmptyHint) {
+            return cachedSelection
         }
 
         if let nonEmptyHint, WaterBodyNameClassifier.looksLikeWaterName(nonEmptyHint) {
-            return await WaterBodySelection(
+            let fallback = await WaterBodySelection(
                 id: WaterBodySelection.canonicalID(name: nonEmptyHint, coordinate: coordinate),
                 name: nonEmptyHint,
                 waterType: WaterBodyNameClassifier.classify(name: nonEmptyHint),
@@ -92,12 +102,18 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
                 regionSubtitle: regionSubtitle,
                 wikipediaTag: nil
             )
+            cache.saveSelection(fallback)
+            return fallback
         }
         return nil
     }
 
     func cachedInfo(for selection: WaterBodySelection) -> WaterBodyInfo? {
-        cache.load(waterID: selection.id)
+        guard var cached = cache.load(waterID: selection.id) else { return nil }
+        if cached.riverGauge != nil, !cache.isGaugeFresh(cached, now: now()) {
+            cached.isRiverGaugeStale = true
+        }
+        return cached
     }
 
     func fetchInfo(
@@ -113,8 +129,10 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
 
         return try await fetchAllSources(for: selection, cached: cached, now: currentDate)
     }
+}
 
-    private func resolveNonKeywordHint(
+private extension WaterBodyInfoClient {
+    func resolveNonKeywordHint(
         _ hint: String,
         at coordinate: CatchCoordinate
     ) async -> WaterBodySelection? {
@@ -127,7 +145,7 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
         return selection(from: candidate, regionSubtitle: region)
     }
 
-    private func selection(
+    func selection(
         from candidate: OverpassWaterCandidate,
         regionSubtitle: String?
     ) -> WaterBodySelection {
@@ -141,17 +159,22 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
         )
     }
 
-    private func refreshGaugeIfNeeded(
+    func refreshGaugeIfNeeded(
         cached: WaterBodyInfo,
         selection: WaterBodySelection,
         now currentDate: Date
     ) async -> WaterBodyInfo {
         let shouldRefreshGauge = selection.waterType.supportsLiveRiverGauge || cached.riverGauge != nil
-        guard shouldRefreshGauge,
-              !cache.isGaugeFresh(cached, now: currentDate),
-              case let .success(gauge) = await fetchUSGSGauge(around: selection.coordinate)
-        else {
+        guard shouldRefreshGauge, !cache.isGaugeFresh(cached, now: currentDate) else {
             return cached
+        }
+        guard case let .success(gauge) = await fetchUSGSGauge(
+            around: selection.coordinate,
+            waterName: selection.name
+        ) else {
+            var staleCopy = cached
+            staleCopy.isRiverGaugeStale = cached.riverGauge != nil
+            return staleCopy
         }
         let updated = WaterBodyInfo(
             waterID: cached.waterID,
@@ -164,16 +187,17 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
             accessPoints: cached.accessPoints,
             species: cached.species,
             photos: cached.photos,
-            riverGauge: gauge ?? cached.riverGauge,
+            riverGauge: gauge,
             fetchedAt: cached.fetchedAt,
             gaugeFetchedAt: currentDate,
-            isFromOfflineCache: false
+            isFromOfflineCache: false,
+            isRiverGaugeStale: false
         )
         cache.save(updated)
         return updated
     }
 
-    private func fetchAllSources(
+    func fetchAllSources(
         for selection: WaterBodySelection,
         cached: WaterBodyInfo?,
         now currentDate: Date
@@ -183,7 +207,7 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
         async let wikiOutcome = fetchWikipediaSummary(for: selection)
         async let inatOutcome = fetchINaturalist(around: selection.coordinate)
         async let usgsOutcome: SourceOutcome<RiverGaugeReading?> = shouldQueryGauge
-            ? fetchUSGSGauge(around: selection.coordinate)
+            ? fetchUSGSGauge(around: selection.coordinate, waterName: selection.name)
             : .skipped
 
         let (access, wiki, inat, usgs) = await (accessOutcome, wikiOutcome, inatOutcome, usgsOutcome)
@@ -192,42 +216,62 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
         if !anySucceeded {
             if var stale = cached {
                 stale.isFromOfflineCache = true
+                stale.isRiverGaugeStale = stale.riverGauge != nil && !cache.isGaugeFresh(stale, now: currentDate)
                 return stale
             }
             throw WaterBodyInfoError.offlineOrUnavailable
         }
 
-        let wikiSummary = wiki.value ?? nil
-        let inatResult = inat.value
-        var photos: [WaterBodyPhoto] = []
-        if let wikiPhoto = wikiSummary?.photo {
-            photos.append(wikiPhoto)
-        }
-        if let inatPhotos = inatResult?.photos {
-            photos.append(contentsOf: inatPhotos)
-        }
+        let merged = mergeSources(
+            selection: selection,
+            cached: cached,
+            outcomes: SourceOutcomes(access: access, wiki: wiki, inat: inat, usgs: usgs),
+            now: currentDate
+        )
+        cache.save(merged)
+        return merged
+    }
 
-        let info = WaterBodyInfo(
+    func mergeSources(
+        selection: WaterBodySelection,
+        cached: WaterBodyInfo?,
+        outcomes: SourceOutcomes,
+        now currentDate: Date
+    ) -> WaterBodyInfo {
+        let overview = outcomes.wiki.didSucceed ? outcomes.wiki.value??.extract : cached?.overview
+        let wikipediaURL = outcomes.wiki.didSucceed ? outcomes.wiki.value??.pageURL : cached?.wikipediaURL
+        let accessPoints = outcomes.access.didSucceed ? (outcomes.access.value ?? []) : (cached?.accessPoints ?? [])
+        let species = outcomes.inat.didSucceed ? (outcomes.inat.value?.species ?? []) : (cached?.species ?? [])
+        let photos = outcomes.inat.didSucceed
+            ? Array((outcomes.inat.value?.photos ?? []).prefix(6))
+            : (cached?.photos ?? [])
+        let riverGauge = outcomes.usgs.didSucceed ? (outcomes.usgs.value ?? nil) : cached?.riverGauge
+        let gaugeFetchedAt = outcomes.usgs.didSucceed ? currentDate : cached?.gaugeFetchedAt
+        let wasGaugeFresh = cached.map { cache.isGaugeFresh($0, now: currentDate) } ?? false
+        let isGaugeStale = riverGauge != nil && !outcomes.usgs.didSucceed && !wasGaugeFresh
+        let allStaticSucceeded = outcomes.access.didSucceed && outcomes.wiki.didSucceed && outcomes.inat.didSucceed
+        let fetchedAt = (allStaticSucceeded || cached == nil) ? currentDate : (cached?.fetchedAt ?? currentDate)
+
+        return WaterBodyInfo(
             waterID: selection.id,
             name: selection.name,
             waterType: selection.waterType,
-            regionSubtitle: selection.regionSubtitle,
+            regionSubtitle: selection.regionSubtitle ?? cached?.regionSubtitle,
             coordinate: selection.coordinate,
-            overview: wikiSummary?.extract,
-            wikipediaURL: wikiSummary?.pageURL,
-            accessPoints: access.value ?? [],
-            species: inatResult?.species ?? [],
-            photos: Array(photos.prefix(6)),
-            riverGauge: usgs.value ?? nil,
-            fetchedAt: currentDate,
-            gaugeFetchedAt: usgs.didSucceed ? currentDate : nil,
-            isFromOfflineCache: false
+            overview: overview,
+            wikipediaURL: wikipediaURL,
+            accessPoints: accessPoints,
+            species: species,
+            photos: photos,
+            riverGauge: riverGauge,
+            fetchedAt: fetchedAt,
+            gaugeFetchedAt: gaugeFetchedAt,
+            isFromOfflineCache: false,
+            isRiverGaugeStale: isGaugeStale
         )
-        cache.save(info)
-        return info
     }
 
-    private func fetchOverpassWaterCandidate(
+    func fetchOverpassWaterCandidate(
         at coordinate: CatchCoordinate,
         hintName: String?
     ) async -> OverpassWaterCandidate? {
@@ -243,9 +287,7 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
         )
     }
 
-    private func fetchAccessPoints(
-        around coordinate: CatchCoordinate
-    ) async -> SourceOutcome<[WaterBodyAccessPoint]> {
+    func fetchAccessPoints(around coordinate: CatchCoordinate) async -> SourceOutcome<[WaterBodyAccessPoint]> {
         guard let request = WaterBodySourceRequests.overpassAccess(around: coordinate),
               let data = await performRequest(request),
               let parsed = try? WaterBodySourceParsers.parseOverpassAccessPoints(from: data, near: coordinate)
@@ -255,26 +297,31 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
         return .success(parsed)
     }
 
-    private func fetchWikipediaSummary(
-        for selection: WaterBodySelection
-    ) async -> SourceOutcome<WikipediaSummaryResult?> {
-        var titles: [String] = []
+    func fetchWikipediaSummary(for selection: WaterBodySelection) async -> SourceOutcome<WikipediaSummaryResult?> {
+        var candidates: [(title: String, requiresGeoMatch: Bool)] = []
         if let tag = selection.wikipediaTag, !tag.isEmpty {
-            titles.append(tag)
+            candidates.append((tag, false))
         }
         if let region = selection.regionSubtitle, !region.isEmpty {
-            titles.append("\(selection.name), \(region)")
+            candidates.append(("\(selection.name), \(region)", false))
         }
-        titles.append(selection.name)
+        candidates.append((selection.name, true))
 
         var sawHTTPResponse = false
-        for title in titles {
-            guard let request = WaterBodySourceRequests.wikipediaSummary(title: title) else { continue }
+        for candidate in candidates {
+            guard let request = WaterBodySourceRequests.wikipediaSummary(title: candidate.title) else { continue }
             switch await performDetailedRequest(request) {
             case let .success(data):
                 sawHTTPResponse = true
                 if let summary = try? WaterBodySourceParsers.parseWikipediaSummary(from: data) {
-                    return .success(summary)
+                    let isGeoOK = wikipediaMatchesLocation(
+                        summary,
+                        selection: selection,
+                        requiresGeo: candidate.requiresGeoMatch
+                    )
+                    if isGeoOK {
+                        return .success(summary)
+                    }
                 }
             case .notFound:
                 sawHTTPResponse = true
@@ -285,9 +332,19 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
         return sawHTTPResponse ? .success(nil) : .failed
     }
 
-    private func fetchINaturalist(
-        around coordinate: CatchCoordinate
-    ) async -> SourceOutcome<INaturalistResult> {
+    func wikipediaMatchesLocation(
+        _ summary: WikipediaSummaryResult,
+        selection: WaterBodySelection,
+        requiresGeo: Bool
+    ) -> Bool {
+        guard requiresGeo else { return true }
+        guard let wikiCoord = summary.coordinate else { return false }
+        let origin = CLLocation(latitude: selection.coordinate.latitude, longitude: selection.coordinate.longitude)
+        let target = CLLocation(latitude: wikiCoord.latitude, longitude: wikiCoord.longitude)
+        return origin.distance(from: target) <= 15000
+    }
+
+    func fetchINaturalist(around coordinate: CatchCoordinate) async -> SourceOutcome<INaturalistResult> {
         guard let request = WaterBodySourceRequests.iNaturalist(around: coordinate),
               let data = await performRequest(request),
               let parsed = try? WaterBodySourceParsers.parseINaturalistObservations(from: data)
@@ -297,26 +354,35 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
         return .success(parsed)
     }
 
-    private func fetchUSGSGauge(
-        around coordinate: CatchCoordinate
+    func fetchUSGSGauge(
+        around coordinate: CatchCoordinate,
+        waterName: String
     ) async -> SourceOutcome<RiverGaugeReading?> {
         guard let request = WaterBodySourceRequests.usgsGauge(around: coordinate),
-              let data = await performRequest(request),
-              let parsed = try? WaterBodySourceParsers.parseUSGSGaugeReading(from: data, near: coordinate)
+              let data = await performRequest(request)
         else {
             return .failed
         }
-        return .success(parsed)
+        do {
+            let parsed = try WaterBodySourceParsers.parseUSGSGaugeReading(
+                from: data,
+                near: coordinate,
+                waterName: waterName
+            )
+            return .success(parsed)
+        } catch {
+            return .failed
+        }
     }
 
-    private func performRequest(_ request: URLRequest) async -> Data? {
+    func performRequest(_ request: URLRequest) async -> Data? {
         if case let .success(data) = await performDetailedRequest(request) {
             return data
         }
         return nil
     }
 
-    private func performDetailedRequest(_ request: URLRequest) async -> HTTPResult {
+    func performDetailedRequest(_ request: URLRequest) async -> HTTPResult {
         do {
             let (data, response) = try await loader(request)
             guard let http = response as? HTTPURLResponse else { return .failed }
@@ -332,7 +398,7 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
         }
     }
 
-    private static func reverseGeocodeRegion(at coordinate: CatchCoordinate) async -> String? {
+    static func reverseGeocodeRegion(at coordinate: CatchCoordinate) async -> String? {
         let geocoder = CLGeocoder()
         let location = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         guard let placemark = try? await geocoder.reverseGeocodeLocation(location).first else {
@@ -343,6 +409,13 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
             .filter { !$0.isEmpty }
         return parts.isEmpty ? nil : parts.joined(separator: ", ")
     }
+}
+
+private struct SourceOutcomes {
+    let access: SourceOutcome<[WaterBodyAccessPoint]>
+    let wiki: SourceOutcome<WikipediaSummaryResult?>
+    let inat: SourceOutcome<INaturalistResult>
+    let usgs: SourceOutcome<RiverGaugeReading?>
 }
 
 private enum HTTPResult {

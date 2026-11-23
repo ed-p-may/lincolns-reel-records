@@ -47,11 +47,11 @@ struct WaterBodyInfoSheet: View {
                     }
 
                     if let gauge = info.riverGauge, gauge.hasAnyMeasurement {
-                        RiverGaugeSection(gauge: gauge)
+                        RiverGaugeSection(gauge: gauge, isStale: info.isRiverGaugeStale || info.isFromOfflineCache)
                     }
 
                     if !info.accessPoints.isEmpty {
-                        WaterBodyAccessSection(accessPoints: info.accessPoints)
+                        WaterBodyAccessSection(accessPoints: info.accessPoints, onOpenURL: openInSafari)
                     }
 
                     if !info.species.isEmpty {
@@ -176,6 +176,19 @@ struct WaterBodyInfoSheet: View {
             Text("Publicly sourced info — verify local fishing regulations and access rules.")
                 .font(ReelFont.body(.caption2))
                 .foregroundStyle(ReelTheme.tertiaryText)
+
+            Button {
+                if let osmURL = URL.validatedWebURL("https://www.openstreetmap.org/copyright") {
+                    openInSafari(osmURL)
+                }
+            } label: {
+                Text("Map & ramp data © OpenStreetMap contributors (ODbL)")
+                    .font(ReelFont.metadata(.caption2))
+                    .foregroundStyle(ReelTheme.tertiaryText)
+                    .underline()
+            }
+            .buttonStyle(.plain)
+            .accessibilityIdentifier("water-sheet.osm-attribution")
         }
         .padding(.top, 4)
     }
@@ -195,7 +208,8 @@ struct WaterBodyInfoSheet: View {
     }
 
     private func openInSafari(_ url: URL) {
-        activeSafariURL = SafariDestination(url: url)
+        guard let validated = URL.validatedWebURL(url.absoluteString) else { return }
+        activeSafariURL = SafariDestination(url: validated)
     }
 }
 
@@ -215,4 +229,72 @@ private struct SafariWebView: UIViewControllerRepresentable {
     }
 
     func updateUIViewController(_: SFSafariViewController, context _: Context) {}
+}
+
+struct CachedWaterPhotoTile: View {
+    let photo: WaterBodyPhoto
+    let onOpenURL: (URL) -> Void
+
+    @State private var image: UIImage?
+    @State private var loadFailed = false
+
+    var body: some View {
+        if !loadFailed {
+            Button {
+                onOpenURL(photo.fullURL ?? photo.thumbnailURL)
+            } label: {
+                VStack(alignment: .leading, spacing: 4) {
+                    Group {
+                        if let image {
+                            Image(uiImage: image)
+                                .resizable()
+                                .scaledToFill()
+                        } else {
+                            Rectangle()
+                                .fill(ReelTheme.raisedSurface)
+                                .overlay {
+                                    ProgressView()
+                                        .tint(ReelTheme.tertiaryText)
+                                }
+                        }
+                    }
+                    .frame(width: 150, height: 100)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+
+                    Text(photo.caption)
+                        .font(ReelFont.metadata(.caption2))
+                        .foregroundStyle(ReelTheme.tertiaryText)
+                        .lineLimit(2)
+                        .frame(width: 150, alignment: .leading)
+                }
+            }
+            .buttonStyle(.plain)
+            .task(id: photo.id) {
+                await loadImage()
+            }
+        }
+    }
+
+    private func loadImage() async {
+        if let cachedData = WaterBodyInfoCache.shared.loadThumbnailData(for: photo.id) {
+            if let cachedImage = UIImage(data: cachedData) {
+                image = cachedImage
+                return
+            }
+        }
+        do {
+            let (data, response) = try await URLSession.shared.data(from: photo.thumbnailURL)
+            guard let http = response as? HTTPURLResponse,
+                  (200 ... 299).contains(http.statusCode),
+                  let loaded = UIImage(data: data)
+            else {
+                loadFailed = true
+                return
+            }
+            WaterBodyInfoCache.shared.saveThumbnailData(data, for: photo.id)
+            image = loaded
+        } catch {
+            loadFailed = true
+        }
+    }
 }

@@ -365,7 +365,7 @@ extension CatchMKMapView {
             return nil
         }
 
-        func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
+        func mapView(_: MKMapView, didSelect view: MKAnnotationView) {
             guard !isSyncingSelection, let annotation = view.annotation else { return }
             if let catchAnnotation = annotation as? CatchPinAnnotation {
                 parent.selection = .catchPin(catchAnnotation.catchItem.id)
@@ -377,7 +377,12 @@ extension CatchMKMapView {
                 if let markerView = view as? MKMarkerAnnotationView {
                     MapMarkerStyler.configureAccess(markerView, site: accessAnnotation.site, isSelected: true)
                 }
-            } else if let featureAnnotation = annotation as? MKMapFeatureAnnotation {
+            }
+        }
+
+        func mapView(_ mapView: MKMapView, didSelect annotation: any MKAnnotation) {
+            guard !isSyncingSelection else { return }
+            if let featureAnnotation = annotation as? MKMapFeatureAnnotation {
                 handleFeatureSelection(featureAnnotation, on: mapView)
             }
         }

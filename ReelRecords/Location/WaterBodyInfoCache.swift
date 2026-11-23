@@ -1,8 +1,10 @@
+import CoreLocation
 import Foundation
 
 struct WaterBodyInfoCache: Sendable {
     static let staticInfoTTL: TimeInterval = 14 * 24 * 60 * 60
     static let riverGaugeTTL: TimeInterval = 15 * 60
+    static let shared = WaterBodyInfoCache()
 
     private let directoryURL: URL
 
@@ -31,8 +33,48 @@ struct WaterBodyInfoCache: Sendable {
         encoder.dateEncodingStrategy = .iso8601
         var sanitized = info
         sanitized.isFromOfflineCache = false
+        sanitized.isRiverGaugeStale = false
         guard let data = try? encoder.encode(sanitized) else { return }
         try? data.write(to: cacheFileURL(for: info.waterID), options: [.atomic])
+    }
+
+    func saveSelection(_ selection: WaterBodySelection) {
+        let fileManager = FileManager.default
+        try? fileManager.createDirectory(at: directoryURL, withIntermediateDirectories: true)
+        var all = loadSelections()
+        all.removeAll { $0.id == selection.id }
+        all.insert(selection, at: 0)
+        let trimmed = Array(all.prefix(100))
+        guard let data = try? JSONEncoder().encode(trimmed) else { return }
+        try? data.write(to: selectionsIndexURL, options: [.atomic])
+    }
+
+    func findSelection(near coordinate: CatchCoordinate, hintName: String?) -> WaterBodySelection? {
+        let origin = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
+        let normalizedHint = hintName.map(CatchDiscovery.normalized)
+        let maxDistance: CLLocationDistance = normalizedHint == nil ? 500 : 5000
+
+        return loadSelections()
+            .compactMap { entry -> (selection: WaterBodySelection, distance: CLLocationDistance)? in
+                if let normalizedHint, CatchDiscovery.normalized(entry.name) != normalizedHint {
+                    return nil
+                }
+                let entryLoc = CLLocation(latitude: entry.coordinate.latitude, longitude: entry.coordinate.longitude)
+                let dist = entryLoc.distance(from: origin)
+                return dist <= maxDistance ? (entry, dist) : nil
+            }
+            .min { $0.distance < $1.distance }?
+            .selection
+    }
+
+    func loadThumbnailData(for photoID: String) -> Data? {
+        try? Data(contentsOf: thumbnailFileURL(for: photoID))
+    }
+
+    func saveThumbnailData(_ data: Data, for photoID: String) {
+        let dir = directoryURL.appendingPathComponent("Thumbnails", isDirectory: true)
+        try? FileManager.default.createDirectory(at: dir, withIntermediateDirectories: true)
+        try? data.write(to: thumbnailFileURL(for: photoID), options: [.atomic])
     }
 
     func isStaticFresh(_ info: WaterBodyInfo, now: Date) -> Bool {
@@ -46,13 +88,31 @@ struct WaterBodyInfoCache: Sendable {
         return age >= 0 && age < Self.riverGaugeTTL
     }
 
+    private var selectionsIndexURL: URL {
+        directoryURL.appendingPathComponent("selections-index.json", isDirectory: false)
+    }
+
+    private func loadSelections() -> [WaterBodySelection] {
+        guard let data = try? Data(contentsOf: selectionsIndexURL) else { return [] }
+        return (try? JSONDecoder().decode([WaterBodySelection].self, from: data)) ?? []
+    }
+
     private func cacheFileURL(for waterID: String) -> URL {
-        let safeName = waterID
+        directoryURL.appendingPathComponent("\(safeKey(waterID)).json", isDirectory: false)
+    }
+
+    private func thumbnailFileURL(for photoID: String) -> URL {
+        directoryURL
+            .appendingPathComponent("Thumbnails", isDirectory: true)
+            .appendingPathComponent("\(safeKey(photoID)).img", isDirectory: false)
+    }
+
+    private func safeKey(_ raw: String) -> String {
+        let safe = raw
             .lowercased()
             .replacingOccurrences(of: "[^a-z0-9_-]+", with: "_", options: .regularExpression)
             .trimmingCharacters(in: CharacterSet(charactersIn: "_"))
-        let filename = (safeName.isEmpty ? "water" : String(safeName.prefix(80))) + ".json"
-        return directoryURL.appendingPathComponent(filename, isDirectory: false)
+        return safe.isEmpty ? "water" : String(safe.prefix(80))
     }
 }
 
