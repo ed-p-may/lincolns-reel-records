@@ -1,23 +1,6 @@
 import CoreLocation
 import Foundation
 
-extension URL {
-    /// Returns a URL only when it is an absolute HTTP or HTTPS URL with a non-empty host.
-    static func validatedWebURL(_ rawString: String?) -> URL? {
-        guard let trimmed = rawString?.trimmingCharacters(in: .whitespacesAndNewlines),
-              !trimmed.isEmpty,
-              let url = URL(string: trimmed),
-              let scheme = url.scheme?.lowercased(),
-              scheme == "https" || scheme == "http",
-              let host = url.host,
-              !host.isEmpty
-        else {
-            return nil
-        }
-        return url
-    }
-}
-
 enum WaterBodyType: String, Codable, Hashable, Sendable {
     case lake
     case pond
@@ -354,29 +337,26 @@ struct LocalWaterHistory: Equatable, Sendable {
         targetLocation: CLLocation,
         proximityMeters: CLLocationDistance
     ) -> Bool {
-        var coordinateDistance: CLLocationDistance?
+        let trimmedLocation = catchItem.location?.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let normalizedCatch = CatchDiscovery.normalized(trimmedLocation)
+        let matchesByName = normalizedWaterName.count >= 3
+            && !trimmedLocation.isEmpty
+            && matchesWaterName(normalizedCatch, waterName: normalizedWaterName)
+        let isConflictingNamedWater = !trimmedLocation.isEmpty
+            && !matchesByName
+            && WaterBodyNameClassifier.isDistinctNamedWaterBody(trimmedLocation)
+
         if let coordinate = catchItem.coordinate {
             let catchLocation = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
             let distance = catchLocation.distance(from: targetLocation)
-            coordinateDistance = distance
             if distance <= proximityMeters {
-                return true
+                return !isConflictingNamedWater
             }
             if distance > conflictingCoordinateMeters {
                 return false
             }
         }
-        if normalizedWaterName.count >= 3, let rawLocation = catchItem.location {
-            let location = rawLocation.trimmingCharacters(in: .whitespacesAndNewlines)
-            if !location.isEmpty {
-                let normalizedCatch = CatchDiscovery.normalized(location)
-                if matchesWaterName(normalizedCatch, waterName: normalizedWaterName) {
-                    return true
-                }
-            }
-        }
-        _ = coordinateDistance
-        return false
+        return matchesByName
     }
 
     private static func matchesWaterName(_ catchLocation: String, waterName: String) -> Bool {
@@ -492,5 +472,18 @@ enum WaterBodyNameClassifier {
         let trimmed = normalizedValue.trimmingCharacters(in: .whitespacesAndNewlines)
         return trimmed == "water"
             || waterKeywords.contains { $0.keyword == trimmed }
+    }
+
+    /// True when a location string explicitly names a primary water body (e.g. "Goose Pond", "Lake Buel")
+    /// rather than a shore/cove spot descriptor like "Unnamed Cove" or "North Shore".
+    static func isDistinctNamedWaterBody(_ name: String) -> Bool {
+        let normalized = CatchDiscovery.normalized(name).trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !normalized.isEmpty, !isGenericWaterTerm(normalized) else { return false }
+        let padded = " \(normalized) "
+        if nonWaterKeywords.contains(where: { padded.contains(" \($0)") || normalized.hasPrefix($0) }) {
+            return false
+        }
+        let primaryKeywords = ["lake", "pond", "river", "stream", "brook", "creek", "reservoir", "bowl"]
+        return primaryKeywords.contains { padded.contains(" \($0) ") }
     }
 }

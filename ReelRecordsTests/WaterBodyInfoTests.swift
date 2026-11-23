@@ -284,11 +284,59 @@ final class WaterBodyInfoTests: XCTestCase {
                 location: "Long Pond",
                 coordinate: CatchCoordinate(latitude: 42.0, longitude: -73.0)
             ).build(),
-            CatchFixture(id: 12, species: "Pike", location: "Long Pond South Cove", coordinate: nil).build()
+            CatchFixture(
+                id: 12,
+                species: "Perch",
+                location: "Neighboring Goose Pond",
+                coordinate: stockbridgeCoord
+            ).build(),
+            CatchFixture(id: 13, species: "Pike", location: "Long Pond South Cove", coordinate: nil).build()
         ]
         let history = LocalWaterHistory.summarize(catches: catches, for: longPond)
         XCTAssertEqual(history.catchCount, 1)
         XCTAssertEqual(history.topSpecies, ["Pike"])
+    }
+}
+
+extension WaterBodyInfoTests {
+    func testClosedWayPondLongPressAndBranchGaugeRejection() throws {
+        let closedWayJSON = Data("""
+        {
+          "elements": [{
+            "type": "way", "id": 555,
+            "tags": { "natural": "water", "water": "pond", "name": "Benedict Pond" }
+          }]
+        }
+        """.utf8)
+        let pond = try XCTUnwrap(WaterBodySourceParsers.parseOverpassWaterCandidate(
+            from: closedWayJSON,
+            fallbackCoordinate: stockbridgeCoord,
+            hintName: nil
+        ))
+        XCTAssertEqual(pond.name, "Benedict Pond")
+        XCTAssertEqual(pond.waterType, .pond)
+
+        let branchJSON = Data("""
+        {
+          "value": {
+            "timeSeries": [{
+              "sourceInfo": {
+                "siteName": "EAST BRANCH HOUSATONIC RIVER AT COLTSVILLE, MA",
+                "siteCode": [{ "value": "01197000" }],
+                "geoLocation": { "geogLocation": { "latitude": 42.23, "longitude": -73.35 } }
+              },
+              "variable": { "variableCode": [{ "value": "00060" }] },
+              "values": [{ "value": [{ "value": "150", "dateTime": "2026-07-20T14:15:00.000-04:00" }] }]
+            }]
+          }
+        }
+        """.utf8)
+        let rejected = try WaterBodySourceParsers.parseUSGSGaugeReading(
+            from: branchJSON,
+            near: XCTUnwrap(CatchCoordinate(latitude: 42.23, longitude: -73.35)),
+            waterName: "Housatonic River"
+        )
+        XCTAssertNil(rejected)
     }
 }
 

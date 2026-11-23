@@ -110,7 +110,9 @@ enum WaterBodySourceRequests {
             URLQueryItem(name: "siteStatus", value: "active")
         ]
         guard let url = components.url else { return nil }
-        return politeRequest(url: url)
+        var request = politeRequest(url: url)
+        request.timeoutInterval = 8
+        return request
     }
 
     private static func overpassPost(query: String) -> URLRequest? {
@@ -195,11 +197,6 @@ enum WaterBodySourceParsers {
         let isPolygonWater = tags["natural"] == "water" || tags["landuse"] == "reservoir"
         let isLinearWaterway = tags["waterway"] == "river" || tags["waterway"] == "stream"
         guard isPolygonWater || isLinearWaterway else { return nil }
-
-        // On unlabeled long-presses, require polygon water to come from area containment (`is_in`).
-        if hint == nil, isPolygonWater, !isLinearWaterway, element.type != "area" {
-            return nil
-        }
 
         let normalizedRaw = CatchDiscovery.normalized(rawName)
         if let hint, normalizedRaw != hint {
@@ -411,17 +408,31 @@ extension WaterBodySourceParsers {
 
     private static func gaugeMatchesWater(siteName: String, waterName: String?) -> Bool {
         guard let waterName = nonEmptyTrimmed(waterName) else { return true }
-        let normalizedSite = CatchDiscovery.normalized(siteName)
         let normalizedWater = CatchDiscovery.normalized(waterName)
-        if normalizedSite.contains(normalizedWater) {
+        let normalizedSite = CatchDiscovery.normalized(siteName)
+        let waterwayPrefix = usgsWaterwayPrefix(from: normalizedSite)
+        if waterwayPrefix == normalizedWater {
             return true
         }
-        let coreTokens = normalizedWater
-            .split(whereSeparator: { !$0.isLetter && !$0.isNumber })
-            .map(String.init)
-            .filter { $0.count >= 3 && !WaterBodyNameClassifier.isGenericWaterTerm($0) }
-        guard !coreTokens.isEmpty else { return false }
-        return coreTokens.allSatisfy { normalizedSite.contains($0) }
+        // Reject branch/tributary prefixes such as "east branch housatonic river" for "housatonic river".
+        let qualifiers = ["branch", "fork", "tributary", "trib", "brook", "creek"]
+        let waterHasQualifier = qualifiers.contains { normalizedWater.contains($0) }
+        let siteHasQualifier = qualifiers.contains { waterwayPrefix.contains($0) }
+        if siteHasQualifier, !waterHasQualifier {
+            return false
+        }
+        return waterwayPrefix.hasPrefix(normalizedWater + " ") || waterwayPrefix == normalizedWater
+    }
+
+    private static func usgsWaterwayPrefix(from normalizedSiteName: String) -> String {
+        let delimiters = [" at ", " near ", " nr ", " below ", " blw ", " above ", " abv ", ","]
+        var prefix = normalizedSiteName
+        for delimiter in delimiters {
+            if let range = prefix.range(of: delimiter) {
+                prefix = String(prefix[..<range.lowerBound])
+            }
+        }
+        return prefix.trimmingCharacters(in: .whitespacesAndNewlines)
     }
 
     private static func mergeUSGSSeries(

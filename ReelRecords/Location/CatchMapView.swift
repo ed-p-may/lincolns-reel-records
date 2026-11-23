@@ -365,6 +365,33 @@ private extension CatchMapView {
         noticeDismissTask?.cancel()
         waterLookupNotice = nil
 
+        // Show local history & cached guide immediately for known/recognizable waters.
+        let instantSelection: WaterBodySelection? = if let cached = waterBodyInfoProvider.cachedSelection(
+            near: coordinate,
+            hintName: hintName
+        ) {
+            cached
+        } else if let hintName, WaterBodyNameClassifier.looksLikeWaterName(hintName) {
+            WaterBodySelection(
+                id: WaterBodySelection.canonicalID(name: hintName, coordinate: coordinate),
+                name: hintName,
+                waterType: WaterBodyNameClassifier.classify(name: hintName),
+                coordinate: coordinate,
+                regionSubtitle: nil,
+                wikipediaTag: nil
+            )
+        } else {
+            nil
+        }
+
+        if let instantSelection {
+            selection = nil
+            selectedWaterBody = instantSelection
+            waterBodyInfo = waterBodyInfoProvider.cachedInfo(for: instantSelection)
+            isLoadingWaterInfo = true
+            isWaterInfoOffline = false
+        }
+
         waterResolveTask = Task { @MainActor in
             let resolved = try? await waterBodyInfoProvider.resolveWaterBody(
                 at: coordinate,
@@ -373,6 +400,10 @@ private extension CatchMapView {
             guard !Task.isCancelled else { return }
 
             guard let resolved else {
+                if instantSelection != nil {
+                    selectedWaterBody = nil
+                    clearWaterBodyState()
+                }
                 if showNotFoundNotice {
                     showTemporaryWaterNotice("No named body of water found here")
                 }

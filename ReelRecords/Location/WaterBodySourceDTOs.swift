@@ -1,5 +1,22 @@
 import Foundation
 
+extension URL {
+    /// Returns a URL only when it is an absolute HTTP or HTTPS URL with a non-empty host.
+    static func validatedWebURL(_ rawString: String?) -> URL? {
+        guard let trimmed = rawString?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !trimmed.isEmpty,
+              let url = URL(string: trimmed),
+              let scheme = url.scheme?.lowercased(),
+              scheme == "https" || scheme == "http",
+              let host = url.host,
+              !host.isEmpty
+        else {
+            return nil
+        }
+        return url
+    }
+}
+
 struct OverpassResponse: Decodable {
     let elements: [OverpassElement]
 }
@@ -154,4 +171,43 @@ struct USGSValueSet: Decodable {
 struct USGSMeasurement: Decodable {
     let value: String
     let dateTime: String?
+}
+
+enum OverpassLookupOutcome {
+    case found(OverpassWaterCandidate)
+    case confirmedEmpty
+    case failed
+}
+
+struct SourceOutcomes {
+    let access: SourceOutcome<[WaterBodyAccessPoint]>
+    let wiki: SourceOutcome<WikipediaSummaryResult?>
+    let inat: SourceOutcome<INaturalistResult>
+    let usgs: SourceOutcome<RiverGaugeReading?>
+}
+
+enum HTTPResult {
+    case success(Data)
+    case notFound
+    case failed
+}
+
+enum SourceOutcome<Value: Sendable>: Sendable {
+    case success(Value)
+    case failed
+    case skipped
+
+    var didSucceed: Bool {
+        if case .success = self {
+            return true
+        }
+        return false
+    }
+
+    var value: Value? {
+        if case let .success(val) = self {
+            return val
+        }
+        return nil
+    }
 }

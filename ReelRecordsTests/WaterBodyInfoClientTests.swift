@@ -133,6 +133,28 @@ final class WaterBodyInfoClientTests: XCTestCase {
         XCTAssertEqual(reopened?.id, selection.id)
     }
 
+    func testConfirmedEmptyOverpassDoesNotReturnCachedPond() async throws {
+        let cacheDir = makeTempCacheDir()
+        defer { try? FileManager.default.removeItem(at: cacheDir) }
+        let cache = WaterBodyInfoCache(directoryURL: cacheDir)
+        cache.saveSelection(stockbridgeSelection)
+
+        let confirmedDryClient = WaterBodyInfoClient(
+            loader: { request in
+                let response = HTTPURLResponse(
+                    url: request.url!,
+                    statusCode: 200,
+                    httpVersion: nil,
+                    headerFields: nil
+                )!
+                return (Data(#"{"elements":[]}"#.utf8), response)
+            },
+            cache: cache
+        )
+        let confirmedDry = try await confirmedDryClient.resolveWaterBody(at: stockbridgeCoord, hintName: nil)
+        XCTAssertNil(confirmedDry)
+    }
+
     func testResolveWaterBodyRejectsNonWaterAndSharesCanonicalCacheKeyOffline() async throws {
         let cacheDir = makeTempCacheDir()
         defer { try? FileManager.default.removeItem(at: cacheDir) }

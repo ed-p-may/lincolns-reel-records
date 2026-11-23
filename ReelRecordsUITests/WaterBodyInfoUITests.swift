@@ -22,10 +22,12 @@ final class WaterBodyInfoUITests: XCTestCase {
         let map = app.maps.firstMatch
         XCTAssertTrue(map.waitForExistence(timeout: 5))
 
-        // Verify catch-pin selection still works before opening water info.
-        let troutChip = app.buttons["map.species.Rainbow Trout"]
-        XCTAssertTrue(troutChip.waitForExistence(timeout: 3))
-        troutChip.tap()
+        // Verify tapping a real catch pin on the map selects it before opening water info.
+        let troutMarker = map.descendants(matching: .any)
+            .matching(NSPredicate(format: "label CONTAINS %@", "Rainbow Trout"))
+            .firstMatch
+        XCTAssertTrue(troutMarker.waitForExistence(timeout: 5))
+        troutMarker.tap()
         let selectedCatch = app.buttons["map.selected-catch"]
         XCTAssertTrue(selectedCatch.waitForExistence(timeout: 3))
 

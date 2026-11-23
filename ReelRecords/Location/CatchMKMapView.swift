@@ -435,7 +435,6 @@ extension CatchMKMapView.Coordinator {
         ) else {
             return
         }
-        parent.selection = nil
         mapView.deselectAnnotation(annotation, animated: false)
         parent.onSelectMapFeature?(title, coord)
     }

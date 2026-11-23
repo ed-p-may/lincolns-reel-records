@@ -264,7 +264,7 @@ struct CachedWaterPhotoTile: View {
                     Text(photo.caption)
                         .font(ReelFont.metadata(.caption2))
                         .foregroundStyle(ReelTheme.tertiaryText)
-                        .lineLimit(2)
+                        .fixedSize(horizontal: false, vertical: true)
                         .frame(width: 150, alignment: .leading)
                 }
             }

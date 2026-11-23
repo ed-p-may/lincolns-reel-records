@@ -52,7 +52,7 @@ struct WaterBodyInfoCache: Sendable {
     func findSelection(near coordinate: CatchCoordinate, hintName: String?) -> WaterBodySelection? {
         let origin = CLLocation(latitude: coordinate.latitude, longitude: coordinate.longitude)
         let normalizedHint = hintName.map(CatchDiscovery.normalized)
-        let maxDistance: CLLocationDistance = normalizedHint == nil ? 500 : 5000
+        let maxDistance: CLLocationDistance = normalizedHint == nil ? 150 : 5000
 
         return loadSelections()
             .compactMap { entry -> (selection: WaterBodySelection, distance: CLLocationDistance)? in

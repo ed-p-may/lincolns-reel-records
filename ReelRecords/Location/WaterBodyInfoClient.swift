@@ -7,6 +7,11 @@ enum WaterBodyInfoError: Error, Equatable, Sendable {
 }
 
 protocol WaterBodyInfoProviding: Sendable {
+    func cachedSelection(
+        near coordinate: CatchCoordinate,
+        hintName: String?
+    ) -> WaterBodySelection?
+
     func resolveWaterBody(
         at coordinate: CatchCoordinate,
         hintName: String?
@@ -21,6 +26,13 @@ protocol WaterBodyInfoProviding: Sendable {
 }
 
 extension WaterBodyInfoProviding {
+    func cachedSelection(
+        near _: CatchCoordinate,
+        hintName _: String?
+    ) -> WaterBodySelection? {
+        nil
+    }
+
     func fetchInfo(for selection: WaterBodySelection) async throws -> WaterBodyInfo {
         try await fetchInfo(for: selection, forceRefresh: false)
     }
@@ -66,6 +78,15 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
         self.regionResolver = regionResolver
     }
 
+    func cachedSelection(
+        near coordinate: CatchCoordinate,
+        hintName: String?
+    ) -> WaterBodySelection? {
+        let trimmedHint = hintName?.trimmingCharacters(in: .whitespacesAndNewlines)
+        let nonEmptyHint = trimmedHint?.isEmpty == false ? trimmedHint : nil
+        return cache.findSelection(near: coordinate, hintName: nonEmptyHint)
+    }
+
     func resolveWaterBody(
         at coordinate: CatchCoordinate,
         hintName: String?
@@ -74,44 +95,32 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
         let nonEmptyHint = trimmedHint?.isEmpty == false ? trimmedHint : nil
 
         if let nonEmptyHint, !WaterBodyNameClassifier.looksLikeWaterName(nonEmptyHint) {
-            if let resolved = await resolveNonKeywordHint(nonEmptyHint, at: coordinate) {
-                cache.saveSelection(resolved)
-                return resolved
-            }
-            return cache.findSelection(near: coordinate, hintName: nonEmptyHint)
+            return await resolveNonKeyword(hint: nonEmptyHint, at: coordinate)
         }
 
         async let regionSubtitle = regionResolver(coordinate)
 
-        if let candidate = await fetchOverpassWaterCandidate(at: coordinate, hintName: nonEmptyHint) {
+        switch await fetchOverpassWaterCandidate(at: coordinate, hintName: nonEmptyHint) {
+        case let .found(candidate):
             let resolved = await selection(from: candidate, regionSubtitle: regionSubtitle)
             cache.saveSelection(resolved)
             return resolved
+        case .confirmedEmpty:
+            return await hintFallback(nonEmptyHint, at: coordinate, regionSubtitle: regionSubtitle)
+        case .failed:
+            if let cachedSelection = cache.findSelection(near: coordinate, hintName: nonEmptyHint) {
+                return cachedSelection
+            }
+            return await hintFallback(nonEmptyHint, at: coordinate, regionSubtitle: regionSubtitle)
         }
-
-        if let cachedSelection = cache.findSelection(near: coordinate, hintName: nonEmptyHint) {
-            return cachedSelection
-        }
-
-        if let nonEmptyHint, WaterBodyNameClassifier.looksLikeWaterName(nonEmptyHint) {
-            let fallback = await WaterBodySelection(
-                id: WaterBodySelection.canonicalID(name: nonEmptyHint, coordinate: coordinate),
-                name: nonEmptyHint,
-                waterType: WaterBodyNameClassifier.classify(name: nonEmptyHint),
-                coordinate: coordinate,
-                regionSubtitle: regionSubtitle,
-                wikipediaTag: nil
-            )
-            cache.saveSelection(fallback)
-            return fallback
-        }
-        return nil
     }
 
     func cachedInfo(for selection: WaterBodySelection) -> WaterBodyInfo? {
         guard var cached = cache.load(waterID: selection.id) else { return nil }
-        if cached.riverGauge != nil, !cache.isGaugeFresh(cached, now: now()) {
-            cached.isRiverGaugeStale = true
+        let currentDate = now()
+        if let gauge = cached.riverGauge {
+            let fetchStale = !cache.isGaugeFresh(cached, now: currentDate)
+            cached.isRiverGaugeStale = fetchStale || Self.isGaugeReadingOld(gauge, now: currentDate)
         }
         return cached
     }
@@ -132,17 +141,43 @@ struct WaterBodyInfoClient: WaterBodyInfoProviding, Sendable {
 }
 
 private extension WaterBodyInfoClient {
-    func resolveNonKeywordHint(
-        _ hint: String,
-        at coordinate: CatchCoordinate
-    ) async -> WaterBodySelection? {
-        guard let candidate = await fetchOverpassWaterCandidate(at: coordinate, hintName: hint),
-              CatchDiscovery.normalized(candidate.name) == CatchDiscovery.normalized(hint)
-        else {
+    private static let maxLiveGaugeObservationAge: TimeInterval = 2 * 60 * 60
+
+    static func isGaugeReadingOld(_ gauge: RiverGaugeReading, now currentDate: Date) -> Bool {
+        guard let observedAt = gauge.observedAt else { return true }
+        return currentDate.timeIntervalSince(observedAt) > maxLiveGaugeObservationAge
+    }
+
+    func resolveNonKeyword(hint: String, at coordinate: CatchCoordinate) async -> WaterBodySelection? {
+        switch await fetchOverpassWaterCandidate(at: coordinate, hintName: hint) {
+        case let .found(candidate)
+            where CatchDiscovery.normalized(candidate.name) == CatchDiscovery.normalized(hint):
+            let resolved = await selection(from: candidate, regionSubtitle: regionResolver(coordinate))
+            cache.saveSelection(resolved)
+            return resolved
+        case .found, .confirmedEmpty:
             return nil
+        case .failed:
+            return cache.findSelection(near: coordinate, hintName: hint)
         }
-        let region = await regionResolver(candidate.coordinate)
-        return selection(from: candidate, regionSubtitle: region)
+    }
+
+    func hintFallback(
+        _ hint: String?,
+        at coordinate: CatchCoordinate,
+        regionSubtitle: String?
+    ) -> WaterBodySelection? {
+        guard let hint, WaterBodyNameClassifier.looksLikeWaterName(hint) else { return nil }
+        let fallback = WaterBodySelection(
+            id: WaterBodySelection.canonicalID(name: hint, coordinate: coordinate),
+            name: hint,
+            waterType: WaterBodyNameClassifier.classify(name: hint),
+            coordinate: coordinate,
+            regionSubtitle: regionSubtitle,
+            wikipediaTag: nil
+        )
+        cache.saveSelection(fallback)
+        return fallback
     }
 
     func selection(
@@ -191,7 +226,7 @@ private extension WaterBodyInfoClient {
             fetchedAt: cached.fetchedAt,
             gaugeFetchedAt: currentDate,
             isFromOfflineCache: false,
-            isRiverGaugeStale: false
+            isRiverGaugeStale: gauge.map { Self.isGaugeReadingOld($0, now: currentDate) } ?? false
         )
         cache.save(updated)
         return updated
@@ -248,9 +283,20 @@ private extension WaterBodyInfoClient {
         let riverGauge = outcomes.usgs.didSucceed ? (outcomes.usgs.value ?? nil) : cached?.riverGauge
         let gaugeFetchedAt = outcomes.usgs.didSucceed ? currentDate : cached?.gaugeFetchedAt
         let wasGaugeFresh = cached.map { cache.isGaugeFresh($0, now: currentDate) } ?? false
-        let isGaugeStale = riverGauge != nil && !outcomes.usgs.didSucceed && !wasGaugeFresh
+        let isGaugeStale = riverGauge.map { gauge in
+            let fetchStale = !outcomes.usgs.didSucceed && !wasGaugeFresh
+            return fetchStale || Self.isGaugeReadingOld(gauge, now: currentDate)
+        } ?? false
         let allStaticSucceeded = outcomes.access.didSucceed && outcomes.wiki.didSucceed && outcomes.inat.didSucceed
-        let fetchedAt = (allStaticSucceeded || cached == nil) ? currentDate : (cached?.fetchedAt ?? currentDate)
+        // If an initial fetch had partial failures, backdate so failed sources retry after 5 minutes.
+        let retrySoonDate = currentDate.addingTimeInterval(-(WaterBodyInfoCache.staticInfoTTL - 300))
+        let fetchedAt: Date = if allStaticSucceeded {
+            currentDate
+        } else if let cached {
+            cached.fetchedAt
+        } else {
+            retrySoonDate
+        }
 
         return WaterBodyInfo(
             waterID: selection.id,
@@ -274,17 +320,24 @@ private extension WaterBodyInfoClient {
     func fetchOverpassWaterCandidate(
         at coordinate: CatchCoordinate,
         hintName: String?
-    ) async -> OverpassWaterCandidate? {
+    ) async -> OverpassLookupOutcome {
         guard let request = WaterBodySourceRequests.overpassResolve(at: coordinate),
               let data = await performRequest(request)
         else {
-            return nil
+            return .failed
         }
-        return try? WaterBodySourceParsers.parseOverpassWaterCandidate(
-            from: data,
-            fallbackCoordinate: coordinate,
-            hintName: hintName
-        )
+        do {
+            if let candidate = try WaterBodySourceParsers.parseOverpassWaterCandidate(
+                from: data,
+                fallbackCoordinate: coordinate,
+                hintName: hintName
+            ) {
+                return .found(candidate)
+            }
+            return .confirmedEmpty
+        } catch {
+            return .failed
+        }
     }
 
     func fetchAccessPoints(around coordinate: CatchCoordinate) async -> SourceOutcome<[WaterBodyAccessPoint]> {
@@ -408,38 +461,5 @@ private extension WaterBodyInfoClient {
             .compactMap { $0?.trimmingCharacters(in: .whitespacesAndNewlines) }
             .filter { !$0.isEmpty }
         return parts.isEmpty ? nil : parts.joined(separator: ", ")
-    }
-}
-
-private struct SourceOutcomes {
-    let access: SourceOutcome<[WaterBodyAccessPoint]>
-    let wiki: SourceOutcome<WikipediaSummaryResult?>
-    let inat: SourceOutcome<INaturalistResult>
-    let usgs: SourceOutcome<RiverGaugeReading?>
-}
-
-private enum HTTPResult {
-    case success(Data)
-    case notFound
-    case failed
-}
-
-private enum SourceOutcome<Value: Sendable>: Sendable {
-    case success(Value)
-    case failed
-    case skipped
-
-    var didSucceed: Bool {
-        if case .success = self {
-            return true
-        }
-        return false
-    }
-
-    var value: Value? {
-        if case let .success(val) = self {
-            return val
-        }
-        return nil
     }
 }

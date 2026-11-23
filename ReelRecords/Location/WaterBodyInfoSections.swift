@@ -17,20 +17,7 @@ struct WaterBodyHeaderView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
             HStack(alignment: .top, spacing: 12) {
-                if let thumbURL = info?.heroThumbnailURL {
-                    AsyncImage(url: thumbURL) { phase in
-                        switch phase {
-                        case let .success(image):
-                            image.resizable().scaledToFill()
-                        default:
-                            waterIconBadge
-                        }
-                    }
-                    .frame(width: 52, height: 52)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                } else {
-                    waterIconBadge
-                }
+                waterIconBadge
 
                 VStack(alignment: .leading, spacing: 3) {
                     Text(selection.name)
@@ -280,7 +267,11 @@ struct WaterBodyAccessSection: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            waterSectionHeader("BOAT RAMPS & ACCESS · OPENSTREETMAP", icon: "sailboat.fill", tint: ReelTheme.accessPin)
+            waterSectionHeader(
+                "NEARBY BOAT RAMPS (2.5 KM) · OPENSTREETMAP",
+                icon: "sailboat.fill",
+                tint: ReelTheme.accessPin
+            )
             ForEach(accessPoints) { point in
                 HStack(spacing: 10) {
                     VStack(alignment: .leading, spacing: 2) {
