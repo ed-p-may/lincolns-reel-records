@@ -117,7 +117,8 @@ final class SwiftDataCatchRepository {
         id: UUID,
         ownerID: UUID,
         values proposedValues: CatchValues,
-        expectedValues: CatchValues? = nil
+        expectedValues: CatchValues? = nil,
+        allowTimestampNormalization: Bool = false
     ) throws -> CatchItem {
         guard let record = try record(id: id, ownerID: ownerID) else {
             throw CatchRepositoryError.missingCatch(id)
@@ -126,7 +127,8 @@ final class SwiftDataCatchRepository {
             record: record,
             ownerID: ownerID,
             proposedValues: proposedValues,
-            expectedValues: expectedValues
+            expectedValues: expectedValues,
+            allowTimestampNormalization: allowTimestampNormalization
         )
     }
 
@@ -134,7 +136,8 @@ final class SwiftDataCatchRepository {
         record: CatchRecord,
         ownerID: UUID,
         proposedValues: CatchValues,
-        expectedValues: CatchValues? = nil
+        expectedValues: CatchValues? = nil,
+        allowTimestampNormalization: Bool = false
     ) throws -> CatchItem {
         let id = record.id
         guard record.deletedAt == nil else { throw CatchRepositoryError.deletedCatch(id) }
@@ -143,25 +146,15 @@ final class SwiftDataCatchRepository {
         if let expectedValues {
             let normalizedExpected = try validated(expectedValues)
             guard values != normalizedExpected else { return record.item }
-            guard record.values.hasSameMutationPayload(as: normalizedExpected) else {
+            guard Self.matchesExpected(
+                record.item,
+                expectedValues: expectedValues,
+                allowTimestampNormalization: allowTimestampNormalization
+            ) else {
                 throw CatchRepositoryError.concurrentChange(id)
             }
-            if values.caughtAt == normalizedExpected.caughtAt {
-                values = CatchValues(
-                    species: values.species,
-                    weight: values.weight,
-                    length: values.length,
-                    caughtAt: record.caughtAt,
-                    location: values.location,
-                    coordinate: values.coordinate,
-                    conditions: values.conditions,
-                    tackleItemID: values.tackleItemID,
-                    lureText: values.lureText,
-                    rodReel: values.rodReel,
-                    notes: values.notes,
-                    released: values.released,
-                    bookmarked: values.bookmarked
-                )
+            if values.caughtAt == expectedValues.caughtAt {
+                values = values.withCaughtAt(record.caughtAt)
             }
         }
         guard values != record.values else { return record.item }
@@ -348,28 +341,6 @@ final class SwiftDataCatchRepository {
 extension SwiftDataCatchRepository {
     func normalizedValues(_ proposedValues: CatchValues) throws -> CatchValues {
         try validated(proposedValues)
-    }
-
-    func verifyActive(id: UUID, ownerID: UUID) throws {
-        guard let record = try record(id: id, ownerID: ownerID) else {
-            throw CatchRepositoryError.missingCatch(id)
-        }
-        guard record.deletedAt == nil else {
-            throw CatchRepositoryError.deletedCatch(id)
-        }
-    }
-
-    func verifyUnchanged(id: UUID, ownerID: UUID, expectedValues: CatchValues) throws {
-        guard let record = try record(id: id, ownerID: ownerID) else {
-            throw CatchRepositoryError.missingCatch(id)
-        }
-        guard record.deletedAt == nil else {
-            throw CatchRepositoryError.deletedCatch(id)
-        }
-        let normalizedExpected = try validated(expectedValues)
-        guard record.values.hasSameMutationPayload(as: normalizedExpected) else {
-            throw CatchRepositoryError.concurrentChange(id)
-        }
     }
 }
 

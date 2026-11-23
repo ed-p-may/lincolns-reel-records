@@ -116,7 +116,8 @@ enum CatchEditSave {
             try request.catchRepository.verifyUnchanged(
                 id: catchID,
                 ownerID: request.ownerID,
-                expectedValues: plan.normalizedOpening
+                expectedValues: plan.snapshot.catchItem.values,
+                allowTimestampNormalization: plan.snapshot.catchItem.syncState != .synced
             )
         } else {
             try request.catchRepository.verifyActive(id: catchID, ownerID: request.ownerID)
@@ -142,7 +143,8 @@ enum CatchEditSave {
                 id: catchID,
                 ownerID: request.ownerID,
                 values: plan.normalizedSubmitted,
-                expectedValues: plan.normalizedOpening
+                expectedValues: plan.snapshot.catchItem.values,
+                allowTimestampNormalization: plan.snapshot.catchItem.syncState != .synced
             )
         }
 
@@ -173,5 +175,70 @@ enum CatchEditSave {
             return !draftPhotos.isEmpty || orderedPhotoIDs != openingPhotos.map(\.id)
         }
         return !draftPhotos.isEmpty || !orderedPhotoIDs.isEmpty
+    }
+}
+
+extension SwiftDataCatchRepository {
+    func verifyActive(id: UUID, ownerID: UUID) throws {
+        guard let item = try item(id: id, ownerID: ownerID) else {
+            throw CatchRepositoryError.missingCatch(id)
+        }
+        guard item.deletedAt == nil else {
+            throw CatchRepositoryError.deletedCatch(id)
+        }
+    }
+
+    func verifyUnchanged(
+        id: UUID,
+        ownerID: UUID,
+        expectedValues: CatchValues,
+        allowTimestampNormalization: Bool = false
+    ) throws {
+        guard let item = try item(id: id, ownerID: ownerID) else {
+            throw CatchRepositoryError.missingCatch(id)
+        }
+        guard item.deletedAt == nil else {
+            throw CatchRepositoryError.deletedCatch(id)
+        }
+        guard Self.matchesExpected(
+            item,
+            expectedValues: expectedValues,
+            allowTimestampNormalization: allowTimestampNormalization
+        ) else {
+            throw CatchRepositoryError.concurrentChange(id)
+        }
+    }
+
+    static func matchesExpected(
+        _ item: CatchItem,
+        expectedValues: CatchValues,
+        allowTimestampNormalization: Bool
+    ) -> Bool {
+        if item.values == expectedValues {
+            return true
+        }
+        return allowTimestampNormalization
+            && item.syncState == .synced
+            && item.values.hasSameMutationPayload(as: expectedValues)
+    }
+}
+
+extension CatchValues {
+    func withCaughtAt(_ newCaughtAt: Date) -> CatchValues {
+        CatchValues(
+            species: species,
+            weight: weight,
+            length: length,
+            caughtAt: newCaughtAt,
+            location: location,
+            coordinate: coordinate,
+            conditions: conditions,
+            tackleItemID: tackleItemID,
+            lureText: lureText,
+            rodReel: rodReel,
+            notes: notes,
+            released: released,
+            bookmarked: bookmarked
+        )
     }
 }

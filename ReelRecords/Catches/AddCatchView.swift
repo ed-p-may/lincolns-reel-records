@@ -334,10 +334,8 @@ private extension AddCatchView {
             }
         } catch let saveError as CatchEditSaveError {
             if case let .photosFailed(savedCatch, _) = saveError, let savedCatch {
-                editSnapshot = CatchEditSnapshot(
-                    catchItem: savedCatch,
-                    photos: editSnapshot?.photos ?? []
-                )
+                editSnapshot = CatchEditSnapshot(catchItem: savedCatch, photos: editSnapshot?.photos ?? [])
+                caughtAt = savedCatch.caughtAt
                 hasPendingSyncFromEarlierSave = true
                 notifySaved()
             }
