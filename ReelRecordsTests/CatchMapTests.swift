@@ -89,6 +89,28 @@ final class CatchMapTests: XCTestCase {
         XCTAssertEqual(CatchMapFilter.speciesChipIdentifier(for: "all"), "map.species.option.all")
     }
 
+    func testFittingRegionFramesSingleAndMultiplePinnedCatches() throws {
+        XCTAssertNil(CatchMapFilter.fittingRegion(for: []))
+
+        let bass = catchItem(id: 1, species: "Bass", latitude: 42.31, longitude: -73.32)
+        let single = try XCTUnwrap(CatchMapFilter.fittingRegion(for: [bass]))
+        XCTAssertEqual(single.center.latitude, 42.31, accuracy: 0.0001)
+        XCTAssertEqual(single.center.longitude, -73.32, accuracy: 0.0001)
+        XCTAssertEqual(single.span.latitudeDelta, 0.035, accuracy: 0.0001)
+
+        let trout = catchItem(id: 2, species: "Trout", latitude: 42.19, longitude: -73.35)
+        let pair = try XCTUnwrap(CatchMapFilter.fittingRegion(for: [bass, trout]))
+        XCTAssertEqual(pair.center.latitude, 42.25, accuracy: 0.0001)
+        XCTAssertGreaterThan(pair.span.latitudeDelta, 0.12)
+        XCTAssertLessThan(pair.span.latitudeDelta, 0.5)
+
+        let eastOfDateLine = catchItem(id: 3, species: "Tuna", latitude: 10.0, longitude: 179.9)
+        let westOfDateLine = catchItem(id: 4, species: "Tuna", latitude: 10.0, longitude: -179.9)
+        let antimeridian = try XCTUnwrap(CatchMapFilter.fittingRegion(for: [eastOfDateLine, westOfDateLine]))
+        XCTAssertLessThan(antimeridian.span.longitudeDelta, 1.0)
+        XCTAssertGreaterThan(abs(antimeridian.center.longitude), 179.0)
+    }
+
     func testCountSummaryFormatsFilteredAndUnfilteredCounts() {
         XCTAssertEqual(
             CatchMapFilter.countSummary(filteredCount: 2, totalCount: 2, spotCount: 2, isFiltered: false),

@@ -143,6 +143,12 @@ _As an angler, I want to filter map pins by species and switch between standard,
 - Species chips derived from pinned catches filter map markers and update header counts when 2+ species are pinned.
 - Map style (`Standard`, `Hybrid`, `Satellite`) persists across launches and applies to both Catch Map and Manual Location Picker.
 
+**D4 · Browse MA public boat and fishing access sites (P1)**
+_As an angler, I want to see official Massachusetts boat ramps, kayak launches, and shore access points on the map._
+- Toggleable layer in Map Layers (off by default, persisted) renders 282 bundled MassGIS OFBA sites offline without changing catch or spot counts.
+- Tapping an access site opens a detail card with facility types, ramp surface, parking, notes, and Apple Maps directions.
+- The live map remains browsable even when 0 catches are pinned.
+
 ## Epic E — Account, data & settings
 
 **E1 · Get into the app (P0)**

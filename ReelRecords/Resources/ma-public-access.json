@@ -1,0 +1,5664 @@
+{
+  "source": "MassGIS / MA Office of Fishing and Boating Access (OFBA)",
+  "state": "MA",
+  "fetchedAt": "2026-11-22",
+  "sites": [
+    {
+      "id": "MA-1",
+      "ofbaId": "1",
+      "name": "Monponsett Pond",
+      "town": "Halifax",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "22 Trailer - 10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Halifax",
+      "latitude": 42.006436,
+      "longitude": -70.84125
+    },
+    {
+      "id": "MA-10",
+      "ofbaId": "10",
+      "name": "Long Pond",
+      "town": "Plymouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B",
+        "F"
+      ],
+      "rampType": "Concrete",
+      "parking": "29 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": true,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 41.865739,
+      "longitude": -70.609125
+    },
+    {
+      "id": "MA-100",
+      "ofbaId": "100",
+      "name": "Ashumet Pond",
+      "town": "Falmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "28 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 41.634082,
+      "longitude": -70.540638
+    },
+    {
+      "id": "MA-101",
+      "ofbaId": "101",
+      "name": "Baker Pond",
+      "town": "Orleans",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 41.766432,
+      "longitude": -70.001018
+    },
+    {
+      "id": "MA-102",
+      "ofbaId": "102",
+      "name": "Bass River",
+      "town": "Yarmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A",
+        "E"
+      ],
+      "rampType": "Concrete",
+      "parking": "68 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": true,
+      "comments": "General Access & Fishing Pier",
+      "maintainer": "Town Of Yarmouth",
+      "latitude": 41.645418,
+      "longitude": -70.197951
+    },
+    {
+      "id": "MA-103",
+      "ofbaId": "103",
+      "name": "Clarks Cove",
+      "town": "New Bedford",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "22 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of New Bedford",
+      "latitude": 41.603566,
+      "longitude": -70.914935
+    },
+    {
+      "id": "MA-104",
+      "ofbaId": "104",
+      "name": "Little Cliff Pond",
+      "town": "Brewster",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "4 Trailer - 6 Car",
+      "lanes": 1,
+      "fee": "Yes",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 41.759967,
+      "longitude": -70.017901
+    },
+    {
+      "id": "MA-105",
+      "ofbaId": "105",
+      "name": "Green Pond",
+      "town": "Falmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "18 Trailer",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Moderate Draft",
+      "maintainer": "Town Of Barnstable",
+      "latitude": 41.552513,
+      "longitude": -70.568585
+    },
+    {
+      "id": "MA-106",
+      "ofbaId": "106",
+      "name": "Hither Creek",
+      "town": "Nantucket",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "4 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "Town Of Nantucket",
+      "latitude": 41.274524,
+      "longitude": -70.197129
+    },
+    {
+      "id": "MA-107",
+      "ofbaId": "107",
+      "name": "Johns Pond",
+      "town": "Mashpee",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 41.633879,
+      "longitude": -70.524613
+    },
+    {
+      "id": "MA-108",
+      "ofbaId": "108",
+      "name": "Katama Bay",
+      "town": "Edgartown",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "28 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "Town Of Edgartown",
+      "latitude": 41.352834,
+      "longitude": -70.499267
+    },
+    {
+      "id": "MA-109",
+      "ofbaId": "109",
+      "name": "Lagoon Pond",
+      "town": "Tisbury",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "24 Trailer",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Moderate Draft",
+      "maintainer": "Town Of Tisbury",
+      "latitude": 41.456188,
+      "longitude": -70.58957
+    },
+    {
+      "id": "MA-11",
+      "ofbaId": "11",
+      "name": "Great Herring Pond",
+      "town": "Bourne",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 41.786481,
+      "longitude": -70.564008
+    },
+    {
+      "id": "MA-110",
+      "ofbaId": "110",
+      "name": "Lovells Pond",
+      "town": "Barnstable",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Barnstable",
+      "latitude": 41.648928,
+      "longitude": -70.445333
+    },
+    {
+      "id": "MA-111",
+      "ofbaId": "111",
+      "name": "Mashpee/wakeby Pond",
+      "town": "Mashpee",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "44 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "Town Of Mashpee",
+      "latitude": 41.652162,
+      "longitude": -70.481796
+    },
+    {
+      "id": "MA-112",
+      "ofbaId": "112",
+      "name": "New Bedford Harbor",
+      "town": "New Bedford",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "30 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of New Bedford",
+      "latitude": 41.611344,
+      "longitude": -70.906518
+    },
+    {
+      "id": "MA-113",
+      "ofbaId": "113",
+      "name": "Pamet River",
+      "town": "Truro",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "30 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Truro",
+      "latitude": 41.991398,
+      "longitude": -70.072068
+    },
+    {
+      "id": "MA-114",
+      "ofbaId": "114",
+      "name": "Acushnet River Basin (Pease Park)",
+      "town": "Fairhaven",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "30 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Fairhaven",
+      "latitude": 41.638917,
+      "longitude": -70.906893
+    },
+    {
+      "id": "MA-115",
+      "ofbaId": "115",
+      "name": "Peters Pond",
+      "town": "Sandwich",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "14 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "Town Of Sandwich",
+      "latitude": 41.685354,
+      "longitude": -70.485293
+    },
+    {
+      "id": "MA-116",
+      "ofbaId": "116",
+      "name": "Rock Harbor",
+      "town": "Eastham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "35 Trailer - 17 Car",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "1/2 Tide Ramp-Shallow Draft Boats",
+      "maintainer": "Town Of Eastham",
+      "latitude": 41.80065,
+      "longitude": -70.006602
+    },
+    {
+      "id": "MA-117",
+      "ofbaId": "117",
+      "name": "Saquatucket Harbor",
+      "town": "Harwich",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "63 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Harwich",
+      "latitude": 41.669466,
+      "longitude": -70.057952
+    },
+    {
+      "id": "MA-118",
+      "ofbaId": "118",
+      "name": "Nasketucket Bay (Sconticut Neck)",
+      "town": "Fairhaven",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "38 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Moderate Draft",
+      "maintainer": "Town Of Fairhaven",
+      "latitude": 41.620007,
+      "longitude": -70.855521
+    },
+    {
+      "id": "MA-119",
+      "ofbaId": "119",
+      "name": "Sesuit Harbor",
+      "town": "Dennis",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "74  Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Dennis",
+      "latitude": 41.753581,
+      "longitude": -70.151206
+    },
+    {
+      "id": "MA-12",
+      "ofbaId": "12",
+      "name": "Weweantic River",
+      "town": "Wareham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "24 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "MASSDOT",
+      "latitude": 41.749294,
+      "longitude": -70.74607
+    },
+    {
+      "id": "MA-120",
+      "ofbaId": "120",
+      "name": "Sheep Pond",
+      "town": "Brewster",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "15 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "Town Of Brewster",
+      "latitude": 41.733266,
+      "longitude": -70.079261
+    },
+    {
+      "id": "MA-121",
+      "ofbaId": "121",
+      "name": "Shubael Pond",
+      "town": "Barnstable",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "Town Of Barnstable",
+      "latitude": 41.67422,
+      "longitude": -70.394968
+    },
+    {
+      "id": "MA-122",
+      "ofbaId": "122",
+      "name": "Westport River",
+      "town": "Westport",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "60 Trailer",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Westport",
+      "latitude": 41.514702,
+      "longitude": -71.068065
+    },
+    {
+      "id": "MA-123",
+      "ofbaId": "123",
+      "name": "Merrimack River",
+      "town": "Haverhill",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Haverhill",
+      "latitude": 42.772745,
+      "longitude": -71.0724
+    },
+    {
+      "id": "MA-124",
+      "ofbaId": "124",
+      "name": "Bartlett Pond",
+      "town": "Northborough",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Northborough",
+      "latitude": 42.317707,
+      "longitude": -71.615859
+    },
+    {
+      "id": "MA-125",
+      "ofbaId": "125",
+      "name": "Big Pond",
+      "town": "Otis",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "5 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "DCR(S)",
+      "latitude": 42.179495,
+      "longitude": -73.03901
+    },
+    {
+      "id": "MA-126",
+      "ofbaId": "126",
+      "name": "Barnstable Harbor (Blish Point)",
+      "town": "Barnstable",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "34 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Moderate Draft Boats",
+      "maintainer": "Town Of Barnstable",
+      "latitude": 41.707901,
+      "longitude": -70.299334
+    },
+    {
+      "id": "MA-127",
+      "ofbaId": "127",
+      "name": "Chicopee River",
+      "town": "Wilbraham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "5 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Canoe Access Below Impoundment",
+      "maintainer": "DCR(S)",
+      "latitude": 42.17481,
+      "longitude": -72.411151
+    },
+    {
+      "id": "MA-128",
+      "ofbaId": "128",
+      "name": "Chicopee River (Red Bridge Landing)",
+      "town": "Wilbraham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "4 Trailer - 2 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft Boats Only",
+      "maintainer": "DCR(S)",
+      "latitude": 42.177188,
+      "longitude": -72.407846
+    },
+    {
+      "id": "MA-129",
+      "ofbaId": "129",
+      "name": "Annisquam River (Corliss Landing)",
+      "town": "Gloucester",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "1/2 Tide Ramp-Shallow Draft Boats",
+      "maintainer": "City Of Gloucester",
+      "latitude": 42.633503,
+      "longitude": -70.685237
+    },
+    {
+      "id": "MA-13",
+      "ofbaId": "13",
+      "name": "Mattapoisett H. Short Wharf",
+      "town": "Mattapoisett",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "22 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Mattapoisett",
+      "latitude": 41.657358,
+      "longitude": -70.812568
+    },
+    {
+      "id": "MA-130",
+      "ofbaId": "130",
+      "name": "Lanes Cove",
+      "town": "Gloucester",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "1/2 Tide Ramp-Shallow Draft Boats",
+      "maintainer": "City Of Gloucester",
+      "latitude": 42.680327,
+      "longitude": -70.659212
+    },
+    {
+      "id": "MA-131",
+      "ofbaId": "131",
+      "name": "Jones River (Long Wharf)",
+      "town": "Gloucester",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Full Tide Ramp-Shallow Draft Boats",
+      "maintainer": "City Of Gloucester",
+      "latitude": 42.641284,
+      "longitude": -70.693826
+    },
+    {
+      "id": "MA-132",
+      "ofbaId": "132",
+      "name": "Goose Pond",
+      "town": "Tyringham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access/Small Trailers",
+      "maintainer": "DFW",
+      "latitude": 42.274384,
+      "longitude": -73.200952
+    },
+    {
+      "id": "MA-133",
+      "ofbaId": "133",
+      "name": "Lake Garfield",
+      "town": "Monterey",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "12 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Ramp Open Sept-May Only",
+      "maintainer": "Town Of Monterey",
+      "latitude": 42.1899,
+      "longitude": -73.209509
+    },
+    {
+      "id": "MA-134",
+      "ofbaId": "134",
+      "name": "Hopkinton Reservoir",
+      "town": "Ashland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "25 Trailer - 12 Car",
+      "lanes": 6,
+      "fee": "Yes",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Fisherman Access / Electric Motors",
+      "maintainer": "DCR(S)",
+      "latitude": 42.258066,
+      "longitude": -71.520815
+    },
+    {
+      "id": "MA-135",
+      "ofbaId": "135",
+      "name": "Long Pond",
+      "town": "Rutland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "40 Trailer",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft Boats Only",
+      "maintainer": "DCR(S)",
+      "latitude": 42.358483,
+      "longitude": -71.992434
+    },
+    {
+      "id": "MA-136",
+      "ofbaId": "136",
+      "name": "Long Sought-for Pond",
+      "town": "Westford",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Canoe/Cartop Access Only",
+      "maintainer": "DFW",
+      "latitude": 42.616955,
+      "longitude": -71.449592
+    },
+    {
+      "id": "MA-137",
+      "ofbaId": "137",
+      "name": "Merrimack River",
+      "town": "Chelmsford",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "30 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Moderate Draft Boats",
+      "maintainer": "Town Of Chelmsford",
+      "latitude": 42.641643,
+      "longitude": -71.37802
+    },
+    {
+      "id": "MA-138",
+      "ofbaId": "138",
+      "name": "Ponkapog Pond",
+      "town": "Canton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(U)",
+      "latitude": 42.188148,
+      "longitude": -71.093408
+    },
+    {
+      "id": "MA-139",
+      "ofbaId": "139",
+      "name": "Whiting Pond",
+      "town": "North Attleborough",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "Yes",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Fisherman Access/Electric Motors",
+      "maintainer": "Town Of North Attleboro",
+      "latitude": 41.994393,
+      "longitude": -71.336868
+    },
+    {
+      "id": "MA-14",
+      "ofbaId": "14",
+      "name": "Lake Buel",
+      "town": "Monterey",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "23 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Moderate Draft",
+      "maintainer": "DCR(S)",
+      "latitude": 42.175165,
+      "longitude": -73.279685
+    },
+    {
+      "id": "MA-140",
+      "ofbaId": "140",
+      "name": "Charles River (Elm Bank)",
+      "town": "Dover",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Canoe Access",
+      "maintainer": "DCR(U)",
+      "latitude": 42.277794,
+      "longitude": -71.305246
+    },
+    {
+      "id": "MA-141",
+      "ofbaId": "141",
+      "name": "Charles River",
+      "town": "Needham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Canoe/Cartop Access Only",
+      "maintainer": "DCR(U)",
+      "latitude": 42.25994,
+      "longitude": -71.264724
+    },
+    {
+      "id": "MA-142",
+      "ofbaId": "142",
+      "name": "South Pond",
+      "town": "Brookfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "23 Trailer - 12 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access For Bass/trout",
+      "maintainer": "DFW",
+      "latitude": 42.180982,
+      "longitude": -72.073004
+    },
+    {
+      "id": "MA-143",
+      "ofbaId": "143",
+      "name": "Blackstone River",
+      "town": "Northbridge",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Canoe/Hand Carry",
+      "maintainer": "DCR(S)",
+      "latitude": 42.128704,
+      "longitude": -71.637108
+    },
+    {
+      "id": "MA-144",
+      "ofbaId": "144",
+      "name": "Highland Lake (Upper)",
+      "town": "Goshen",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "Yes",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Cartop/electric Motors Only",
+      "maintainer": "DCR(S)",
+      "latitude": 42.457336,
+      "longitude": -72.791956
+    },
+    {
+      "id": "MA-146",
+      "ofbaId": "146",
+      "name": "Assabet River",
+      "town": "Hudson",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "5 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Canoe Access",
+      "maintainer": "Town Of Hudson",
+      "latitude": 42.380111,
+      "longitude": -71.585685
+    },
+    {
+      "id": "MA-147",
+      "ofbaId": "147",
+      "name": "Center Pond",
+      "town": "Becket",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access/Small Trailers",
+      "maintainer": "Town Of Becket",
+      "latitude": 42.295274,
+      "longitude": -73.063979
+    },
+    {
+      "id": "MA-148",
+      "ofbaId": "148",
+      "name": "Housatonic River",
+      "town": "Lenox",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.393683,
+      "longitude": -73.24232
+    },
+    {
+      "id": "MA-149",
+      "ofbaId": "149",
+      "name": "Housatonic River",
+      "town": "Pittsfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Pittsfield",
+      "latitude": 42.435644,
+      "longitude": -73.249679
+    },
+    {
+      "id": "MA-15",
+      "ofbaId": "15",
+      "name": "Benedict Pond",
+      "town": "Monterey",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.202763,
+      "longitude": -73.288778
+    },
+    {
+      "id": "MA-150",
+      "ofbaId": "150",
+      "name": "Indian Lake",
+      "town": "Worcester",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "7 Trailer - 13 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "City Of Worcester",
+      "latitude": 42.293266,
+      "longitude": -71.816238
+    },
+    {
+      "id": "MA-151",
+      "ofbaId": "151",
+      "name": "Laurel Lake",
+      "town": "Erving",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "5 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Fisherman Access-Shallow Draft Boats",
+      "maintainer": "DCR(S)",
+      "latitude": 42.62216,
+      "longitude": -72.37759
+    },
+    {
+      "id": "MA-152",
+      "ofbaId": "152",
+      "name": "Long Pond",
+      "town": "Yarmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "4 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Fisherman Access/Electric Motors",
+      "maintainer": "Town Of Yarmouth",
+      "latitude": 41.66807,
+      "longitude": -70.200877
+    },
+    {
+      "id": "MA-153",
+      "ofbaId": "153",
+      "name": "Millers River",
+      "town": "Orange",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Canoe/Cartop Access Only",
+      "maintainer": "Town Of Orange",
+      "latitude": 42.585537,
+      "longitude": -72.29867
+    },
+    {
+      "id": "MA-154",
+      "ofbaId": "154",
+      "name": "Sandy Pond",
+      "town": "Plymouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "2 Trailer - 3 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "DFW",
+      "latitude": 41.809577,
+      "longitude": -70.600158
+    },
+    {
+      "id": "MA-155",
+      "ofbaId": "155",
+      "name": "Tisbury Great Pond",
+      "town": "West Tisbury",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "5 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access-Shallow Draft Boats",
+      "maintainer": "MV Land Bank",
+      "latitude": 41.360378,
+      "longitude": -70.654831
+    },
+    {
+      "id": "MA-156",
+      "ofbaId": "156",
+      "name": "Wareham River (Tempest Knob)",
+      "town": "Wareham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "36 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Moderate Draft Boats",
+      "maintainer": "Town Of Wareham",
+      "latitude": 41.75032,
+      "longitude": -70.700459
+    },
+    {
+      "id": "MA-157",
+      "ofbaId": "157",
+      "name": "Wickaboag Pond",
+      "town": "West Brookfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "8 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "Town Of West Brookfield",
+      "latitude": 42.237866,
+      "longitude": -72.147436
+    },
+    {
+      "id": "MA-158",
+      "ofbaId": "158",
+      "name": "Marblehead Harbor (Riverhead Beach)",
+      "town": "Marblehead",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "25 Trailer",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "1/2 Tide Ramp-Shallow Draft Boats",
+      "maintainer": "Town Of Marblehead",
+      "latitude": 42.49209,
+      "longitude": -70.855263
+    },
+    {
+      "id": "MA-159",
+      "ofbaId": "159",
+      "name": "Housatonic River",
+      "town": "Great Barrington",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "5 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.176398,
+      "longitude": -73.358138
+    },
+    {
+      "id": "MA-16",
+      "ofbaId": "16",
+      "name": "Thousand Acre Pond",
+      "town": "New Marlborough",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "8 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.070344,
+      "longitude": -73.210971
+    },
+    {
+      "id": "MA-160",
+      "ofbaId": "160",
+      "name": "Hopkinton Reservoir",
+      "town": "Hopkinton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Electric Motor Only",
+      "maintainer": "DCR(S)",
+      "latitude": 42.247551,
+      "longitude": -71.528228
+    },
+    {
+      "id": "MA-161",
+      "ofbaId": "161",
+      "name": "Farm Pond",
+      "town": "Framingham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Framingham",
+      "latitude": 42.288007,
+      "longitude": -71.43016
+    },
+    {
+      "id": "MA-162",
+      "ofbaId": "162",
+      "name": "Long Pond",
+      "town": "Littleton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "5 Trailer - 7 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Horsepower Limitation",
+      "maintainer": "Town Of Littleton",
+      "latitude": 42.531471,
+      "longitude": -71.465168
+    },
+    {
+      "id": "MA-163",
+      "ofbaId": "163",
+      "name": "Seapit River (Seapit Landing)",
+      "town": "Falmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "5 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "Town Of Falmouth",
+      "latitude": 41.576265,
+      "longitude": -70.527891
+    },
+    {
+      "id": "MA-164",
+      "ofbaId": "164",
+      "name": "Parkers River Sportfishing Pier",
+      "town": "Yarmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "E"
+      ],
+      "rampType": "Other",
+      "parking": "6 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": true,
+      "comments": null,
+      "maintainer": "Town Of Yarmouth",
+      "latitude": 41.649423,
+      "longitude": -70.222805
+    },
+    {
+      "id": "MA-165",
+      "ofbaId": "165",
+      "name": "Cliff Pond",
+      "town": "Brewster",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 41.755946,
+      "longitude": -70.030661
+    },
+    {
+      "id": "MA-166",
+      "ofbaId": "166",
+      "name": "Salem Harbor (Winter Island)",
+      "town": "Salem",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "45 Trailer",
+      "lanes": 3,
+      "fee": "Yes",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Salem",
+      "latitude": 42.526133,
+      "longitude": -70.869086
+    },
+    {
+      "id": "MA-167",
+      "ofbaId": "167",
+      "name": "Lake Pentucket",
+      "town": "Haverhill",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C",
+        "F"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": null,
+      "maintainer": "City Of Haverhill",
+      "latitude": 42.789744,
+      "longitude": -71.07378
+    },
+    {
+      "id": "MA-168",
+      "ofbaId": "168",
+      "name": "Lake Saltonstall",
+      "town": "Haverhill",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "12 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "City Of Haverhill",
+      "latitude": 42.78067,
+      "longitude": -71.064466
+    },
+    {
+      "id": "MA-169",
+      "ofbaId": "169",
+      "name": "Mystic Lake (Upper)",
+      "town": "Medford",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "12 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "DCR(U)",
+      "latitude": 42.431243,
+      "longitude": -71.147517
+    },
+    {
+      "id": "MA-17",
+      "ofbaId": "17",
+      "name": "Laurel Lake",
+      "town": "Lee",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "20 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.324741,
+      "longitude": -73.261408
+    },
+    {
+      "id": "MA-170",
+      "ofbaId": "170",
+      "name": "Ipswich River",
+      "town": "North Reading",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D",
+        "F"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": "Canoe Access & Shorefishing",
+      "maintainer": "Town Of North Reading",
+      "latitude": 42.572242,
+      "longitude": -71.08966
+    },
+    {
+      "id": "MA-171",
+      "ofbaId": "171",
+      "name": "Windsor Lake",
+      "town": "North Adams",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer - 4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "City Of North Adams",
+      "latitude": 42.688923,
+      "longitude": -73.095407
+    },
+    {
+      "id": "MA-172",
+      "ofbaId": "172",
+      "name": "Hoosic River",
+      "town": "North Adams",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.70295,
+      "longitude": -73.168151
+    },
+    {
+      "id": "MA-173",
+      "ofbaId": "173",
+      "name": "Cranberry Pond",
+      "town": "Sunderland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Sunderland",
+      "latitude": 42.503284,
+      "longitude": -72.52533
+    },
+    {
+      "id": "MA-174",
+      "ofbaId": "174",
+      "name": "Lake Cochituate",
+      "town": "Wayland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.314911,
+      "longitude": -71.371884
+    },
+    {
+      "id": "MA-175",
+      "ofbaId": "175",
+      "name": "Hamblin Pond",
+      "town": "Barnstable",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Barnstable",
+      "latitude": 41.667072,
+      "longitude": -70.405397
+    },
+    {
+      "id": "MA-176",
+      "ofbaId": "176",
+      "name": "Wequaquet Lake",
+      "town": "Barnstable",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Barnstable",
+      "latitude": 41.679539,
+      "longitude": -70.348674
+    },
+    {
+      "id": "MA-177",
+      "ofbaId": "177",
+      "name": "Slough Pond",
+      "town": "Brewster",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Brewster",
+      "latitude": 41.724737,
+      "longitude": -70.134547
+    },
+    {
+      "id": "MA-178",
+      "ofbaId": "178",
+      "name": "Schoolhouse Pond",
+      "town": "Brewster",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C",
+        "E"
+      ],
+      "rampType": "Cartop",
+      "parking": "3 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": "Canoe Access/Fishing Pier",
+      "maintainer": "Town Of Brewster",
+      "latitude": 41.754991,
+      "longitude": -70.092081
+    },
+    {
+      "id": "MA-179",
+      "ofbaId": "179",
+      "name": "Lake Rohunta",
+      "town": "Orange",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B",
+        "F"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer - 4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": "Fisherman Access & Pier",
+      "maintainer": "DFW",
+      "latitude": 42.560766,
+      "longitude": -72.274935
+    },
+    {
+      "id": "MA-18",
+      "ofbaId": "18",
+      "name": "Stockbridge Bowl",
+      "town": "Stockbridge",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "25 Trailer",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "Town Of Stockbridge",
+      "latitude": 42.341739,
+      "longitude": -73.324188
+    },
+    {
+      "id": "MA-180",
+      "ofbaId": "180",
+      "name": "Sengekontacket Pond",
+      "town": "Oak Bluffs",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "Town Of Oak Bluffs",
+      "latitude": 41.431898,
+      "longitude": -70.556768
+    },
+    {
+      "id": "MA-181",
+      "ofbaId": "181",
+      "name": "Sudbury River (Kellogg Street)",
+      "town": "Framingham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Framingham",
+      "latitude": 42.305941,
+      "longitude": -71.431013
+    },
+    {
+      "id": "MA-182",
+      "ofbaId": "182",
+      "name": "Meganesett Harbor",
+      "town": "Falmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "5 Trailer - 10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Spring And Fall Only",
+      "maintainer": "Town Of Falmouth",
+      "latitude": 41.656209,
+      "longitude": -70.623664
+    },
+    {
+      "id": "MA-183",
+      "ofbaId": "183",
+      "name": "Lake Winthrop Shorefishing Area",
+      "town": "Holliston",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "6 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Holliston",
+      "latitude": 42.187311,
+      "longitude": -71.420032
+    },
+    {
+      "id": "MA-184",
+      "ofbaId": "184",
+      "name": "Lake Pentucket Shorefishing Area",
+      "town": "Haverhill",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "4 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Haverhill",
+      "latitude": 42.789618,
+      "longitude": -71.07106
+    },
+    {
+      "id": "MA-185",
+      "ofbaId": "185",
+      "name": "Big Bearhole Pond",
+      "town": "Taunton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "5 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "DCR(S)",
+      "latitude": 41.865346,
+      "longitude": -70.987027
+    },
+    {
+      "id": "MA-186",
+      "ofbaId": "186",
+      "name": "Hoosic River",
+      "town": "Williamstown",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Williamstown",
+      "latitude": 42.729398,
+      "longitude": -73.208166
+    },
+    {
+      "id": "MA-187",
+      "ofbaId": "187",
+      "name": "Ware River (North Street)",
+      "town": "Hardwick",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "5 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Hardwick",
+      "latitude": 42.311709,
+      "longitude": -72.207397
+    },
+    {
+      "id": "MA-188",
+      "ofbaId": "188",
+      "name": "Ware River (Hardwick Road)",
+      "town": "Hardwick",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "7 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Hardwick",
+      "latitude": 42.343673,
+      "longitude": -72.157872
+    },
+    {
+      "id": "MA-189",
+      "ofbaId": "189",
+      "name": "Connecticut River",
+      "town": "Chicopee",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Syrek Street",
+      "maintainer": "DCR(S)",
+      "latitude": 42.210471,
+      "longitude": -72.590808
+    },
+    {
+      "id": "MA-19",
+      "ofbaId": "19",
+      "name": "Richmond Pond",
+      "town": "Richmond",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "25 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Richmond",
+      "latitude": 42.415866,
+      "longitude": -73.331613
+    },
+    {
+      "id": "MA-190",
+      "ofbaId": "190",
+      "name": "Great Rock Bight Shorefish Access",
+      "town": "Chilmark",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "6 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Shorefishing Access",
+      "maintainer": "MV Land Bank",
+      "latitude": 41.381873,
+      "longitude": -70.740477
+    },
+    {
+      "id": "MA-191",
+      "ofbaId": "191",
+      "name": "Sengekontacket Pond (Pecoy Point)",
+      "town": "Oak Bluffs",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Cartop Access",
+      "maintainer": "MV Land Bank",
+      "latitude": 41.423246,
+      "longitude": -70.56468
+    },
+    {
+      "id": "MA-192",
+      "ofbaId": "192",
+      "name": "Fort Meadow Reservoir",
+      "town": "Marlboro",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Marlboro",
+      "latitude": 42.368437,
+      "longitude": -71.561148
+    },
+    {
+      "id": "MA-193",
+      "ofbaId": "193",
+      "name": "Forest Lake",
+      "town": "Methuen",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer - 4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "City Of Methuen",
+      "latitude": 42.730894,
+      "longitude": -71.248296
+    },
+    {
+      "id": "MA-194",
+      "ofbaId": "194",
+      "name": "Charles River",
+      "town": "Millis",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Canoe Access",
+      "maintainer": "Town Of Millis",
+      "latitude": 42.143268,
+      "longitude": -71.348911
+    },
+    {
+      "id": "MA-195",
+      "ofbaId": "195",
+      "name": "Madaket Harbor (Jackson Point)",
+      "town": "Nantucket",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "8 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Coastal Access",
+      "maintainer": "Town Of Nantucket",
+      "latitude": 41.274662,
+      "longitude": -70.202748
+    },
+    {
+      "id": "MA-196",
+      "ofbaId": "196",
+      "name": "Wareham River Sportfishing Pier",
+      "town": "Wareham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "E"
+      ],
+      "rampType": "Other",
+      "parking": "10 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": "Besse Park - Main Street",
+      "maintainer": "Town Of Wareham",
+      "latitude": 41.755968,
+      "longitude": -70.712119
+    },
+    {
+      "id": "MA-197",
+      "ofbaId": "197",
+      "name": "Hamilton Reservoir",
+      "town": "Holland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A",
+        "E"
+      ],
+      "rampType": "Concrete",
+      "parking": "12 Trailer - 10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": null,
+      "maintainer": "Town Of Holland",
+      "latitude": 42.068208,
+      "longitude": -72.15248
+    },
+    {
+      "id": "MA-198",
+      "ofbaId": "198",
+      "name": "Squannacook River",
+      "town": "Townsend",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "5 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.65209,
+      "longitude": -71.688038
+    },
+    {
+      "id": "MA-199",
+      "ofbaId": "199",
+      "name": "Nashua River",
+      "town": "Groton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "15 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Boat Access",
+      "maintainer": "Town Of Groton",
+      "latitude": 42.627482,
+      "longitude": -71.593062
+    },
+    {
+      "id": "MA-2",
+      "ofbaId": "2",
+      "name": "Plymouth Harbor",
+      "town": "Plymouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "102 Trailer - 15 Car",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Coastal Access",
+      "maintainer": "Town Of Plymouth",
+      "latitude": 41.968011,
+      "longitude": -70.672259
+    },
+    {
+      "id": "MA-20",
+      "ofbaId": "20",
+      "name": "Onota Lake",
+      "town": "Pittsfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A",
+        "E"
+      ],
+      "rampType": "Concrete",
+      "parking": "20 Trailer - 13 Car",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": true,
+      "comments": "Shallow Draft; Sport Fishing Pier",
+      "maintainer": "City Of Pittsfield",
+      "latitude": 42.465475,
+      "longitude": -73.279548
+    },
+    {
+      "id": "MA-200",
+      "ofbaId": "200",
+      "name": "Wampatuck Pond",
+      "town": "Hanson",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "3 Trailer - 6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Hanson",
+      "latitude": 42.064493,
+      "longitude": -70.867411
+    },
+    {
+      "id": "MA-201",
+      "ofbaId": "201",
+      "name": "Nashua River",
+      "town": "Pepperell",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "15 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Cartop & Shorefish Access",
+      "maintainer": "DFW",
+      "latitude": 42.626635,
+      "longitude": -71.594056
+    },
+    {
+      "id": "MA-202",
+      "ofbaId": "202",
+      "name": "Ashmere Lake",
+      "town": "Hinsdale",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.435489,
+      "longitude": -73.083323
+    },
+    {
+      "id": "MA-203",
+      "ofbaId": "203",
+      "name": "Haviland (Chapin) Pond",
+      "town": "Ludlow",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "3 Trailer - 6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Ludlow",
+      "latitude": 42.172861,
+      "longitude": -72.476714
+    },
+    {
+      "id": "MA-204",
+      "ofbaId": "204",
+      "name": "Bungay River",
+      "town": "Attleboro",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Attleboro",
+      "latitude": 41.953799,
+      "longitude": -71.280326
+    },
+    {
+      "id": "MA-205",
+      "ofbaId": "205",
+      "name": "Sudbury River (Little Farm Road)",
+      "town": "Framingham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Framingham",
+      "latitude": 42.33502,
+      "longitude": -71.394732
+    },
+    {
+      "id": "MA-206",
+      "ofbaId": "206",
+      "name": "Scorton Creek",
+      "town": "Sandwich",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "6 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Shorefishing Area",
+      "maintainer": "DMF",
+      "latitude": 41.748411,
+      "longitude": -70.428592
+    },
+    {
+      "id": "MA-207",
+      "ofbaId": "207",
+      "name": "Merrimack River (Joppa Flats)",
+      "town": "Newburyport",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Newburyport",
+      "latitude": 42.806342,
+      "longitude": -70.857629
+    },
+    {
+      "id": "MA-208",
+      "ofbaId": "208",
+      "name": "Quinebaug River Water Trail",
+      "town": "Holland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Canoe Access",
+      "maintainer": "A.C.E.",
+      "latitude": 42.082319,
+      "longitude": -72.16361
+    },
+    {
+      "id": "MA-209",
+      "ofbaId": "209",
+      "name": "Charles River",
+      "town": "Dedham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Common Street",
+      "maintainer": "Town Of Dedham",
+      "latitude": 42.258681,
+      "longitude": -71.191887
+    },
+    {
+      "id": "MA-21",
+      "ofbaId": "21",
+      "name": "Pontoosuc Lake",
+      "town": "Pittsfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "30 Trailer",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Pittsfield",
+      "latitude": 42.484769,
+      "longitude": -73.2473
+    },
+    {
+      "id": "MA-210",
+      "ofbaId": "210",
+      "name": "Cheshire Lake",
+      "town": "Cheshire",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Cheshire",
+      "latitude": 42.555754,
+      "longitude": -73.166512
+    },
+    {
+      "id": "MA-211",
+      "ofbaId": "211",
+      "name": "Falmouth Inner Harbor",
+      "town": "Falmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "30 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Falmouth",
+      "latitude": 41.550558,
+      "longitude": -70.60186
+    },
+    {
+      "id": "MA-212",
+      "ofbaId": "212",
+      "name": "Great Bay",
+      "town": "Falmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "12 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Falmouth",
+      "latitude": 41.559842,
+      "longitude": -70.5861
+    },
+    {
+      "id": "MA-213",
+      "ofbaId": "213",
+      "name": "Assonet River",
+      "town": "Freetown",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "12 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Freetown",
+      "latitude": 41.793685,
+      "longitude": -71.072676
+    },
+    {
+      "id": "MA-214",
+      "ofbaId": "214",
+      "name": "Annisquam River (Dunfudgen Landing)",
+      "town": "Gloucester",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "48 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Gloucester",
+      "latitude": 42.613396,
+      "longitude": -70.678005
+    },
+    {
+      "id": "MA-216",
+      "ofbaId": "216",
+      "name": "Nashua River",
+      "town": "Lancaster",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Trailer - 6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Lancaster",
+      "latitude": 42.461225,
+      "longitude": -71.656208
+    },
+    {
+      "id": "MA-217",
+      "ofbaId": "217",
+      "name": "Concord River",
+      "town": "Lowell",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "7 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Lowell",
+      "latitude": 42.625513,
+      "longitude": -71.295317
+    },
+    {
+      "id": "MA-218",
+      "ofbaId": "218",
+      "name": "Merrimack River",
+      "town": "Lowell",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "44 Trailer - 20 Car",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.638761,
+      "longitude": -71.369232
+    },
+    {
+      "id": "MA-219",
+      "ofbaId": "219",
+      "name": "Springfield Reservoir",
+      "town": "Ludlow",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "E",
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "18 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": "Sport Fishing Pier, Shore Fish Area",
+      "maintainer": "City Of Springfield",
+      "latitude": 42.205768,
+      "longitude": -72.433964
+    },
+    {
+      "id": "MA-22",
+      "ofbaId": "22",
+      "name": "Upper Spectacle Pond",
+      "town": "Sandisfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.177214,
+      "longitude": -73.117687
+    },
+    {
+      "id": "MA-220",
+      "ofbaId": "220",
+      "name": "Popponesset Beach Shore Fishing Area",
+      "town": "Mashpee",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "5 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Shorefishing Area",
+      "maintainer": "DFW",
+      "latitude": 41.576129,
+      "longitude": -70.458145
+    },
+    {
+      "id": "MA-221",
+      "ofbaId": "221",
+      "name": "Charles River",
+      "town": "Millis",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "7 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "A.C.E.",
+      "latitude": 42.157901,
+      "longitude": -71.33179
+    },
+    {
+      "id": "MA-222",
+      "ofbaId": "222",
+      "name": "Jacobs Pond",
+      "town": "Norwell",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Norwell",
+      "latitude": 42.164164,
+      "longitude": -70.853177
+    },
+    {
+      "id": "MA-223",
+      "ofbaId": "223",
+      "name": "Little Long Pond",
+      "town": "Plymouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 41.866769,
+      "longitude": -70.610188
+    },
+    {
+      "id": "MA-224",
+      "ofbaId": "224",
+      "name": "Fore River (Houghs Neck)",
+      "town": "Quincy",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "27 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Quincy",
+      "latitude": 42.271509,
+      "longitude": -70.950173
+    },
+    {
+      "id": "MA-225",
+      "ofbaId": "225",
+      "name": "Housatonic River",
+      "town": "Stockbridge",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Stockbridge",
+      "latitude": 42.27911,
+      "longitude": -73.313643
+    },
+    {
+      "id": "MA-226",
+      "ofbaId": "226",
+      "name": "Holland Pond",
+      "town": "Holland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "8 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": null,
+      "maintainer": "A.C.E.",
+      "latitude": 42.084302,
+      "longitude": -72.159525
+    },
+    {
+      "id": "MA-227",
+      "ofbaId": "227",
+      "name": "Charles River",
+      "town": "Boston",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "27 Trailer - 12 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Boston",
+      "latitude": 42.279962,
+      "longitude": -71.18517
+    },
+    {
+      "id": "MA-228",
+      "ofbaId": "228",
+      "name": "Silver Lake",
+      "town": "Wilmington",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "E"
+      ],
+      "rampType": "Other",
+      "parking": "12 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": "Sport Fishing. Pier, Cartop Access",
+      "maintainer": "Town Of Wilmington",
+      "latitude": 42.563925,
+      "longitude": -71.187938
+    },
+    {
+      "id": "MA-229",
+      "ofbaId": "229",
+      "name": "Fore River",
+      "town": "Weymouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Weymouth",
+      "latitude": 42.2232,
+      "longitude": -70.966606
+    },
+    {
+      "id": "MA-23",
+      "ofbaId": "23",
+      "name": "Otis Reservoir",
+      "town": "Tolland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "26 Trailer",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.1448,
+      "longitude": -73.043504
+    },
+    {
+      "id": "MA-230",
+      "ofbaId": "230",
+      "name": "Dogfish Bar",
+      "town": "Aquinnah",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "5 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFG",
+      "latitude": 41.356136,
+      "longitude": -70.807594
+    },
+    {
+      "id": "MA-231",
+      "ofbaId": "231",
+      "name": "Bass River",
+      "town": "Yarmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A",
+        "E",
+        "F"
+      ],
+      "rampType": "Concrete",
+      "parking": "16 Trailer - 10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": null,
+      "maintainer": "Town Of Yarmouth",
+      "latitude": 41.684942,
+      "longitude": -70.160288
+    },
+    {
+      "id": "MA-232",
+      "ofbaId": "232",
+      "name": "Agawam Mill Pond",
+      "town": "Wareham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 41.767047,
+      "longitude": -70.676909
+    },
+    {
+      "id": "MA-233",
+      "ofbaId": "233",
+      "name": "Cranberry Pond",
+      "town": "West Stockbridge",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.346797,
+      "longitude": -73.381267
+    },
+    {
+      "id": "MA-234",
+      "ofbaId": "234",
+      "name": "Taunton River",
+      "town": "Berkley",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Elm Street",
+      "maintainer": "Town Of Berkley",
+      "latitude": 41.834339,
+      "longitude": -71.106905
+    },
+    {
+      "id": "MA-24",
+      "ofbaId": "24",
+      "name": "Shaw Pond",
+      "town": "Otis",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "DCR(S)",
+      "latitude": 42.249366,
+      "longitude": -73.123972
+    },
+    {
+      "id": "MA-240",
+      "ofbaId": "240",
+      "name": "Wellfleet Harbor",
+      "town": "Wellfleet",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "60 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Wellfleet",
+      "latitude": 41.929946,
+      "longitude": -70.028536
+    },
+    {
+      "id": "MA-242",
+      "ofbaId": "242",
+      "name": "Bass River(uncle Freeman's Landing)",
+      "town": "Dennis",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "8 Trailer - 3 Car",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Dennis",
+      "latitude": 41.660658,
+      "longitude": -70.186135
+    },
+    {
+      "id": "MA-243",
+      "ofbaId": "243",
+      "name": "Horsefoot Cove",
+      "town": "Dennis",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "9 Trailer - 4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Dennis",
+      "latitude": 41.665674,
+      "longitude": -70.180201
+    },
+    {
+      "id": "MA-244",
+      "ofbaId": "244",
+      "name": "Lewis Bay(englewood Beach)",
+      "town": "Yarmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "11 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Yarmouth",
+      "latitude": 41.64007,
+      "longitude": -70.247492
+    },
+    {
+      "id": "MA-245",
+      "ofbaId": "245",
+      "name": "Millers River (Main Street)",
+      "town": "Athol",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": "Canoe",
+      "maintainer": "Town Of Athol",
+      "latitude": 42.593474,
+      "longitude": -72.238983
+    },
+    {
+      "id": "MA-246",
+      "ofbaId": "246",
+      "name": "Millers River (North Orange Road)",
+      "town": "Athol",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Athol",
+      "latitude": 42.596113,
+      "longitude": -72.241
+    },
+    {
+      "id": "MA-247",
+      "ofbaId": "247",
+      "name": "Millers River (Shore Drive Pier)",
+      "town": "Athol",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "4 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Athol",
+      "latitude": 42.59701,
+      "longitude": -72.234157
+    },
+    {
+      "id": "MA-248",
+      "ofbaId": "248",
+      "name": "Satucket River",
+      "town": "East Bridgewater",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of East Bridgewater",
+      "latitude": 42.022658,
+      "longitude": -70.931684
+    },
+    {
+      "id": "MA-249",
+      "ofbaId": "249",
+      "name": "Sudbury River (Myrtle Steet)",
+      "town": "Ashland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Ashland",
+      "latitude": 42.264402,
+      "longitude": -71.467779
+    },
+    {
+      "id": "MA-25",
+      "ofbaId": "25",
+      "name": "Windsor Pond",
+      "town": "Windsor",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "13 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "DCR(S)",
+      "latitude": 42.537619,
+      "longitude": -72.975666
+    },
+    {
+      "id": "MA-250",
+      "ofbaId": "250",
+      "name": "Sudbury River (High Street)",
+      "town": "Ashland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Ashland",
+      "latitude": 42.262198,
+      "longitude": -71.482885
+    },
+    {
+      "id": "MA-251",
+      "ofbaId": "251",
+      "name": "Wankinco River",
+      "town": "Wareham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "5 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Wareham",
+      "latitude": 41.766702,
+      "longitude": -70.722024
+    },
+    {
+      "id": "MA-252",
+      "ofbaId": "252",
+      "name": "Ware River",
+      "town": "Ware",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B",
+        "F"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer - 3 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": null,
+      "maintainer": "Town Of Ware",
+      "latitude": 42.266704,
+      "longitude": -72.227573
+    },
+    {
+      "id": "MA-253",
+      "ofbaId": "253",
+      "name": "Long Pond",
+      "town": "Sturbridge",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Boat Access",
+      "maintainer": "A.C.E.",
+      "latitude": 42.112959,
+      "longitude": -72.13148
+    },
+    {
+      "id": "MA-254",
+      "ofbaId": "254",
+      "name": "Quinsigamond River",
+      "town": "Grafton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Grafton",
+      "latitude": 42.221378,
+      "longitude": -71.700685
+    },
+    {
+      "id": "MA-255",
+      "ofbaId": "255",
+      "name": "York Lake",
+      "town": "New Marlborough",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.095818,
+      "longitude": -73.180013
+    },
+    {
+      "id": "MA-256",
+      "ofbaId": "256",
+      "name": "Mary's Pond",
+      "town": "Rochester",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "15 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Rochester",
+      "latitude": 41.754453,
+      "longitude": -70.793852
+    },
+    {
+      "id": "MA-257",
+      "ofbaId": "257",
+      "name": "Satucket River (Robbins Pond)",
+      "town": "East Bridgewater",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of East Bridgewater",
+      "latitude": 42.009037,
+      "longitude": -70.907505
+    },
+    {
+      "id": "MA-258",
+      "ofbaId": "258",
+      "name": "Town River",
+      "town": "Bridgewater",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Bridgewater",
+      "latitude": 41.993503,
+      "longitude": -70.970395
+    },
+    {
+      "id": "MA-259",
+      "ofbaId": "259",
+      "name": "Johnson Pond",
+      "town": "Groveland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Groveland",
+      "latitude": 42.732727,
+      "longitude": -71.045847
+    },
+    {
+      "id": "MA-26",
+      "ofbaId": "26",
+      "name": "Highland Lake (Lower)",
+      "town": "Goshen",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "5 Car",
+      "lanes": 1,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "DCR(S)",
+      "latitude": 42.454937,
+      "longitude": -72.798561
+    },
+    {
+      "id": "MA-261",
+      "ofbaId": "261",
+      "name": "Fore River",
+      "town": "Quincy",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "6 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Quincy",
+      "latitude": 42.251381,
+      "longitude": -70.95991
+    },
+    {
+      "id": "MA-262",
+      "ofbaId": "262",
+      "name": "Whitman Pond",
+      "town": "Weymouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B",
+        "F"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": true,
+      "comments": null,
+      "maintainer": "Town Of Weymouth",
+      "latitude": 42.206515,
+      "longitude": -70.942776
+    },
+    {
+      "id": "MA-263",
+      "ofbaId": "263",
+      "name": "Cape Poge Bay",
+      "town": "Edgartown",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "MV Land Bank",
+      "latitude": 41.384302,
+      "longitude": -70.467381
+    },
+    {
+      "id": "MA-264",
+      "ofbaId": "264",
+      "name": "Broad Cove",
+      "town": "Somerset",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C",
+        "F"
+      ],
+      "rampType": "Cartop",
+      "parking": "12 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Somerset",
+      "latitude": 41.788908,
+      "longitude": -71.124983
+    },
+    {
+      "id": "MA-265",
+      "ofbaId": "265",
+      "name": "Taunton River",
+      "town": "Somerset",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "26 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Somerset",
+      "latitude": 41.769353,
+      "longitude": -71.124713
+    },
+    {
+      "id": "MA-267",
+      "ofbaId": "267",
+      "name": "Chicopee River",
+      "town": "Springfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Springfield",
+      "latitude": 42.160867,
+      "longitude": -72.501199
+    },
+    {
+      "id": "MA-268",
+      "ofbaId": "268",
+      "name": "Mystic Lake (Lower)",
+      "town": "Medford",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(U)",
+      "latitude": 42.43052,
+      "longitude": -71.147498
+    },
+    {
+      "id": "MA-269",
+      "ofbaId": "269",
+      "name": "South Meadow Pond",
+      "town": "Clinton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.414319,
+      "longitude": -71.709981
+    },
+    {
+      "id": "MA-27",
+      "ofbaId": "27",
+      "name": "Congamond Lakes (South Ramp)",
+      "town": "Southwick",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "18 Trailer",
+      "lanes": 1,
+      "fee": "Yes",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Moderate Draft",
+      "maintainer": "Town Of Southwick",
+      "latitude": 42.02095,
+      "longitude": -72.768803
+    },
+    {
+      "id": "MA-270",
+      "ofbaId": "270",
+      "name": "Ipswich River",
+      "town": "Reading",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Reading",
+      "latitude": 42.561362,
+      "longitude": -71.110269
+    },
+    {
+      "id": "MA-271",
+      "ofbaId": "271",
+      "name": "Little South Pond",
+      "town": "Plymouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "2 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Plymouth",
+      "latitude": 41.918253,
+      "longitude": -70.67626
+    },
+    {
+      "id": "MA-272",
+      "ofbaId": "272",
+      "name": "Winnings Pond",
+      "town": "Billerica",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C",
+        "F"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Trailer - 4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Billerica",
+      "latitude": 42.552706,
+      "longitude": -71.298878
+    },
+    {
+      "id": "MA-273",
+      "ofbaId": "273",
+      "name": "Cheshire Lake (Farnams Causeway)",
+      "town": "Cheshire",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "12 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Cheshire",
+      "latitude": 42.538868,
+      "longitude": -73.182728
+    },
+    {
+      "id": "MA-274",
+      "ofbaId": "274",
+      "name": "Charles River",
+      "town": "Medway",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D",
+        "F"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Village Street",
+      "maintainer": "Town Of Medway",
+      "latitude": 42.1403,
+      "longitude": -71.388043
+    },
+    {
+      "id": "MA-275",
+      "ofbaId": "275",
+      "name": "Allen Harbor",
+      "town": "Harwich",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "12 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Harwich",
+      "latitude": 41.667106,
+      "longitude": -70.090445
+    },
+    {
+      "id": "MA-276",
+      "ofbaId": "276",
+      "name": "Oak Bluffs Sportfishing Pier",
+      "town": "Oak Bluffs",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "E"
+      ],
+      "rampType": "Other",
+      "parking": null,
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": true,
+      "comments": "Sport Fishing Pier",
+      "maintainer": "Town Of Oak Bluffs",
+      "latitude": 41.458591,
+      "longitude": -70.556393
+    },
+    {
+      "id": "MA-277",
+      "ofbaId": "277",
+      "name": "Merrimack River (Methuen)",
+      "town": "Methuen",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "19 Trailer - 11 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Methuen",
+      "latitude": 42.703174,
+      "longitude": -71.213605
+    },
+    {
+      "id": "MA-278",
+      "ofbaId": "278",
+      "name": "Childs River",
+      "town": "Falmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "32 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Falmouth",
+      "latitude": 41.579043,
+      "longitude": -70.53162
+    },
+    {
+      "id": "MA-279",
+      "ofbaId": "279",
+      "name": "Quaboag River",
+      "town": "Brookfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Brookfield",
+      "latitude": 42.207792,
+      "longitude": -72.102003
+    },
+    {
+      "id": "MA-28",
+      "ofbaId": "28",
+      "name": "Congamond Lakes (North Ramp)",
+      "town": "Southwick",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A",
+        "E"
+      ],
+      "rampType": "Concrete",
+      "parking": "30 Trailer - 10 Car",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "Yes",
+      "barrierFree": true,
+      "comments": "Moderate Draft",
+      "maintainer": "Town Of Southwick",
+      "latitude": 42.041396,
+      "longitude": -72.757144
+    },
+    {
+      "id": "MA-280",
+      "ofbaId": "280",
+      "name": "Nashawannuck Pond",
+      "town": "Easthampton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "4 Trailer - 4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Easthampton",
+      "latitude": 42.259378,
+      "longitude": -72.664476
+    },
+    {
+      "id": "MA-281",
+      "ofbaId": "281",
+      "name": "Lake Ellis",
+      "town": "Athol",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "4 Trailer - 6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Bylaws & Hp Restrictions, Call Town",
+      "maintainer": "Town Of Athol",
+      "latitude": 42.582075,
+      "longitude": -72.205535
+    },
+    {
+      "id": "MA-282",
+      "ofbaId": "282",
+      "name": "Connecticut River",
+      "town": "Sunderland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "8 Trailer - 6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Parking At The Library, Town Hall, School Street",
+      "maintainer": "Town Of Sunderland",
+      "latitude": 42.467463,
+      "longitude": -72.583362
+    },
+    {
+      "id": "MA-283",
+      "ofbaId": "283",
+      "name": "Blackstone River - Grafton",
+      "town": "Grafton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Grafton",
+      "latitude": 42.176737,
+      "longitude": -71.689758
+    },
+    {
+      "id": "MA-284",
+      "ofbaId": "284",
+      "name": "Deer Island Sportfishing Pier",
+      "town": "Winthrop",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "E"
+      ],
+      "rampType": "Other",
+      "parking": "6 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "MWRA",
+      "latitude": 42.354475,
+      "longitude": -70.967833
+    },
+    {
+      "id": "MA-285",
+      "ofbaId": "285",
+      "name": "Hingham Harbor",
+      "town": "Hingham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "32 Trailer - 20 Car",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Hingham",
+      "latitude": 42.246088,
+      "longitude": -70.886094
+    },
+    {
+      "id": "MA-286",
+      "ofbaId": "286",
+      "name": "Forest Lake",
+      "town": "Palmer",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "8 Trailer - 8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Palmer",
+      "latitude": 42.209966,
+      "longitude": -72.306632
+    },
+    {
+      "id": "MA-287",
+      "ofbaId": "287",
+      "name": "Swift River (Palmer)",
+      "town": "Palmer",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "8 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Palmer Conservation Commission",
+      "latitude": 42.20859,
+      "longitude": -72.349991
+    },
+    {
+      "id": "MA-288",
+      "ofbaId": "288",
+      "name": "Merrimack River (Riverside Park)",
+      "town": "Methuen",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "F"
+      ],
+      "rampType": "Other",
+      "parking": "4 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Methuen",
+      "latitude": 42.699939,
+      "longitude": -71.202074
+    },
+    {
+      "id": "MA-289",
+      "ofbaId": "289",
+      "name": "Sudbury  River",
+      "town": "Ashland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "5 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.266335,
+      "longitude": -71.521123
+    },
+    {
+      "id": "MA-29",
+      "ofbaId": "29",
+      "name": "Pequot Pond",
+      "town": "Westfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "15 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "DCR(S)",
+      "latitude": 42.178876,
+      "longitude": -72.696992
+    },
+    {
+      "id": "MA-290",
+      "ofbaId": "290",
+      "name": "Jordan Pond",
+      "town": "Shrewsbury",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "E"
+      ],
+      "rampType": "Other",
+      "parking": "6 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town of Shrewsbury",
+      "latitude": 42.269402,
+      "longitude": -71.747646
+    },
+    {
+      "id": "MA-291",
+      "ofbaId": "291",
+      "name": "Salem Harbor",
+      "town": "Salem",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "E"
+      ],
+      "rampType": "Other",
+      "parking": "43 Car",
+      "lanes": null,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "43 Metererd Parking Spots (April 1 to October 31) More Nearby - Free and Metered",
+      "maintainer": "City of Salem",
+      "latitude": 42.536559,
+      "longitude": -70.868181
+    },
+    {
+      "id": "MA-292",
+      "ofbaId": "292",
+      "name": "Buzzards Bay",
+      "town": "Fairhaven",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "35 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Fairhaven",
+      "latitude": 41.595809,
+      "longitude": -70.84366
+    },
+    {
+      "id": "MA-3",
+      "ofbaId": "3",
+      "name": "Cole River",
+      "town": "Swansea",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "40 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Swansea",
+      "latitude": 41.726592,
+      "longitude": -71.223203
+    },
+    {
+      "id": "MA-30",
+      "ofbaId": "30",
+      "name": "Buffumville Reservoir",
+      "town": "Charlton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "A.C.E.",
+      "latitude": 42.12031,
+      "longitude": -71.909431
+    },
+    {
+      "id": "MA-31",
+      "ofbaId": "31",
+      "name": "Connecticut River",
+      "town": "Chicopee",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "40 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Melina Street",
+      "maintainer": "DCR(S)",
+      "latitude": 42.15279,
+      "longitude": -72.624953
+    },
+    {
+      "id": "MA-32",
+      "ofbaId": "32",
+      "name": "Connecticut River (Oxbow)",
+      "town": "Easthampton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "32 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.288082,
+      "longitude": -72.617843
+    },
+    {
+      "id": "MA-33",
+      "ofbaId": "33",
+      "name": "Connecticut River",
+      "town": "Hatfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "8 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.393683,
+      "longitude": -72.590341
+    },
+    {
+      "id": "MA-34",
+      "ofbaId": "34",
+      "name": "Connecticut River (Barton Cove)",
+      "town": "Gill",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "45 Trailer",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.607739,
+      "longitude": -72.541781
+    },
+    {
+      "id": "MA-35",
+      "ofbaId": "35",
+      "name": "Connecticut River",
+      "town": "Northfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "32 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "DCR(S)",
+      "latitude": 42.715921,
+      "longitude": -72.451618
+    },
+    {
+      "id": "MA-36",
+      "ofbaId": "36",
+      "name": "Five Mile Pond",
+      "town": "Springfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "12 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Springfield",
+      "latitude": 42.139761,
+      "longitude": -72.509184
+    },
+    {
+      "id": "MA-37",
+      "ofbaId": "37",
+      "name": "Swift River",
+      "town": "Belchertown",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "20 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "DFW",
+      "latitude": 42.242932,
+      "longitude": -72.335207
+    },
+    {
+      "id": "MA-38",
+      "ofbaId": "38",
+      "name": "Quabbin Reservoir",
+      "town": "Belchertown",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "Varies",
+      "lanes": null,
+      "fee": "Yes",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Number Of Ramps/Parking Varies",
+      "maintainer": "DCR(W)",
+      "latitude": 42.332392,
+      "longitude": -72.367879
+    },
+    {
+      "id": "MA-39",
+      "ofbaId": "39",
+      "name": "Quabbin Reservoir",
+      "town": "Hardwick",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "Varies",
+      "lanes": null,
+      "fee": "Yes",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Number Of Ramps/Parking Varies",
+      "maintainer": "DCR(W)",
+      "latitude": 42.391282,
+      "longitude": -72.238965
+    },
+    {
+      "id": "MA-4",
+      "ofbaId": "4",
+      "name": "Taunton River Basin",
+      "town": "Fall River",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "47 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Fall River",
+      "latitude": 41.717885,
+      "longitude": -71.157338
+    },
+    {
+      "id": "MA-40",
+      "ofbaId": "40",
+      "name": "Quabbin Reservoir",
+      "town": "New Salem",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "Varies",
+      "lanes": null,
+      "fee": "Yes",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Number Of Ramps/Parking Varies",
+      "maintainer": "DCR(W)",
+      "latitude": 42.518232,
+      "longitude": -72.293881
+    },
+    {
+      "id": "MA-41",
+      "ofbaId": "41",
+      "name": "East Brimfield Reservoir",
+      "town": "Sturbridge",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": null,
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "A.C.E.",
+      "latitude": 42.110416,
+      "longitude": -72.139226
+    },
+    {
+      "id": "MA-42",
+      "ofbaId": "42",
+      "name": "Hardwick Pond",
+      "town": "Hardwick",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "9 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Hardwick",
+      "latitude": 42.310514,
+      "longitude": -72.241628
+    },
+    {
+      "id": "MA-43",
+      "ofbaId": "43",
+      "name": "Lake Dennison",
+      "town": "Winchendon",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "8 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.646344,
+      "longitude": -72.092372
+    },
+    {
+      "id": "MA-44",
+      "ofbaId": "44",
+      "name": "Alum Pond",
+      "town": "Sturbridge",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Sturbridge",
+      "latitude": 42.134223,
+      "longitude": -72.118104
+    },
+    {
+      "id": "MA-45",
+      "ofbaId": "45",
+      "name": "Quaboag Pond",
+      "town": "Brookfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "31 Trailer - 7 Car",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Brookfield",
+      "latitude": 42.203505,
+      "longitude": -72.062945
+    },
+    {
+      "id": "MA-46",
+      "ofbaId": "46",
+      "name": "Sugden Reservoir",
+      "town": "Spencer",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.273504,
+      "longitude": -71.961728
+    },
+    {
+      "id": "MA-47",
+      "ofbaId": "47",
+      "name": "Ware River-east Branch",
+      "town": "Rutland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.436961,
+      "longitude": -71.971499
+    },
+    {
+      "id": "MA-48",
+      "ofbaId": "48",
+      "name": "Asnacomet Pond",
+      "town": "Hubbardston",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "38 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(W)",
+      "latitude": 42.448521,
+      "longitude": -71.979266
+    },
+    {
+      "id": "MA-49",
+      "ofbaId": "49",
+      "name": "Moosehorn Pond",
+      "town": "Hubbardston",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.465863,
+      "longitude": -71.968599
+    },
+    {
+      "id": "MA-5",
+      "ofbaId": "5",
+      "name": "Cook Pond",
+      "town": "Fall River",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "30 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Fall River",
+      "latitude": 41.67505,
+      "longitude": -71.17184
+    },
+    {
+      "id": "MA-50",
+      "ofbaId": "50",
+      "name": "Webster Lake",
+      "town": "Webster",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "18 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.027914,
+      "longitude": -71.826631
+    },
+    {
+      "id": "MA-51",
+      "ofbaId": "51",
+      "name": "Wallum Lake",
+      "town": "Douglas",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "30 Trailer",
+      "lanes": 3,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": "Moderate Draft",
+      "maintainer": "DCR(S)",
+      "latitude": 42.021685,
+      "longitude": -71.767886
+    },
+    {
+      "id": "MA-52",
+      "ofbaId": "52",
+      "name": "Manchaug Pond",
+      "town": "Sutton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "28 Trailer - 10 Car",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "Town Of Sutton",
+      "latitude": 42.091384,
+      "longitude": -71.768411
+    },
+    {
+      "id": "MA-53",
+      "ofbaId": "53",
+      "name": "Singletary Pond",
+      "town": "Millbury",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "15 Trailer - 7 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "DCR(S)",
+      "latitude": 42.169546,
+      "longitude": -71.782759
+    },
+    {
+      "id": "MA-54",
+      "ofbaId": "54",
+      "name": "Eddy Pond",
+      "town": "Auburn",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Auburn",
+      "latitude": 42.178964,
+      "longitude": -71.841427
+    },
+    {
+      "id": "MA-55",
+      "ofbaId": "55",
+      "name": "Lake Quinsigamond (Flint Pond)",
+      "town": "Shrewsbury",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "50 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Shrewsbury",
+      "latitude": 42.242761,
+      "longitude": -71.737412
+    },
+    {
+      "id": "MA-56",
+      "ofbaId": "56",
+      "name": "Lake Quinsigamond",
+      "town": "Shrewsbury",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "53 Trailer - 15 Car",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Shrewsbury",
+      "latitude": 42.290943,
+      "longitude": -71.755704
+    },
+    {
+      "id": "MA-57",
+      "ofbaId": "57",
+      "name": "Fort Pond",
+      "town": "Lancaster",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "3 Trailer - 4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.520486,
+      "longitude": -71.690696
+    },
+    {
+      "id": "MA-58",
+      "ofbaId": "58",
+      "name": "Whalom Lake",
+      "town": "Leominster",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "9 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "City Of Leominster",
+      "latitude": 42.572684,
+      "longitude": -71.744509
+    },
+    {
+      "id": "MA-59",
+      "ofbaId": "59",
+      "name": "Little Chauncy Pond",
+      "town": "Northborough",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "3 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.305093,
+      "longitude": -71.614563
+    },
+    {
+      "id": "MA-6",
+      "ofbaId": "6",
+      "name": "South Watuppa Pond",
+      "town": "Fall River",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "55 Trailer - 4 Car",
+      "lanes": 2,
+      "fee": "Annual",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "The Annual, Municipal Fee To Use The Lot And Ramp Is $60.",
+      "maintainer": "City Of Fall River",
+      "latitude": 41.674057,
+      "longitude": -71.139629
+    },
+    {
+      "id": "MA-60",
+      "ofbaId": "60",
+      "name": "Lake Chauncy",
+      "town": "Westborough",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.289587,
+      "longitude": -71.6131
+    },
+    {
+      "id": "MA-61",
+      "ofbaId": "61",
+      "name": "Baddacook Pond",
+      "town": "Groton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "5 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.623425,
+      "longitude": -71.530374
+    },
+    {
+      "id": "MA-62",
+      "ofbaId": "62",
+      "name": "Knopps Pond",
+      "town": "Groton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.596877,
+      "longitude": -71.518626
+    },
+    {
+      "id": "MA-63",
+      "ofbaId": "63",
+      "name": "Delaney Pond",
+      "town": "Stow",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "12 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.451048,
+      "longitude": -71.544234
+    },
+    {
+      "id": "MA-64",
+      "ofbaId": "64",
+      "name": "Whitehall Reservoir",
+      "town": "Hopkinton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "30 Trailer",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "DCR(S)",
+      "latitude": 42.240993,
+      "longitude": -71.572318
+    },
+    {
+      "id": "MA-65",
+      "ofbaId": "65",
+      "name": "North Pond",
+      "town": "Hopkinton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.205312,
+      "longitude": -71.558744
+    },
+    {
+      "id": "MA-66",
+      "ofbaId": "66",
+      "name": "Ashland Reservoir",
+      "town": "Ashland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.232472,
+      "longitude": -71.468545
+    },
+    {
+      "id": "MA-67",
+      "ofbaId": "67",
+      "name": "Lake Winthrop",
+      "town": "Holliston",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Holliston",
+      "latitude": 42.189874,
+      "longitude": -71.427247
+    },
+    {
+      "id": "MA-68",
+      "ofbaId": "68",
+      "name": "Lake Cochituate",
+      "town": "Wayland",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "50 Trailer",
+      "lanes": 20,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Many Ramps",
+      "maintainer": "DCR(S)",
+      "latitude": 42.31026,
+      "longitude": -71.375448
+    },
+    {
+      "id": "MA-69",
+      "ofbaId": "69",
+      "name": "Walden Pond",
+      "town": "Concord",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "10 Car",
+      "lanes": 1,
+      "fee": "Yes",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.437835,
+      "longitude": -71.335485
+    },
+    {
+      "id": "MA-7",
+      "ofbaId": "7",
+      "name": "Tispaquin Pond",
+      "town": "Middleborough",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "6 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 41.856361,
+      "longitude": -70.854355
+    },
+    {
+      "id": "MA-70",
+      "ofbaId": "70",
+      "name": "White Pond",
+      "town": "Concord",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.428849,
+      "longitude": -71.387529
+    },
+    {
+      "id": "MA-71",
+      "ofbaId": "71",
+      "name": "Flint Pond",
+      "town": "Tyngsborough",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "8 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.675092,
+      "longitude": -71.425674
+    },
+    {
+      "id": "MA-72",
+      "ofbaId": "72",
+      "name": "Mascuppic Lake",
+      "town": "Dracut",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "4 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.679279,
+      "longitude": -71.374871
+    },
+    {
+      "id": "MA-73",
+      "ofbaId": "73",
+      "name": "Merrimack River (Riley Park)",
+      "town": "Lawrence",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "54 Trailer",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "DCR(S)",
+      "latitude": 42.696619,
+      "longitude": -71.169641
+    },
+    {
+      "id": "MA-74",
+      "ofbaId": "74",
+      "name": "Lake Attitash",
+      "town": "Merrimac",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "22 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "DCR(S)",
+      "latitude": 42.842802,
+      "longitude": -70.98186
+    },
+    {
+      "id": "MA-75",
+      "ofbaId": "75",
+      "name": "Merrimack River (Cashman Park)",
+      "town": "Newburyport",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "124 Trailer - 6 Car",
+      "lanes": 3,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Newburyport",
+      "latitude": 42.816983,
+      "longitude": -70.877808
+    },
+    {
+      "id": "MA-76",
+      "ofbaId": "76",
+      "name": "Black Rock Creek",
+      "town": "Salisbury",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "60 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.822851,
+      "longitude": -70.826574
+    },
+    {
+      "id": "MA-77",
+      "ofbaId": "77",
+      "name": "Parker River",
+      "town": "Newbury",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.758709,
+      "longitude": -70.891253
+    },
+    {
+      "id": "MA-78",
+      "ofbaId": "78",
+      "name": "Rock Pond",
+      "town": "Georgetown",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "10 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "DCR(S)",
+      "latitude": 42.731217,
+      "longitude": -71.007618
+    },
+    {
+      "id": "MA-79",
+      "ofbaId": "79",
+      "name": "Ipswich River",
+      "town": "Ipswich",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "48 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Ipswich",
+      "latitude": 42.684116,
+      "longitude": -70.827169
+    },
+    {
+      "id": "MA-8",
+      "ofbaId": "8",
+      "name": "Snipatuit Pond",
+      "town": "Rochester",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "5 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Fisherman Access",
+      "maintainer": "DFW",
+      "latitude": 41.785254,
+      "longitude": -70.858179
+    },
+    {
+      "id": "MA-80",
+      "ofbaId": "80",
+      "name": "Hood Pond",
+      "town": "Ipswich",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "4 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.671601,
+      "longitude": -70.955599
+    },
+    {
+      "id": "MA-81",
+      "ofbaId": "81",
+      "name": "Chebacco Lake",
+      "town": "Hamilton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "17 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(S)",
+      "latitude": 42.604325,
+      "longitude": -70.810818
+    },
+    {
+      "id": "MA-82",
+      "ofbaId": "82",
+      "name": "Porter River (Popes Landing)",
+      "town": "Danvers",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "64 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Danvers",
+      "latitude": 42.556525,
+      "longitude": -70.922233
+    },
+    {
+      "id": "MA-83",
+      "ofbaId": "83",
+      "name": "Danvers River",
+      "town": "Salem",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "42 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Salem",
+      "latitude": 42.54061,
+      "longitude": -70.898518
+    },
+    {
+      "id": "MA-84",
+      "ofbaId": "84",
+      "name": "Lynn Harbor",
+      "town": "Lynn",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "37 Trailer",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(U)",
+      "latitude": 42.455288,
+      "longitude": -70.939372
+    },
+    {
+      "id": "MA-85",
+      "ofbaId": "85",
+      "name": "Horn Pond",
+      "town": "Woburn",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "34 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "City Of Woburn",
+      "latitude": 42.464561,
+      "longitude": -71.153611
+    },
+    {
+      "id": "MA-86",
+      "ofbaId": "86",
+      "name": "Charles River",
+      "town": "Waltham",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "16 Trailer - 5 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(U)",
+      "latitude": 42.362526,
+      "longitude": -71.244944
+    },
+    {
+      "id": "MA-87",
+      "ofbaId": "87",
+      "name": "Charles River",
+      "town": "Brighton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "80 Car",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DCR(U)",
+      "latitude": 42.359439,
+      "longitude": -71.166432
+    },
+    {
+      "id": "MA-88",
+      "ofbaId": "88",
+      "name": "Winthrop Harbor",
+      "town": "Winthrop",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "59 Trailer - 21 Car",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Winthrop",
+      "latitude": 42.366542,
+      "longitude": -70.971109
+    },
+    {
+      "id": "MA-89",
+      "ofbaId": "89",
+      "name": "Back River",
+      "town": "Weymouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "88 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Weymouth",
+      "latitude": 42.252024,
+      "longitude": -70.936354
+    },
+    {
+      "id": "MA-9",
+      "ofbaId": "9",
+      "name": "Long Pond",
+      "town": "Freetown",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "47 Trailer",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "Yes",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Freetown",
+      "latitude": 41.783195,
+      "longitude": -70.929488
+    },
+    {
+      "id": "MA-90",
+      "ofbaId": "90",
+      "name": "Scituate Harbor",
+      "town": "Scituate",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "43 Trailer - 12 Car",
+      "lanes": 2,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Scituate",
+      "latitude": 42.201491,
+      "longitude": -70.726007
+    },
+    {
+      "id": "MA-91",
+      "ofbaId": "91",
+      "name": "Green Harbor",
+      "town": "Marshfield",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "74 Trailer",
+      "lanes": 3,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Marshfield",
+      "latitude": 42.083367,
+      "longitude": -70.645981
+    },
+    {
+      "id": "MA-92",
+      "ofbaId": "92",
+      "name": "Indian Head River",
+      "town": "Hanover",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "15 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Hanover",
+      "latitude": 42.099787,
+      "longitude": -70.818842
+    },
+    {
+      "id": "MA-93",
+      "ofbaId": "93",
+      "name": "Falls Pond",
+      "town": "North Attleborough",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "15 Trailer",
+      "lanes": 1,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "Town Of North Attleboro",
+      "latitude": 41.968821,
+      "longitude": -71.326222
+    },
+    {
+      "id": "MA-94",
+      "ofbaId": "94",
+      "name": "Snake River (Winnecunnet Pond)",
+      "town": "Norton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "C"
+      ],
+      "rampType": "Cartop",
+      "parking": "6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 41.967178,
+      "longitude": -71.125804
+    },
+    {
+      "id": "MA-95",
+      "ofbaId": "95",
+      "name": "Lake Sabbatia",
+      "town": "Taunton",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "17 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": "Shallow Draft",
+      "maintainer": "City Of Taunton",
+      "latitude": 41.946621,
+      "longitude": -71.114202
+    },
+    {
+      "id": "MA-96",
+      "ofbaId": "96",
+      "name": "West Meadows Pond",
+      "town": "West Bridgewater",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Gravel",
+      "parking": "20 Trailer",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.034919,
+      "longitude": -71.035933
+    },
+    {
+      "id": "MA-97",
+      "ofbaId": "97",
+      "name": "Hockomock River",
+      "town": "West Bridgewater",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "D"
+      ],
+      "rampType": "Cartop",
+      "parking": "10 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "DFW",
+      "latitude": 42.011028,
+      "longitude": -71.058293
+    },
+    {
+      "id": "MA-98",
+      "ofbaId": "98",
+      "name": "Lake Nippenicket",
+      "town": "Bridgewater",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "B"
+      ],
+      "rampType": "Concrete",
+      "parking": "22 Trailer - 6 Car",
+      "lanes": 1,
+      "fee": "No",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Bridgewater",
+      "latitude": 41.964458,
+      "longitude": -71.033764
+    },
+    {
+      "id": "MA-99",
+      "ofbaId": "99",
+      "name": "Apponagansett Bay",
+      "town": "Dartmouth",
+      "state": "MA",
+      "facilityTypeCodes": [
+        "A"
+      ],
+      "rampType": "Concrete",
+      "parking": "52 Trailer - 14 Car",
+      "lanes": 2,
+      "fee": "Yes",
+      "restricted": "No",
+      "barrierFree": false,
+      "comments": null,
+      "maintainer": "Town Of Dartmouth",
+      "latitude": 41.584688,
+      "longitude": -70.954408
+    }
+  ]
+}

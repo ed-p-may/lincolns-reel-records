@@ -123,4 +123,91 @@ final class CatchMapUITests: XCTestCase {
         app.buttons["map.layers.done"].tap()
         XCTAssertEqual(persistedStyleButton.value as? String, "Standard")
     }
+
+    func testPublicAccessLayerTogglesWithoutChangingCatchCounts() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--ui-testing-logbook"]
+        app.launch()
+
+        let mapTab = app.tabBars.buttons["Map"]
+        XCTAssertTrue(mapTab.waitForExistence(timeout: 5))
+        mapTab.tap()
+
+        let counts = app.staticTexts["map.counts"]
+        XCTAssertTrue(counts.waitForExistence(timeout: 5))
+        XCTAssertEqual(counts.label, "2 CATCHES ACROSS 2 SPOTS")
+
+        let layersButton = app.buttons["map.style.button"]
+        XCTAssertTrue(layersButton.waitForExistence(timeout: 5))
+        layersButton.tap()
+
+        let accessToggle = app.switches["map.layer.public-access"]
+        XCTAssertTrue(accessToggle.waitForExistence(timeout: 3))
+        XCTAssertEqual(accessToggle.value as? String, "0")
+        accessToggle.switches.firstMatch.tap()
+        app.buttons["map.layers.done"].tap()
+
+        XCTAssertEqual(counts.label, "2 CATCHES ACROSS 2 SPOTS")
+
+        let accessPin = app.buttons["map.access-site.MA-225"]
+        XCTAssertTrue(accessPin.waitForExistence(timeout: 5))
+        accessPin.tap()
+
+        let accessCard = app.otherElements["map.access-site-card"]
+        XCTAssertTrue(accessCard.waitForExistence(timeout: 3))
+        XCTAssertTrue(app.buttons["map.access-site-card.directions"].exists)
+        app.buttons["map.access-site-card.close"].tap()
+        XCTAssertFalse(accessCard.exists)
+
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["Map"].waitForExistence(timeout: 5))
+        app.tabBars.buttons["Map"].tap()
+        XCTAssertTrue(app.buttons["map.access-site.MA-225"].waitForExistence(timeout: 5))
+
+        let persistedLayersButton = app.buttons["map.style.button"]
+        XCTAssertTrue(persistedLayersButton.waitForExistence(timeout: 3))
+        persistedLayersButton.tap()
+        let persistedToggle = app.switches["map.layer.public-access"]
+        XCTAssertTrue(persistedToggle.waitForExistence(timeout: 3))
+        XCTAssertEqual(persistedToggle.value as? String, "1")
+        persistedToggle.switches.firstMatch.tap()
+        app.buttons["map.layers.done"].tap()
+
+        XCTAssertFalse(app.buttons["map.access-site.MA-225"].exists)
+    }
+
+    func testZeroCatchMapShowsLiveMapCanvasWithCompactHeader() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing"]
+        app.launch()
+
+        let mapTab = app.tabBars.buttons["Map"]
+        XCTAssertTrue(mapTab.waitForExistence(timeout: 5))
+        mapTab.tap()
+
+        let emptyHeader = app.staticTexts["map.empty"]
+        XCTAssertTrue(emptyHeader.waitForExistence(timeout: 5))
+        XCTAssertTrue(app.maps.firstMatch.waitForExistence(timeout: 5))
+        let layersButton = app.buttons["map.style.button"]
+        XCTAssertTrue(layersButton.waitForExistence(timeout: 3))
+
+        layersButton.tap()
+        let accessToggle = app.switches["map.layer.public-access"]
+        XCTAssertTrue(accessToggle.waitForExistence(timeout: 3))
+        accessToggle.switches.firstMatch.tap()
+        app.buttons["map.layers.done"].tap()
+
+        let accessPin = app.buttons["map.access-site.MA-225"]
+        XCTAssertTrue(accessPin.waitForExistence(timeout: 5))
+        accessPin.tap()
+        XCTAssertTrue(app.otherElements["map.access-site-card"].waitForExistence(timeout: 3))
+        XCTAssertTrue(emptyHeader.exists)
+        app.buttons["map.access-site-card.close"].tap()
+
+        layersButton.tap()
+        XCTAssertTrue(accessToggle.waitForExistence(timeout: 3))
+        accessToggle.switches.firstMatch.tap()
+        app.buttons["map.layers.done"].tap()
+    }
 }

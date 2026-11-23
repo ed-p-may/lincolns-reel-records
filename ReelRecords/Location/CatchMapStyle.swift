@@ -123,11 +123,89 @@ enum CatchMapFilter {
         }
         return "\(totalCount) \(catchWord) ACROSS \(spotCount) \(spotWord)"
     }
+
+    static func fittingRegion(for catches: [CatchItem]) -> MKCoordinateRegion? {
+        let coordinates = catches.compactMap(\.coordinate)
+        guard let first = coordinates.first else { return nil }
+        let minimumSpan = 0.035
+        if coordinates.count == 1 {
+            return MKCoordinateRegion(
+                center: first.mapCoordinate,
+                span: MKCoordinateSpan(latitudeDelta: minimumSpan, longitudeDelta: minimumSpan)
+            )
+        }
+        var minLat = first.latitude
+        var maxLat = first.latitude
+        for coord in coordinates.dropFirst() {
+            minLat = min(minLat, coord.latitude)
+            maxLat = max(maxLat, coord.latitude)
+        }
+        let (centerLon, rawLonSpan) = shortestLongitudeInterval(coordinates.map(\.longitude))
+        let latSpan = max((maxLat - minLat) * 1.4, minimumSpan)
+        let lonSpan = max(rawLonSpan * 1.4, minimumSpan)
+        return MKCoordinateRegion(
+            center: CLLocationCoordinate2D(
+                latitude: (minLat + maxLat) / 2,
+                longitude: centerLon
+            ),
+            span: MKCoordinateSpan(latitudeDelta: min(latSpan, 180), longitudeDelta: min(lonSpan, 360))
+        )
+    }
+
+    private static func shortestLongitudeInterval(_ longitudes: [Double]) -> (center: Double, span: Double) {
+        let sorted = longitudes.sorted()
+        guard let first = sorted.first, let last = sorted.last else {
+            return (0, 0)
+        }
+        var maxGap = (first + 360) - last
+        var gapStart = last
+        for index in 0 ..< (sorted.count - 1) {
+            let gap = sorted[index + 1] - sorted[index]
+            if gap > maxGap {
+                maxGap = gap
+                gapStart = sorted[index]
+            }
+        }
+        let span = max(0, 360 - maxGap)
+        var center = gapStart + maxGap + span / 2
+        while center > 180 {
+            center -= 360
+        }
+        while center < -180 {
+            center += 360
+        }
+        return (center, span)
+    }
+}
+
+enum CatchMapLayerSettings {
+    static let showPublicAccessKey = "reelrecords.map.showPublicAccess"
+}
+
+enum CatchMapSelection: Hashable, Sendable {
+    case catchPin(UUID)
+    case accessSite(String)
+
+    var catchID: UUID? {
+        if case let .catchPin(id) = self {
+            return id
+        }
+        return nil
+    }
+
+    var accessSiteID: String? {
+        if case let .accessSite(id) = self {
+            return id
+        }
+        return nil
+    }
 }
 
 struct CatchMapLayersSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var mapStyle: CatchMapStyle
+    @Binding var showPublicAccess: Bool
+    let publicAccessSiteCount: Int
 
     var body: some View {
         NavigationStack {
@@ -166,6 +244,25 @@ struct CatchMapLayersSheet: View {
                         .accessibilityValue(mapStyle == style ? "Selected" : "Not selected")
                         .accessibilityIdentifier("map.style.\(style.rawValue)")
                     }
+                }
+
+                Section {
+                    Toggle(isOn: $showPublicAccess) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("MA Boat & Fishing Access")
+                                .font(ReelFont.body(.body, weight: .semibold))
+                                .foregroundStyle(ReelTheme.primaryText)
+                            Text("\(publicAccessSiteCount) official MassGIS ramps, launches, and shore spots (offline)")
+                                .font(ReelFont.body(.caption))
+                                .foregroundStyle(ReelTheme.secondaryText)
+                        }
+                    }
+                    .tint(ReelTheme.accessPin)
+                    .accessibilityIdentifier("map.layer.public-access")
+                } header: {
+                    Text("Layers")
+                } footer: {
+                    Text("Public access data sourced from MassGIS / MA Office of Fishing and Boating Access.")
                 }
             }
             .scrollContentBackground(.hidden)
