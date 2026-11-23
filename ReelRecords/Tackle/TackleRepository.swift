@@ -23,6 +23,11 @@ struct PendingTackleLocalState {
     let operation: TackleOutboxOperation
 }
 
+struct TackleMergeResult {
+    let didChange: Bool
+    let missingPhotos: [TackleItem]
+}
+
 @MainActor
 @Observable
 final class SwiftDataTackleRepository {
@@ -47,6 +52,15 @@ final class SwiftDataTackleRepository {
 
     func item(id: UUID, ownerID: UUID) throws -> TackleItem? {
         try record(id: id, ownerID: ownerID)?.item
+    }
+
+    func itemsIncludingSelected(ownerID: UUID, selectedID: UUID?) throws -> [TackleItem] {
+        var loaded = try items(ownerID: ownerID)
+        guard let selectedID, !loaded.contains(where: { $0.id == selectedID }) else { return loaded }
+        if let historical = try item(id: selectedID, ownerID: ownerID) {
+            loaded.append(historical)
+        }
+        return loaded
     }
 
     func itemNames(ownerID: UUID, referencedIDs: Set<UUID>) throws -> [UUID: String] {
@@ -309,7 +323,7 @@ extension SwiftDataTackleRepository {
         try modelContext.save()
     }
 
-    func merge(_ remoteItems: [RemoteTackleItem], ownerID: UUID) throws -> [TackleItem] {
+    func merge(_ remoteItems: [RemoteTackleItem], ownerID: UUID) throws -> TackleMergeResult {
         let localRecords = try records(ownerID: ownerID)
         var recordsByID = Dictionary(uniqueKeysWithValues: localRecords.map { ($0.id, $0) })
         let pendingIDs = try Set(operations(ownerID: ownerID).map(\.itemID))
@@ -349,9 +363,10 @@ extension SwiftDataTackleRepository {
         if changed {
             try modelContext.save()
         }
-        return recordsByID.values
+        let missingPhotos = recordsByID.values
             .filter { $0.photoStoragePath != nil && $0.photoLocalRelativePath == nil }
             .map(\.item)
+        return TackleMergeResult(didChange: changed, missingPhotos: missingPhotos)
     }
 
     func markDownloaded(_ item: TackleItem, data: Data) async throws {
@@ -376,27 +391,5 @@ extension SwiftDataTackleRepository {
         }
         current.photoLocalRelativePath = relativePath
         try modelContext.save()
-    }
-}
-
-enum TackleDiscovery {
-    static func results(
-        in items: [TackleItem],
-        query: String,
-        type: TackleItemType?
-    ) -> [TackleItem] {
-        let query = CatchDiscovery.normalized(query.trimmingCharacters(in: .whitespacesAndNewlines))
-        return items.filter { item in
-            (type == nil || item.type == type)
-                && (query.isEmpty || CatchDiscovery.normalized(item.name).contains(query))
-        }
-        .sorted(by: alphabeticallyPrecedes)
-    }
-
-    static func alphabeticallyPrecedes(_ first: TackleItem, _ second: TackleItem) -> Bool {
-        if CatchDiscovery.normalized(first.name) != CatchDiscovery.normalized(second.name) {
-            return CatchDiscovery.alphabeticallyPrecedes(first.name, second.name)
-        }
-        return first.id.uuidString < second.id.uuidString
     }
 }

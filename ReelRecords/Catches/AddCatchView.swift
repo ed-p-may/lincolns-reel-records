@@ -1,17 +1,6 @@
 import SwiftUI
 
 struct AddCatchView: View {
-    private static let suggestedSpecies = [
-        "Largemouth Bass",
-        "Smallmouth Bass",
-        "Northern Pike",
-        "Walleye",
-        "Crappie",
-        "Bluegill",
-        "Channel Catfish",
-        "Rainbow Trout"
-    ]
-
     @Environment(\.dismiss) private var dismiss
     @Environment(SwiftDataCatchRepository.self) private var repository
     @Environment(SwiftDataCatchPhotoRepository.self) private var photoRepository
@@ -21,7 +10,7 @@ struct AddCatchView: View {
     @Environment(\.weatherSuggestionProvider) private var weatherSuggestionProvider
     @State private var selectedSpecies: String
     @State private var customSpecies: String
-    @State private var speciesOptions = Self.suggestedSpecies
+    @State private var speciesOptions = CatchSpeciesEditor.suggestedSpecies
     @State private var weight: String
     @State private var length: String
     @State private var caughtAt: Date
@@ -36,8 +25,10 @@ struct AddCatchView: View {
     @State private var fetchingWeatherKey: WeatherRequestKey?
     @State private var weatherSuggestionMessage: String?
     @State private var tackleItems: [TackleItem] = []
+    @State private var recentCatchHistory: [CatchItem] = []
     @State private var selectedTackleItemID: UUID?
     @State private var isAddingTackle = false
+    @State private var isBrowsingTackle = false
     @State private var isManagingTackle = false
     @State private var lureText: String
     @State private var rodReel: String
@@ -67,7 +58,10 @@ struct AddCatchView: View {
 
         let values = editItem?.values
         _initialValues = State(initialValue: values)
-        let species = CatchDiscovery.pickerSelection(for: values?.species ?? "", options: Self.suggestedSpecies)
+        let species = CatchDiscovery.pickerSelection(
+            for: values?.species ?? "",
+            options: CatchSpeciesEditor.suggestedSpecies
+        )
         _selectedSpecies = State(initialValue: species.selected)
         _customSpecies = State(initialValue: species.custom)
         let numbers = CatchNumberInputs(loading: values)
@@ -104,7 +98,7 @@ struct AddCatchView: View {
                         selectedSpecies: $selectedSpecies,
                         customSpecies: $customSpecies
                     )
-                    measurementSection
+                    CatchMeasurementEditor(weight: $weight, length: $length)
                     CatchDateEditor(caughtAt: caughtAtBinding)
                     CatchLocationEditor(
                         location: $location,
@@ -114,9 +108,14 @@ struct AddCatchView: View {
                     conditionsSection
                     CatchTackleSection(
                         items: tackleItems,
-                        selectedItemID: $selectedTackleItemID,
+                        recentItems: recentTackleItems,
+                        selectedItemID: selectedTackleBinding,
                         lureText: $lureText,
                         onAdd: { isAddingTackle = true },
+                        onBrowse: {
+                            loadTackleItems()
+                            isBrowsingTackle = true
+                        },
                         onManage: { isManagingTackle = true }
                     )
                     CatchDetailsEditor(rodReel: $rodReel, notes: $notes)
@@ -166,6 +165,12 @@ struct AddCatchView: View {
                 coordinate = capturedCoordinate
             }
         }
+        .onChange(of: syncCoordinator.revision) { _, _ in
+            loadTackleItems()
+            if let catches = try? repository.list(ownerID: ownerID) {
+                recentCatchHistory = catches
+            }
+        }
         .sheet(isPresented: $isChoosingLocation) {
             ManualLocationPicker(initialCoordinate: coordinate) { selected in
                 locationService.reset()
@@ -173,25 +178,21 @@ struct AddCatchView: View {
                 coordinate = selected
             }
         }
-        .sheet(isPresented: $isAddingTackle) {
-            TackleItemEditor(ownerID: ownerID) { item in
+        .modifier(AddCatchTacklePresentations(
+            ownerID: ownerID,
+            items: tackleItems,
+            recentItems: recentTackleItems,
+            selectedItemID: selectedTackleItemID,
+            isAdding: $isAddingTackle,
+            isBrowsing: $isBrowsingTackle,
+            isManaging: $isManagingTackle,
+            onSelect: { acceptSelectableTackle($0.id) },
+            onCreated: {
                 loadTackleItems()
-                selectedTackleItemID = item.id
-            }
-        }
-        .fullScreenCover(isPresented: $isManagingTackle) {
-            NavigationStack {
-                TackleBoxView(ownerID: ownerID)
-                    .toolbar {
-                        ToolbarItem(placement: .cancellationAction) {
-                            Button("Done") {
-                                loadTackleItems()
-                                isManagingTackle = false
-                            }
-                        }
-                    }
-            }
-        }
+                selectedTackleItemID = $0.id
+            },
+            onReload: loadTackleItems
+        ))
         .onDisappear {
             locationService.reset()
             if !didCommitPhotos {
@@ -209,16 +210,6 @@ struct AddCatchView: View {
             Button("OK", role: .cancel) { errorMessage = nil }
         } message: {
             Text(errorMessage ?? "")
-        }
-    }
-
-    private var measurementSection: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            AddCatchFieldLabel("Measurements")
-            HStack(spacing: 12) {
-                measurementInput("Weight", unit: "lb", text: $weight, identifier: "add.weight")
-                measurementInput("Length", unit: "in", text: $length, identifier: "add.length")
-            }
         }
     }
 
@@ -268,19 +259,31 @@ private extension AddCatchView {
         )
     }
 
-    private func measurementInput(
-        _ title: String,
-        unit: String,
-        text: Binding<String>,
-        identifier: String
-    ) -> some View {
-        UnitInput(
-            title,
-            unit: unit,
-            text: text,
-            keyboardType: .decimalPad,
-            identifier: identifier
+    private var recentTackleItems: [TackleItem] {
+        TackleDiscovery.recentlyUsed(from: tackleItems, catches: recentCatchHistory)
+    }
+
+    private var selectedTackleBinding: Binding<UUID?> {
+        Binding(
+            get: { selectedTackleItemID },
+            set: { newID in
+                if let newID {
+                    _ = acceptSelectableTackle(newID)
+                } else {
+                    selectedTackleItemID = nil
+                }
+            }
         )
+    }
+
+    @discardableResult
+    private func acceptSelectableTackle(_ itemID: UUID) -> Bool {
+        guard (try? tackleRepository.item(id: itemID, ownerID: ownerID))?.isSelectable == true else {
+            loadTackleItems()
+            return false
+        }
+        selectedTackleItemID = itemID
+        return true
     }
 
     private func formValues() throws -> CatchValues {
@@ -363,9 +366,11 @@ private extension AddCatchView {
         guard !didLoadSpeciesOptions else { return }
         didLoadSpeciesOptions = true
         do {
-            speciesOptions = try CatchDiscovery.pickerSpecies(
-                suggested: Self.suggestedSpecies,
-                in: repository.list(ownerID: ownerID)
+            let catches = try repository.list(ownerID: ownerID)
+            recentCatchHistory = catches
+            speciesOptions = CatchDiscovery.pickerSpecies(
+                suggested: CatchSpeciesEditor.suggestedSpecies,
+                in: catches
             )
             // An edited catch whose custom species is now a chip shows that chip selected.
             if selectedSpecies.isEmpty {
@@ -416,16 +421,10 @@ private extension AddCatchView {
 
     private func loadTackleItems() {
         do {
-            var loaded = try tackleRepository.items(ownerID: ownerID)
-            if let selectedTackleItemID {
-                let isLoaded = loaded.contains { $0.id == selectedTackleItemID }
-                if !isLoaded {
-                    if let historical = try tackleRepository.item(id: selectedTackleItemID, ownerID: ownerID) {
-                        loaded.append(historical)
-                    }
-                }
-            }
-            tackleItems = loaded
+            tackleItems = try tackleRepository.itemsIncludingSelected(
+                ownerID: ownerID,
+                selectedID: selectedTackleItemID
+            )
         } catch {
             errorMessage = error.localizedDescription
         }

@@ -4,6 +4,7 @@ struct TackleItemCard: View {
     @Environment(SwiftDataTackleRepository.self) private var repository
 
     let item: TackleItem
+    var isSelected = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -25,11 +26,21 @@ struct TackleItemCard: View {
                         .frame(minHeight: 24)
                         .background(.black.opacity(0.58), in: RoundedRectangle(cornerRadius: 7))
                     Spacer()
-                    Circle()
-                        .fill(TackleColor.swatch(item.color))
-                        .frame(width: 19, height: 19)
-                        .overlay { Circle().stroke(.white.opacity(0.55), lineWidth: 2) }
-                        .accessibilityLabel(item.color.map { "Color \($0)" } ?? "Color not recorded")
+                    HStack(spacing: 6) {
+                        Circle()
+                            .fill(TackleColor.swatch(item.color))
+                            .frame(width: 19, height: 19)
+                            .overlay { Circle().stroke(.white.opacity(0.55), lineWidth: 2) }
+                            .accessibilityLabel(item.color.map { "Color \($0)" } ?? "Color not recorded")
+                        if isSelected {
+                            Image(systemName: "checkmark")
+                                .font(.caption2.bold())
+                                .foregroundStyle(ReelTheme.accentInk)
+                                .frame(width: 22, height: 22)
+                                .background(ReelTheme.accent, in: Circle())
+                                .accessibilityHidden(true)
+                        }
+                    }
                 }
                 .padding(9)
             }
@@ -58,14 +69,48 @@ struct TackleItemCard: View {
         }
         .background(ReelTheme.surface)
         .clipShape(RoundedRectangle(cornerRadius: 18))
-        .overlay { RoundedRectangle(cornerRadius: 18).stroke(ReelTheme.border) }
+        .overlay {
+            RoundedRectangle(cornerRadius: 18)
+                .stroke(isSelected ? ReelTheme.accent : ReelTheme.border, lineWidth: isSelected ? 2 : 1)
+        }
         .contentShape(RoundedRectangle(cornerRadius: 18))
         .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 
     private var metadata: String {
         let details = [item.size, item.brand].compactMap(\.self).joined(separator: " · ")
         return details.isEmpty ? item.type.label : details
+    }
+}
+
+struct TackleSectionHeader: View {
+    let title: String
+    let systemImage: String
+    let count: Int
+    let identifier: String
+
+    var body: some View {
+        HStack(spacing: 7) {
+            Image(systemName: systemImage)
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(ReelTheme.accentHighlight)
+            Text(title)
+                .font(ReelFont.body(.subheadline, weight: .bold))
+                .foregroundStyle(ReelTheme.primaryText)
+            Text("\(count)")
+                .font(ReelFont.metadata(.caption2, weight: .bold))
+                .foregroundStyle(ReelTheme.tertiaryText)
+                .padding(.horizontal, 7)
+                .padding(.vertical, 2)
+                .background(ReelTheme.raisedSurface, in: Capsule())
+            Spacer()
+        }
+        .padding(.top, 8)
+        .padding(.bottom, 2)
+        .accessibilityElement(children: .combine)
+        .accessibilityAddTraits(.isHeader)
+        .accessibilityIdentifier(identifier)
     }
 }
 

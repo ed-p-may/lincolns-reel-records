@@ -223,9 +223,13 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval
 ### 6.6 Add Catch (overlay)
 - Bottom-sheet form: photo(s), species chips, weight, length, date (default today), location, weather,
   water, **lure (Tackle Box picker)**, rod & reel, released toggle, notes → **Save Catch**.
-- **Lure picker:** select from the Tackle Box (currently-picked item shown as a card; a horizontal row
-  of other items; **+ New lure** adds one inline; **Manage Tackle Box** opens §6.8). Free-text fallback
-  (`lureText`) for a one-off. See `mockups/tacklebox.html`, frame 3.
+- **Lure picker:** select from the Tackle Box: currently-picked item shown as a banner; a compact
+  inline horizontal strip showing **+ New lure** plus up to **5 recently used** active items derived
+  from catch history (falling back to up to 5 alphabetical active items on cold start); **Browse
+  Tackle Box** opens a full-screen 2-column tile gallery (`TacklePickerView`) with **Recently Used**
+  first followed by `TackleItemType` sections, search across name/brand/color, quick type filter
+  chips, single-tap select-and-dismiss, and inline `+` creation; **Manage Tackle Box** opens §6.8.
+  Free-text fallback (`lureText`) stays available for one-offs.
 - **Scope note:** `lureText` is the always-available path and ships with core logging; the Tackle Box
   picker (A7 / Epic F, P1) is the structured upgrade over it. If the Tackle Box slips, catches still
   record a lure via `lureText`.

@@ -176,8 +176,9 @@ final class SyncCoordinator {
             }
 
             let remoteItems = try await remoteStore.fetch(ownerID: ownerID)
-            let missingPhotos = try repository.merge(remoteItems, ownerID: ownerID)
-            for item in missingPhotos {
+            let mergeResult = try repository.merge(remoteItems, ownerID: ownerID)
+            didChange = mergeResult.didChange || didChange
+            for item in mergeResult.missingPhotos {
                 guard let path = item.photoStoragePath else { continue }
                 do {
                     let data = try await remoteStore.download(path: path)

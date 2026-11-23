@@ -178,6 +178,10 @@ final class AppDependencies {
             try seedLastUsedDefaults(repository: repository, tackleRepository: tackleRepository)
             return
         }
+        if ProcessInfo.processInfo.arguments.contains("--ui-testing-tackle-recency") {
+            try seedTackleRecency(repository: repository, tackleRepository: tackleRepository)
+            return
+        }
         guard ProcessInfo.processInfo.arguments.contains("--ui-testing-logbook") else { return }
         try seedLogbook(
             repository: repository,
@@ -319,6 +323,59 @@ final class AppDependencies {
 }
 
 private extension AppDependencies {
+    struct TackleSeedSpec {
+        let name: String
+        let type: TackleItemType
+        let color: String
+        let brand: String
+    }
+
+    static func seedTackleRecency(
+        repository: SwiftDataCatchRepository,
+        tackleRepository: SwiftDataTackleRepository
+    ) throws {
+        let specs = [
+            TackleSeedSpec(name: "Lure One", type: .softPlastic, color: "Green Pumpkin", brand: "Yamamoto"),
+            TackleSeedSpec(name: "Lure Two", type: .crankbait, color: "Chartreuse", brand: "Rapala"),
+            TackleSeedSpec(name: "Lure Three", type: .spinnerbait, color: "White", brand: "Booyah"),
+            TackleSeedSpec(name: "Lure Four", type: .jig, color: "Black Blue", brand: "Strike King"),
+            TackleSeedSpec(name: "Lure Five", type: .topwater, color: "Bone", brand: "Heddon"),
+            TackleSeedSpec(name: "Lure Six", type: .spoon, color: "Silver", brand: "Johnson"),
+            TackleSeedSpec(name: "Lure Seven", type: .spinnerbait, color: "Firetiger", brand: "Mepps")
+        ]
+        let created = try specs.map { spec in
+            try tackleRepository.create(NewTackleItem(
+                ownerID: uiTestOwnerID,
+                values: TackleValues(
+                    name: spec.name,
+                    type: spec.type,
+                    size: nil,
+                    color: spec.color,
+                    brand: spec.brand,
+                    archived: false
+                )
+            ))
+        }
+        let base = Date(timeIntervalSince1970: 1_753_000_000)
+        for index in 0 ..< 6 {
+            _ = try repository.create(NewCatch(
+                ownerID: uiTestOwnerID,
+                values: CatchValues(
+                    species: "Smallmouth Bass",
+                    weight: nil,
+                    length: nil,
+                    caughtAt: base.addingTimeInterval(Double(index) * 3600),
+                    location: nil,
+                    tackleItemID: created[index].id,
+                    lureText: nil,
+                    rodReel: nil,
+                    notes: nil,
+                    released: true
+                )
+            ))
+        }
+    }
+
     static func makeWeatherSuggestionProvider(
         isUITesting: Bool
     ) -> any WeatherSuggestionProviding {
