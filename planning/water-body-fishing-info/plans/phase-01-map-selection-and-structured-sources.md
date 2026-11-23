@@ -1,13 +1,13 @@
 ---
-DATE: 2026-11-22
-STATUS: Scoped
+DATE: 2026-11-23
+STATUS: Implemented on branch
 AUTHOR: Antigravity
 ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/14
 ---
 
 # Phase 01 — Map selection, sheet UX, and free structured sources
 
-**Status:** Scoped (v1 target — client-only, zero backend changes)
+**Status:** Implemented on branch (`feat/water-body-fishing-info`)
 **Depends on:** Resolved 2026-11-22 decisions in `context/decisions.md`
 
 ## Goal

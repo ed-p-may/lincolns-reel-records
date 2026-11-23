@@ -8,13 +8,24 @@ struct CatchMapView: View {
     )
 
     @Environment(SwiftDataCatchRepository.self) private var repository
+    @Environment(SwiftDataTackleRepository.self) private var tackleRepository
     @Environment(SyncCoordinator.self) private var syncCoordinator
+    @Environment(\.waterBodyInfoProvider) private var waterBodyInfoProvider
     @AppStorage(CatchMapStyle.storageKey) private var mapStyle: CatchMapStyle = .standard
     @AppStorage(CatchMapLayerSettings.showPublicAccessKey) private var showPublicAccess = false
     @AppStorage(CatchMapLayerSettings.showLakeDepthsKey) private var showLakeDepths = false
     @State private var catches: [CatchItem] = []
+    @State private var tackleNames: [UUID: String] = [:]
     @State private var selectedSpecies: String?
     @State private var selection: CatchMapSelection?
+    @State private var selectedWaterBody: WaterBodySelection?
+    @State private var waterBodyInfo: WaterBodyInfo?
+    @State private var isLoadingWaterInfo = false
+    @State private var isWaterInfoOffline = false
+    @State private var waterLookupNotice: String?
+    @State private var waterResolveTask: Task<Void, Never>?
+    @State private var waterFetchTask: Task<Void, Never>?
+    @State private var noticeDismissTask: Task<Void, Never>?
     @State private var handledFocusRevision: Int?
     @State private var hasLoadedCatches = false
     @State private var usingEmptyFallbackCamera = false
@@ -56,12 +67,43 @@ struct CatchMapView: View {
                     publicAccessSiteCount: accessCatalog.sites.count
                 )
             }
+            .sheet(item: $selectedWaterBody, onDismiss: clearWaterBodyState) { water in
+                WaterBodyInfoSheet(
+                    selection: water,
+                    localHistory: LocalWaterHistory.summarize(
+                        catches: catches,
+                        tackleNames: tackleNames,
+                        for: water
+                    ),
+                    info: waterBodyInfo,
+                    isLoading: isLoadingWaterInfo,
+                    isOfflineUnavailable: isWaterInfoOffline,
+                    onRefresh: { loadWaterBodyInfo(for: water, forceRefresh: true) },
+                    onOpenCatch: { catchItem in
+                        selectedWaterBody = nil
+                        onOpenCatch(catchItem)
+                    },
+                    onDismiss: { selectedWaterBody = nil }
+                )
+            }
             .task(id: refreshToken + syncCoordinator.revision) { reload() }
             .onChange(of: focusRevision) { _, _ in reload() }
+            .onChange(of: selection) { _, newValue in
+                if newValue != nil {
+                    waterResolveTask?.cancel()
+                    selectedWaterBody = nil
+                    waterLookupNotice = nil
+                }
+            }
             .onChange(of: showPublicAccess) { _, isVisible in
                 if !isVisible, selection?.accessSiteID != nil {
                     selection = nil
                 }
+            }
+            .onDisappear {
+                waterResolveTask?.cancel()
+                waterFetchTask?.cancel()
+                noticeDismissTask?.cancel()
             }
             .alert("Unable to open map", isPresented: errorBinding) {
                 Button("Retry") { reload() }
@@ -79,7 +121,13 @@ struct CatchMapView: View {
             mapStyle: mapStyle,
             targetRegion: targetRegion,
             cameraRevision: cameraRevision,
-            selection: $selection
+            selection: $selection,
+            onSelectMapFeature: { title, coordinate in
+                inspectWaterBody(at: coordinate, hintName: title, showNotFoundNotice: false)
+            },
+            onLongPressCoordinate: { coordinate in
+                inspectWaterBody(at: coordinate, hintName: nil, showNotFoundNotice: true)
+            }
         )
         .ignoresSafeArea(edges: .bottom)
         .safeAreaInset(edge: .top) { mapHeader }
@@ -139,6 +187,10 @@ struct CatchMapView: View {
         } else if let selectedAccessSite {
             PublicAccessSiteCard(site: selectedAccessSite) {
                 selection = nil
+            }
+        } else if let waterLookupNotice {
+            WaterLookupNoticeBanner(message: waterLookupNotice) {
+                self.waterLookupNotice = nil
             }
         }
     }
@@ -217,11 +269,15 @@ struct CatchMapView: View {
             setCamera(to: region)
         }
     }
+}
 
-    private func reload() {
+private extension CatchMapView {
+    func reload() {
         do {
             let wasFirstLoad = !hasLoadedCatches
             catches = try repository.list(ownerID: ownerID)
+            let referencedIDs = Set(catches.compactMap(\.tackleItemID))
+            tackleNames = (try? tackleRepository.itemNames(ownerID: ownerID, referencedIDs: referencedIDs)) ?? [:]
             hasLoadedCatches = true
             loadError = nil
             selectedSpecies = CatchMapFilter.reconciledSpecies(
@@ -251,7 +307,7 @@ struct CatchMapView: View {
         }
     }
 
-    private func applyPendingFocusIfNeeded() {
+    func applyPendingFocusIfNeeded() {
         guard hasLoadedCatches else { return }
         let hasFocusTarget = focusCatchID != nil || focusSpotName != nil
         guard CatchMapFilter.shouldApplyFocus(
@@ -265,7 +321,7 @@ struct CatchMapView: View {
         focusRequestedCatch()
     }
 
-    private func focusRequestedCatch() {
+    func focusRequestedCatch() {
         guard let focusCatchID,
               let catchItem = pinnedCatches.first(where: { $0.id == focusCatchID }),
               let coordinate = catchItem.coordinate
@@ -294,75 +350,78 @@ struct CatchMapView: View {
             span: MKCoordinateSpan(latitudeDelta: 0.035, longitudeDelta: 0.035)
         ))
     }
-}
 
-private struct MapSpeciesFilterBar: View {
-    let availableSpecies: [String]
-    let selectedSpecies: String?
-    let onSelect: (String?) -> Void
+    func inspectWaterBody(
+        at coordinate: CatchCoordinate,
+        hintName: String?,
+        showNotFoundNotice: Bool
+    ) {
+        waterResolveTask?.cancel()
+        noticeDismissTask?.cancel()
+        waterLookupNotice = nil
 
-    var body: some View {
-        let resetTitle = CatchMapFilter.resetChipTitle(availableSpecies: availableSpecies)
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 8) {
-                SelectionChip(title: resetTitle, isSelected: selectedSpecies == nil, sizing: .compact) {
-                    onSelect(nil)
+        waterResolveTask = Task { @MainActor in
+            let resolved = try? await waterBodyInfoProvider.resolveWaterBody(
+                at: coordinate,
+                hintName: hintName
+            )
+            guard !Task.isCancelled else { return }
+
+            guard let resolved else {
+                if showNotFoundNotice {
+                    showTemporaryWaterNotice("No named body of water found here")
                 }
-                .accessibilityLabel("Show all catches")
-                .accessibilityIdentifier("map.species.All")
-
-                ForEach(availableSpecies, id: \.self) { species in
-                    SelectionChip(title: species, isSelected: selectedSpecies == species, sizing: .compact) {
-                        onSelect(species)
-                    }
-                    .accessibilityLabel(
-                        CatchDiscovery.normalized(species) == "all" ? "Species \(species)" : species
-                    )
-                    .accessibilityIdentifier(CatchMapFilter.speciesChipIdentifier(for: species))
-                }
+                return
             }
+
+            selection = nil
+            selectedWaterBody = resolved
+            loadWaterBodyInfo(for: resolved, forceRefresh: false)
         }
-        .accessibilityLabel("Filter map by species")
     }
-}
 
-private struct SelectedCatchCard: View {
-    let selectedCatch: CatchItem
-    let onOpen: () -> Void
-
-    var body: some View {
-        Button(action: onOpen) {
-            HStack(spacing: 12) {
-                Image(systemName: "fish.fill")
-                    .font(.title2)
-                    .foregroundStyle(ReelTheme.accent)
-                    .frame(width: 44, height: 44)
-                    .background(ReelTheme.accent.opacity(0.12), in: RoundedRectangle(cornerRadius: 12))
-                VStack(alignment: .leading, spacing: 3) {
-                    Text(selectedCatch.species)
-                        .reelDisplayFont(17)
-                        .foregroundStyle(ReelTheme.primaryText)
-                        .lineLimit(1)
-                    Text(selectedCatch.location ?? "Named spot not recorded")
-                        .font(ReelFont.body(.caption))
-                        .foregroundStyle(ReelTheme.secondaryText)
-                        .lineLimit(1)
-                }
-                Spacer()
-                if let weight = selectedCatch.weight {
-                    Text(CatchFormatting.weight(weight))
-                        .font(ReelFont.metadata(.caption, weight: .bold))
-                        .foregroundStyle(ReelTheme.accentHighlight)
-                }
-                Image(systemName: "chevron.right")
-                    .foregroundStyle(ReelTheme.tertiaryText)
-            }
-            .padding(12)
-            .background(.ultraThinMaterial, in: RoundedRectangle(cornerRadius: 18))
-            .padding(12)
+    func loadWaterBodyInfo(for selection: WaterBodySelection, forceRefresh: Bool) {
+        waterFetchTask?.cancel()
+        if !forceRefresh {
+            waterBodyInfo = waterBodyInfoProvider.cachedInfo(for: selection)
         }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Open \(selectedCatch.species) from \(selectedCatch.location ?? "unnamed spot")")
-        .accessibilityIdentifier("map.selected-catch")
+        isLoadingWaterInfo = true
+        isWaterInfoOffline = false
+
+        waterFetchTask = Task { @MainActor in
+            do {
+                let fetched = try await waterBodyInfoProvider.fetchInfo(
+                    for: selection,
+                    forceRefresh: forceRefresh
+                )
+                guard !Task.isCancelled, selectedWaterBody?.id == selection.id else { return }
+                waterBodyInfo = fetched
+                isLoadingWaterInfo = false
+                isWaterInfoOffline = false
+            } catch {
+                guard !Task.isCancelled, selectedWaterBody?.id == selection.id else { return }
+                isLoadingWaterInfo = false
+                if waterBodyInfo == nil {
+                    isWaterInfoOffline = true
+                }
+            }
+        }
+    }
+
+    func showTemporaryWaterNotice(_ message: String) {
+        waterLookupNotice = message
+        noticeDismissTask?.cancel()
+        noticeDismissTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(3.5))
+            guard !Task.isCancelled else { return }
+            waterLookupNotice = nil
+        }
+    }
+
+    func clearWaterBodyState() {
+        waterFetchTask?.cancel()
+        waterBodyInfo = nil
+        isLoadingWaterInfo = false
+        isWaterInfoOffline = false
     }
 }

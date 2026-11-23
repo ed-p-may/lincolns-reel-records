@@ -32,11 +32,13 @@ final class AppDependencies {
     let modelContainer: ModelContainer
     let syncCoordinator: SyncCoordinator
     let weatherSuggestionProvider: any WeatherSuggestionProviding
+    let waterBodyInfoProvider: any WaterBodyInfoProviding
     let photoMetadataDefaultsFixture: PhotoCaptureMetadata?
 
     init(isUITesting: Bool = AppDependencies.isRunningTests) {
         locationService = CatchLocationService()
         weatherSuggestionProvider = Self.makeWeatherSuggestionProvider(isUITesting: isUITesting)
+        waterBodyInfoProvider = Self.makeWaterBodyInfoProvider(isUITesting: isUITesting)
         photoMetadataDefaultsFixture = Self.makePhotoMetadataDefaultsFixture(isUITesting: isUITesting)
         do {
             let stores = try Self.makeLocalStores(isUITesting: isUITesting)
@@ -116,29 +118,6 @@ final class AppDependencies {
             .appendingPathComponent("ReelRecords-UITests-\(ProcessInfo.processInfo.processIdentifier)")
             : nil
         return try PhotoFileStore(rootURL: testRoot)
-    }
-
-    private static func makeWeatherSuggestionProvider(
-        isUITesting: Bool
-    ) -> any WeatherSuggestionProviding {
-        guard isUITesting else { return OpenMeteoClient() }
-        return ProcessInfo.processInfo.arguments.contains("--ui-testing-weather-fixture")
-            ? FixtureWeatherSuggestionProvider()
-            : UnavailableWeatherSuggestionProvider()
-    }
-
-    private static func makePhotoMetadataDefaultsFixture(
-        isUITesting: Bool
-    ) -> PhotoCaptureMetadata? {
-        guard isUITesting,
-              ProcessInfo.processInfo.arguments.contains("--ui-testing-photo-metadata-defaults")
-        else {
-            return nil
-        }
-        return PhotoCaptureMetadata(
-            capturedAt: Date(timeIntervalSince1970: 1_786_317_300),
-            coordinate: CatchCoordinate(latitude: 42.3169, longitude: -73.3226)
-        )
     }
 
     private static func makeServices(isUITesting: Bool) -> AppServices {
@@ -336,5 +315,47 @@ final class AppDependencies {
             UIImage(systemName: "fish.fill")?.withTintColor(.white).draw(in: fishFrame)
         }
         return image.jpegData(compressionQuality: 0.9)!
+    }
+}
+
+private extension AppDependencies {
+    static func makeWeatherSuggestionProvider(
+        isUITesting: Bool
+    ) -> any WeatherSuggestionProviding {
+        guard isUITesting else { return OpenMeteoClient() }
+        return ProcessInfo.processInfo.arguments.contains("--ui-testing-weather-fixture")
+            ? FixtureWeatherSuggestionProvider()
+            : UnavailableWeatherSuggestionProvider()
+    }
+
+    static func makePhotoMetadataDefaultsFixture(
+        isUITesting: Bool
+    ) -> PhotoCaptureMetadata? {
+        guard isUITesting,
+              ProcessInfo.processInfo.arguments.contains("--ui-testing-photo-metadata-defaults")
+        else {
+            return nil
+        }
+        return PhotoCaptureMetadata(
+            capturedAt: Date(timeIntervalSince1970: 1_786_317_300),
+            coordinate: CatchCoordinate(latitude: 42.3169, longitude: -73.3226)
+        )
+    }
+
+    static func makeWaterBodyInfoProvider(
+        isUITesting: Bool
+    ) -> any WaterBodyInfoProviding {
+        guard isUITesting else { return WaterBodyInfoClient() }
+        let args = ProcessInfo.processInfo.arguments
+        if args.contains("--ui-testing-water-info-fixture") {
+            return FixtureWaterBodyInfoProvider(mode: .rich)
+        }
+        if args.contains("--ui-testing-water-info-sparse") {
+            return FixtureWaterBodyInfoProvider(mode: .sparse)
+        }
+        if args.contains("--ui-testing-water-info-empty") {
+            return FixtureWaterBodyInfoProvider(mode: .empty)
+        }
+        return UnavailableWaterBodyInfoProvider()
     }
 }

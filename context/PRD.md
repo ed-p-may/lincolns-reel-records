@@ -197,6 +197,14 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval
   Bathymetry contours (`{z}/{y}/{x}`, zoom 11–18, gated to Massachusetts bounds, silent 404/offline
   fallback) over Standard, Hybrid, or Satellite basemaps via an `MKMapView` `UIViewRepresentable`
   bridge (`CatchMKMapView`).
+- **Water-Body Fishing Info:** Tapping a labeled Apple Maps physical water feature (`MKMapView`
+  `selectableMapFeatures = [.physicalFeatures]`) or long-pressing an unlabeled pond resolves the
+  water body via OpenStreetMap Overpass and presents a Google Maps-style sheet (peek/medium/large
+  detents with live map interaction behind peek/medium). Shows the angler's own local catch history
+  at that water immediately (offline), paired with free client-fetched public sources (Wikipedia
+  overview, OSM boat ramps, iNaturalist fish species & CC-attributed photos, USGS live river flow,
+  and one-tap in-app Safari search links) cached on device (14-day static TTL, 15-min river gauge
+  TTL). Non-water taps and dry-land long-presses degrade cleanly; catch pins always take priority.
 - **GPS** is captured at logging (location permission); **manual pin-drop / map-search fallback** when
   GPS is off/denied or a catch is logged later. Free-text named `location` is kept alongside coordinates.
 - Header: "N catches across M spots" (or "X of N catches across M spots" when filtered).

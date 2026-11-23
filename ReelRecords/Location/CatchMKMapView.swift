@@ -12,6 +12,8 @@ struct CatchMKMapView: UIViewRepresentable {
     let targetRegion: MKCoordinateRegion?
     let cameraRevision: Int
     @Binding var selection: CatchMapSelection?
+    var onSelectMapFeature: ((String, CatchCoordinate) -> Void)?
+    var onLongPressCoordinate: ((CatchCoordinate) -> Void)?
 
     func makeCoordinator() -> Coordinator {
         Coordinator(parent: self)
@@ -33,6 +35,13 @@ struct CatchMKMapView: UIViewRepresentable {
         mapView.showsCompass = true
         mapView.showsScale = true
         mapView.showsUserLocation = false
+        mapView.selectableMapFeatures = [.physicalFeatures]
+        let longPress = UILongPressGestureRecognizer(
+            target: coordinator,
+            action: #selector(Coordinator.handleLongPress(_:))
+        )
+        longPress.minimumPressDuration = 0.5
+        mapView.addGestureRecognizer(longPress)
         mapView.register(
             MKMarkerAnnotationView.self,
             forAnnotationViewWithReuseIdentifier: Coordinator.catchReuseID
@@ -356,7 +365,7 @@ extension CatchMKMapView {
             return nil
         }
 
-        func mapView(_: MKMapView, didSelect view: MKAnnotationView) {
+        func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
             guard !isSyncingSelection, let annotation = view.annotation else { return }
             if let catchAnnotation = annotation as? CatchPinAnnotation {
                 parent.selection = .catchPin(catchAnnotation.catchItem.id)
@@ -368,6 +377,8 @@ extension CatchMKMapView {
                 if let markerView = view as? MKMarkerAnnotationView {
                     MapMarkerStyler.configureAccess(markerView, site: accessAnnotation.site, isSelected: true)
                 }
+            } else if let featureAnnotation = annotation as? MKMapFeatureAnnotation {
+                handleFeatureSelection(featureAnnotation, on: mapView)
             }
         }
 
@@ -405,74 +416,30 @@ extension CatchMKMapView {
     }
 }
 
-private enum MapMarkerStyler {
-    @MainActor
-    static func configureCatch(
-        _ view: MKMarkerAnnotationView,
-        catchItem: CatchItem,
-        isSelected: Bool
-    ) {
-        view.canShowCallout = false
-        view.displayPriority = .required
-        view.zPriority = .max
-        view.titleVisibility = .adaptive
-        view.markerTintColor = UIColor(isSelected ? ReelTheme.accentHighlight : ReelTheme.accent)
-        view.glyphImage = UIImage(systemName: isSelected ? "fish.circle.fill" : "fish.fill")
-        view.isAccessibilityElement = true
-        view.accessibilityLabel = catchItem.species
-        view.accessibilityIdentifier = "map.catch-pin.\(catchItem.id.uuidString)"
+extension CatchMKMapView.Coordinator {
+    func handleFeatureSelection(_ annotation: MKMapFeatureAnnotation, on mapView: MKMapView) {
+        guard annotation.featureType == .physicalFeature,
+              let title = annotation.title?.trimmingCharacters(in: .whitespacesAndNewlines),
+              !title.isEmpty
+        else {
+            return
+        }
+        guard let coord = CatchCoordinate(
+            latitude: annotation.coordinate.latitude,
+            longitude: annotation.coordinate.longitude
+        ) else {
+            return
+        }
+        parent.selection = nil
+        mapView.deselectAnnotation(annotation, animated: false)
+        parent.onSelectMapFeature?(title, coord)
     }
 
-    @MainActor
-    static func configureAccess(
-        _ view: MKMarkerAnnotationView,
-        site: PublicAccessSite,
-        isSelected: Bool
-    ) {
-        view.canShowCallout = false
-        view.displayPriority = .required
-        view.zPriority = isSelected ? .defaultSelected : .defaultUnselected
-        view.titleVisibility = .adaptive
-        view.markerTintColor = UIColor(isSelected ? ReelTheme.accessPin : ReelTheme.raisedSurface)
-        view.glyphTintColor = UIColor(isSelected ? ReelTheme.page : ReelTheme.accessPin)
-        view.glyphImage = UIImage(systemName: site.isBoatLaunch ? "sailboat.fill" : "figure.fishing")
-        view.isAccessibilityElement = true
-        view.accessibilityTraits = .button
-        view.accessibilityLabel = "\(site.name) public access"
-        view.accessibilityIdentifier = "map.access-site.\(site.id)"
-    }
-}
-
-private final class CatchPinAnnotation: NSObject, MKAnnotation {
-    let catchItem: CatchItem
-    let coordinate: CLLocationCoordinate2D
-    var title: String? {
-        catchItem.species
-    }
-
-    var subtitle: String? {
-        catchItem.location
-    }
-
-    init(catchItem: CatchItem) {
-        self.catchItem = catchItem
-        coordinate = catchItem.coordinate?.mapCoordinate ?? kCLLocationCoordinate2DInvalid
-    }
-}
-
-private final class PublicAccessAnnotation: NSObject, MKAnnotation {
-    let site: PublicAccessSite
-    let coordinate: CLLocationCoordinate2D
-    var title: String? {
-        site.name
-    }
-
-    var subtitle: String? {
-        site.locationSubtitle
-    }
-
-    init(site: PublicAccessSite) {
-        self.site = site
-        coordinate = site.mapCoordinate
+    @objc func handleLongPress(_ recognizer: UILongPressGestureRecognizer) {
+        guard recognizer.state == .began, let mapView = recognizer.view as? MKMapView else { return }
+        let point = recognizer.location(in: mapView)
+        let mapCoord = mapView.convert(point, toCoordinateFrom: mapView)
+        guard let coord = CatchCoordinate(latitude: mapCoord.latitude, longitude: mapCoord.longitude) else { return }
+        parent.onLongPressCoordinate?(coord)
     }
 }
