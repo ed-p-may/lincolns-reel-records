@@ -1,6 +1,6 @@
 ---
 DATE: 2026-11-23
-STATUS: Scoped
+STATUS: Complete
 AUTHOR: Antigravity
 ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/11
 ---
@@ -8,7 +8,7 @@ ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/11
 # Tackle Box UX
 
 **Source:** [GitHub Issue #11](https://github.com/ed-p-may/lincolns-reel-records/issues/11)
-**Status:** Scoped (all 4 product decisions resolved on 2026-11-23; ready for Phase 01 implementation)
+**Status:** Complete — see [STATUS.md](STATUS.md) for shipped PRs and verification evidence.
 **Canonical context affected:** `context/PRD.md` (§6.5 Add / Edit Catch, §6.8 Tackle Box), `context/user-stories.md` (Story A7, Epic F), `context/decisions.md`
 
 ## Scope

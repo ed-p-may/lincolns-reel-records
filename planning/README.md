@@ -5,7 +5,7 @@ Canonical product intent remains in `context/`; each packet links back to the af
 
 | Feature | Source | Status |
 |---|---|---|
-| [Tackle Box UX](tackle-box-ux/README.md) | [GitHub Issue #11](https://github.com/ed-p-may/lincolns-reel-records/issues/11) | In progress |
+| [Tackle Box UX](archive/tackle-box-ux/README.md) | [GitHub Issue #11](https://github.com/ed-p-may/lincolns-reel-records/issues/11) | Complete |
 | [Water-Body Fishing Info](archive/water-body-fishing-info/README.md) | [GitHub Issue #14](https://github.com/ed-p-may/lincolns-reel-records/issues/14) | Complete |
 | [Map Improvements](archive/map-improvements/README.md) | [GitHub Issue #12](https://github.com/ed-p-may/lincolns-reel-records/issues/12) | Complete |
 | [Custom Species Chips](archive/custom-species-chips/PRD.md) | [GitHub Issue #13](https://github.com/ed-p-may/lincolns-reel-records/issues/13) | Complete |

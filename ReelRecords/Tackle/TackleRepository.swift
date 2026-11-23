@@ -7,6 +7,7 @@ enum TackleRepositoryError: LocalizedError, Equatable {
     case missingOperation(UUID)
     case deletedItem(UUID)
     case missingPhoto(UUID)
+    case retiredSelection
 
     var errorDescription: String? {
         switch self {
@@ -14,6 +15,7 @@ enum TackleRepositoryError: LocalizedError, Equatable {
         case let .missingOperation(id): "The tackle queue operation \(id.uuidString) is missing."
         case let .deletedItem(id): "Tackle item \(id.uuidString) is no longer available."
         case let .missingPhoto(id): "The photo for tackle item \(id.uuidString) is missing locally."
+        case .retiredSelection: "The selected tackle item is no longer available. Clear or choose another lure to save."
         }
     }
 }
@@ -61,6 +63,18 @@ final class SwiftDataTackleRepository {
             loaded.append(historical)
         }
         return loaded
+    }
+
+    func validateSelectableSelection(itemID: UUID?, unchangedFrom originalID: UUID?, ownerID: UUID) throws {
+        guard let itemID, itemID != originalID else { return }
+        guard try item(id: itemID, ownerID: ownerID)?.isSelectable == true else {
+            throw TackleRepositoryError.retiredSelection
+        }
+    }
+
+    func selectableID(_ id: UUID?, ownerID: UUID) -> UUID? {
+        guard let id, (try? item(id: id, ownerID: ownerID))?.isSelectable == true else { return nil }
+        return id
     }
 
     func itemNames(ownerID: UUID, referencedIDs: Set<UUID>) throws -> [UUID: String] {

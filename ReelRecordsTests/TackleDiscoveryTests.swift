@@ -183,6 +183,42 @@ final class TackleDiscoveryTests: XCTestCase {
         XCTAssertGreaterThan(coordinator.revision, revisionAfterInitialSync)
         XCTAssertEqual(try tackleRepo.item(id: item.id, ownerID: ownerID)?.isSelectable, false)
     }
+
+    @MainActor
+    func testValidateSelectableSelectionRejectsRetiredNewLinkAndPreservesHistoricalEdit() throws {
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try ModelContainer(
+            for: TackleItemRecord.self,
+            TackleOutboxOperation.self,
+            configurations: configuration
+        )
+        let root = FileManager.default.temporaryDirectory
+            .appending(path: "reel-records-tackle-val-\(UUID().uuidString)", directoryHint: .isDirectory)
+        let repo = try SwiftDataTackleRepository(
+            modelContext: container.mainContext,
+            fileStore: PhotoFileStore(rootURL: root)
+        )
+        let ownerID = UUID()
+        let item = try repo.create(NewTackleItem(
+            ownerID: ownerID,
+            values: TackleValues(name: "Senko", type: .softPlastic, size: nil, color: nil, brand: nil, archived: false)
+        ))
+        XCTAssertNoThrow(try repo.validateSelectableSelection(itemID: item.id, unchangedFrom: nil, ownerID: ownerID))
+
+        _ = try repo.update(
+            id: item.id,
+            ownerID: ownerID,
+            values: TackleValues(name: "Senko", type: .softPlastic, size: nil, color: nil, brand: nil, archived: true)
+        )
+        XCTAssertThrowsError(
+            try repo.validateSelectableSelection(itemID: item.id, unchangedFrom: nil, ownerID: ownerID)
+        ) { error in
+            XCTAssertEqual(error as? TackleRepositoryError, .retiredSelection)
+        }
+        XCTAssertNoThrow(
+            try repo.validateSelectableSelection(itemID: item.id, unchangedFrom: item.id, ownerID: ownerID)
+        )
+    }
 }
 
 private extension TackleDiscoveryTests {
