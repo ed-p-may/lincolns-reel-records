@@ -378,25 +378,3 @@ extension SwiftDataTackleRepository {
         try modelContext.save()
     }
 }
-
-enum TackleDiscovery {
-    static func results(
-        in items: [TackleItem],
-        query: String,
-        type: TackleItemType?
-    ) -> [TackleItem] {
-        let query = CatchDiscovery.normalized(query.trimmingCharacters(in: .whitespacesAndNewlines))
-        return items.filter { item in
-            (type == nil || item.type == type)
-                && (query.isEmpty || CatchDiscovery.normalized(item.name).contains(query))
-        }
-        .sorted(by: alphabeticallyPrecedes)
-    }
-
-    static func alphabeticallyPrecedes(_ first: TackleItem, _ second: TackleItem) -> Bool {
-        if CatchDiscovery.normalized(first.name) != CatchDiscovery.normalized(second.name) {
-            return CatchDiscovery.alphabeticallyPrecedes(first.name, second.name)
-        }
-        return first.id.uuidString < second.id.uuidString
-    }
-}

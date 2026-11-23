@@ -1,5 +1,32 @@
 import SwiftUI
 
+struct CatchMeasurementEditor: View {
+    @Binding var weight: String
+    @Binding var length: String
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            AddCatchFieldLabel("Measurements")
+            HStack(spacing: 12) {
+                UnitInput(
+                    "Weight",
+                    unit: "lb",
+                    text: $weight,
+                    keyboardType: .decimalPad,
+                    identifier: "add.weight"
+                )
+                UnitInput(
+                    "Length",
+                    unit: "in",
+                    text: $length,
+                    keyboardType: .decimalPad,
+                    identifier: "add.length"
+                )
+            }
+        }
+    }
+}
+
 struct CatchDateEditor: View {
     @Binding var caughtAt: Date
 

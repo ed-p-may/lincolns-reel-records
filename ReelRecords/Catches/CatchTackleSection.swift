@@ -4,17 +4,29 @@ struct CatchTackleSection: View {
     @Environment(SwiftDataTackleRepository.self) private var repository
 
     let items: [TackleItem]
+    let recentItems: [TackleItem]
     @Binding var selectedItemID: UUID?
     @Binding var lureText: String
     let onAdd: () -> Void
+    let onBrowse: () -> Void
     let onManage: () -> Void
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
-            Text("LURE / BAIT")
-                .font(ReelFont.metadata(.caption2, weight: .bold))
-                .tracking(1)
-                .foregroundStyle(ReelTheme.tertiaryText)
+            HStack(alignment: .firstTextBaseline) {
+                Text("LURE / BAIT")
+                    .font(ReelFont.metadata(.caption2, weight: .bold))
+                    .tracking(1)
+                    .foregroundStyle(ReelTheme.tertiaryText)
+                Spacer()
+                if !selectableItems.isEmpty {
+                    Button("Browse All", action: onBrowse)
+                        .font(ReelFont.metadata(.caption, weight: .bold))
+                        .foregroundStyle(ReelTheme.accentHighlight)
+                        .buttonStyle(.plain)
+                        .accessibilityIdentifier("add.tackle.browse.header")
+                }
+            }
             if let selectedItem {
                 Button { selectedItemID = nil } label: {
                     TackleItemRow(item: selectedItem, isSelected: true)
@@ -24,6 +36,9 @@ struct CatchTackleSection: View {
                 .accessibilityIdentifier("add.tackle.selected")
             }
             itemPicker
+            if !selectableItems.isEmpty {
+                browseButton
+            }
             manageButton
             TextField("One-off lure or bait (optional)", text: $lureText)
                 .fieldInputStyle()
@@ -34,18 +49,37 @@ struct CatchTackleSection: View {
         }
     }
 
+    private var selectableItems: [TackleItem] {
+        items.filter(\.isSelectable)
+    }
+
     private var selectedItem: TackleItem? {
         guard let selectedItemID else { return nil }
         return items.first { $0.id == selectedItemID }
     }
 
     private var itemPicker: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 11) {
-                addButton
-                ForEach(items.filter(\.isSelectable)) { item in
-                    itemButton(item)
+        let strip = TackleDiscovery.inlineStripItems(from: items, recentItems: recentItems)
+        return VStack(alignment: .leading, spacing: 8) {
+            if !strip.items.isEmpty {
+                Text(strip.isRecent ? "RECENTLY USED" : "TACKLE BOX")
+                    .font(ReelFont.metadata(.caption2, weight: .semibold))
+                    .tracking(0.8)
+                    .foregroundStyle(ReelTheme.secondaryText)
+                    .accessibilityIdentifier("add.tackle.strip-label")
+            }
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 11) {
+                    addButton
+                    ForEach(strip.items) { item in
+                        itemButton(item)
+                    }
                 }
+            }
+            if selectableItems.isEmpty {
+                Text("Add your first lure or bait to reuse it here.")
+                    .font(ReelFont.body(.caption))
+                    .foregroundStyle(ReelTheme.secondaryText)
             }
         }
     }
@@ -95,6 +129,28 @@ struct CatchTackleSection: View {
         }
         .buttonStyle(.plain)
         .accessibilityIdentifier("add.tackle.\(item.id.uuidString)")
+    }
+
+    private var browseButton: some View {
+        let count = selectableItems.count
+        return Button(action: onBrowse) {
+            HStack {
+                Label("Browse Tackle Box", systemImage: "square.grid.2x2.fill")
+                    .foregroundStyle(ReelTheme.primaryText)
+                Spacer()
+                Text("\(count) item\(count == 1 ? "" : "s")")
+                    .font(ReelFont.metadata(.caption, weight: .semibold))
+                    .foregroundStyle(ReelTheme.secondaryText)
+                Image(systemName: "chevron.right")
+                    .foregroundStyle(ReelTheme.accentHighlight)
+            }
+            .font(ReelFont.body(.subheadline, weight: .semibold))
+            .padding(14)
+            .background(ReelTheme.raisedSurface, in: RoundedRectangle(cornerRadius: 14))
+            .overlay { RoundedRectangle(cornerRadius: 14).stroke(ReelTheme.accent.opacity(0.45)) }
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("add.tackle.browse")
     }
 
     private var manageButton: some View {

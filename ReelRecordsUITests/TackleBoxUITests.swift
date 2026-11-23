@@ -82,6 +82,57 @@ final class TackleBoxUITests: XCTestCase {
         XCTAssertTrue(app.staticTexts["ARCHIVED"].exists)
     }
 
+    func testLogCatchRecentStripAndFullScreenGalleryPickerSelectAndCreate() {
+        let app = launchApp(arguments: ["--ui-testing-logbook"])
+
+        let logTab = app.tabBars.buttons["Log"]
+        XCTAssertTrue(logTab.waitForExistence(timeout: 5))
+        logTab.tap()
+        let addButton = app.buttons["Log a catch"]
+        XCTAssertTrue(addButton.waitForExistence(timeout: 5))
+        addButton.tap()
+
+        let form = app.scrollViews.firstMatch
+        for _ in 0 ..< 5 where !app.buttons["add.tackle.browse"].exists {
+            form.swipeUp()
+        }
+
+        let stripLabel = app.staticTexts["add.tackle.strip-label"]
+        XCTAssertTrue(stripLabel.waitForExistence(timeout: 3))
+        XCTAssertEqual(stripLabel.label, "RECENTLY USED")
+
+        let browseButton = app.buttons["add.tackle.browse"]
+        XCTAssertTrue(browseButton.waitForExistence(timeout: 3))
+        browseButton.tap()
+
+        XCTAssertTrue(app.navigationBars["Choose Lure / Bait"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["tackle.picker.section.recent"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["tackle.picker.section.soft_plastic"].exists)
+        XCTAssertTrue(app.staticTexts["tackle.picker.section.spinnerbait"].exists)
+
+        let spinnerTile = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'tackle.picker.item.' AND label CONTAINS 'Chartreuse Spinner'")
+        ).firstMatch
+        XCTAssertTrue(spinnerTile.waitForExistence(timeout: 3))
+        spinnerTile.tap()
+
+        let selectedBanner = app.buttons["add.tackle.selected"]
+        XCTAssertTrue(selectedBanner.waitForExistence(timeout: 5))
+        XCTAssertTrue(selectedBanner.label.contains("Chartreuse Spinner"))
+
+        browseButton.tap()
+        XCTAssertTrue(app.navigationBars["Choose Lure / Bait"].waitForExistence(timeout: 5))
+        app.buttons["tackle.picker.add"].tap()
+        let name = app.textFields["tackle.editor.name"]
+        XCTAssertTrue(name.waitForExistence(timeout: 3))
+        name.tap()
+        name.typeText("Inline Crank")
+        app.buttons["tackle.editor.save"].tap()
+
+        XCTAssertTrue(selectedBanner.waitForExistence(timeout: 5))
+        XCTAssertTrue(selectedBanner.label.contains("Inline Crank"))
+    }
+
     private func launchLogbook() -> XCUIApplication {
         let app = launchApp()
         let logTab = app.tabBars.buttons["Log"]
