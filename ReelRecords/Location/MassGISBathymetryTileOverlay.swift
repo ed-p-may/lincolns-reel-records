@@ -31,14 +31,24 @@ final class MassGISBathymetryTileOverlay: MKTileOverlay, @unchecked Sendable {
 
     private let session: URLSession
     private let transientFailureLock = OSAllocatedUnfairLock(initialState: false)
+    private let onTransientFailure: (@Sendable () -> Void)?
 
-    init(session: URLSession? = nil) {
+    init(session: URLSession? = nil, onTransientFailure: (@Sendable () -> Void)? = nil) {
         self.session = session ?? Self.makeCachingSession()
+        self.onTransientFailure = onTransientFailure
         super.init(urlTemplate: Self.tileURLTemplate)
         canReplaceMapContent = false
         minimumZ = Self.minZoom
         maximumZ = Self.maxZoom
         tileSize = CGSize(width: 256, height: 256)
+    }
+
+    var hasTransientFailure: Bool {
+        transientFailureLock.withLock { $0 }
+    }
+
+    func clearTransientFailure() {
+        transientFailureLock.withLock { $0 = false }
     }
 
     func consumeTransientFailure() -> Bool {
@@ -97,9 +107,15 @@ final class MassGISBathymetryTileOverlay: MKTileOverlay, @unchecked Sendable {
         request.cachePolicy = .returnCacheDataElseLoad
         request.timeoutInterval = 10
 
+        if let cached = session.configuration.urlCache?.cachedResponse(for: request), !cached.data.isEmpty {
+            resultBox.handler(cached.data, nil)
+            return
+        }
+
         session.dataTask(with: request) { [weak self] data, response, error in
             if error != nil {
                 self?.transientFailureLock.withLock { $0 = true }
+                self?.onTransientFailure?()
                 resultBox.handler(Self.emptyTilePNG, nil)
                 return
             }
@@ -111,6 +127,12 @@ final class MassGISBathymetryTileOverlay: MKTileOverlay, @unchecked Sendable {
                 resultBox.handler(Self.emptyTilePNG, nil)
                 return
             }
+            let cachedResponse = CachedURLResponse(
+                response: httpResponse,
+                data: data,
+                storagePolicy: .allowed
+            )
+            self?.session.configuration.urlCache?.storeCachedResponse(cachedResponse, for: request)
             resultBox.handler(data, nil)
         }.resume()
     }

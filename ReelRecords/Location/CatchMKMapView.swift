@@ -38,14 +38,17 @@ struct CatchMKMapView: UIViewRepresentable {
             forAnnotationViewWithReuseIdentifier: Coordinator.catchReuseID
         )
         mapView.register(
-            MKAnnotationView.self,
+            MKMarkerAnnotationView.self,
             forAnnotationViewWithReuseIdentifier: Coordinator.accessReuseID
         )
         applyConfiguration(to: mapView, style: style)
     }
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
-        let coordinator = context.coordinator
+        applyUpdate(to: mapView, coordinator: context.coordinator)
+    }
+
+    func applyUpdate(to mapView: MKMapView, coordinator: Coordinator) {
         coordinator.parent = self
 
         if coordinator.lastAppliedStyle != mapStyle {
@@ -96,9 +99,11 @@ extension CatchMKMapView {
         var lastAppliedStyle: CatchMapStyle?
         var lastAppliedCameraRevision: Int?
 
-        private let bathymetryOverlay = MassGISBathymetryTileOverlay()
+        private var bathymetryOverlay: MassGISBathymetryTileOverlay!
         private var bathymetryAttached = false
         private var pathMonitor: NWPathMonitor?
+        private var isPathSatisfied = false
+        private var retryReloadTask: Task<Void, Never>?
         private weak var monitoredMapView: MKMapView?
         private var catchAnnotationsByID: [UUID: CatchPinAnnotation] = [:]
         private var accessAnnotationsByID: [String: PublicAccessAnnotation] = [:]
@@ -107,10 +112,17 @@ extension CatchMKMapView {
 
         init(parent: CatchMKMapView) {
             self.parent = parent
+            super.init()
+            bathymetryOverlay = MassGISBathymetryTileOverlay { [weak self] in
+                Task { @MainActor [weak self] in
+                    self?.scheduleRetryReloadIfSatisfied()
+                }
+            }
         }
 
         deinit {
             pathMonitor?.cancel()
+            retryReloadTask?.cancel()
         }
 
         func syncBathymetryOverlay(on mapView: MKMapView, isVisible: Bool) {
@@ -130,9 +142,9 @@ extension CatchMKMapView {
             monitoredMapView = mapView
             let monitor = NWPathMonitor()
             monitor.pathUpdateHandler = { [weak self] path in
-                guard path.status == .satisfied else { return }
+                let satisfied = path.status == .satisfied
                 Task { @MainActor [weak self] in
-                    self?.reloadBathymetryIfNeeded()
+                    self?.handlePathStatus(satisfied: satisfied)
                 }
             }
             monitor.start(queue: DispatchQueue.global(qos: .utility))
@@ -142,17 +154,38 @@ extension CatchMKMapView {
         private func stopPathMonitoring() {
             pathMonitor?.cancel()
             pathMonitor = nil
+            retryReloadTask?.cancel()
+            retryReloadTask = nil
+            isPathSatisfied = false
             monitoredMapView = nil
+        }
+
+        private func handlePathStatus(satisfied: Bool) {
+            isPathSatisfied = satisfied
+            if satisfied {
+                reloadBathymetryIfNeeded()
+            }
+        }
+
+        private func scheduleRetryReloadIfSatisfied() {
+            guard bathymetryAttached, isPathSatisfied, retryReloadTask == nil else { return }
+            retryReloadTask = Task { @MainActor [weak self] in
+                try? await Task.sleep(for: .seconds(2))
+                guard let self, !Task.isCancelled else { return }
+                retryReloadTask = nil
+                reloadBathymetryIfNeeded()
+            }
         }
 
         private func reloadBathymetryIfNeeded() {
             guard bathymetryAttached,
-                  bathymetryOverlay.consumeTransientFailure(),
+                  bathymetryOverlay.hasTransientFailure,
                   let mapView = monitoredMapView,
                   let renderer = mapView.renderer(for: bathymetryOverlay) as? MKTileOverlayRenderer
             else {
                 return
             }
+            bathymetryOverlay.clearTransientFailure()
             renderer.reloadData()
         }
 
@@ -303,17 +336,20 @@ extension CatchMKMapView {
                     reuseIdentifier: Self.catchReuseID
                 )
                 let isSelected = parent.selection == .catchPin(catchAnnotation.catchItem.id)
-                configureCatchView(view, catchItem: catchAnnotation.catchItem, isSelected: isSelected)
+                MapMarkerStyler.configureCatch(view, catchItem: catchAnnotation.catchItem, isSelected: isSelected)
                 return view
             }
 
             if let accessAnnotation = annotation as? PublicAccessAnnotation {
-                let view = mapView.dequeueReusableAnnotationView(
+                let view = (mapView.dequeueReusableAnnotationView(
                     withIdentifier: Self.accessReuseID,
                     for: accessAnnotation
+                ) as? MKMarkerAnnotationView) ?? MKMarkerAnnotationView(
+                    annotation: accessAnnotation,
+                    reuseIdentifier: Self.accessReuseID
                 )
                 let isSelected = parent.selection == .accessSite(accessAnnotation.site.id)
-                configureAccessView(view, site: accessAnnotation.site, isSelected: isSelected)
+                MapMarkerStyler.configureAccess(view, site: accessAnnotation.site, isSelected: isSelected)
                 return view
             }
 
@@ -325,11 +361,13 @@ extension CatchMKMapView {
             if let catchAnnotation = annotation as? CatchPinAnnotation {
                 parent.selection = .catchPin(catchAnnotation.catchItem.id)
                 if let markerView = view as? MKMarkerAnnotationView {
-                    configureCatchView(markerView, catchItem: catchAnnotation.catchItem, isSelected: true)
+                    MapMarkerStyler.configureCatch(markerView, catchItem: catchAnnotation.catchItem, isSelected: true)
                 }
             } else if let accessAnnotation = annotation as? PublicAccessAnnotation {
                 parent.selection = .accessSite(accessAnnotation.site.id)
-                configureAccessView(view, site: accessAnnotation.site, isSelected: true)
+                if let markerView = view as? MKMarkerAnnotationView {
+                    MapMarkerStyler.configureAccess(markerView, site: accessAnnotation.site, isSelected: true)
+                }
             }
         }
 
@@ -337,13 +375,15 @@ extension CatchMKMapView {
             guard !isSyncingSelection, let annotation = view.annotation else { return }
             if let catchAnnotation = annotation as? CatchPinAnnotation {
                 if let markerView = view as? MKMarkerAnnotationView {
-                    configureCatchView(markerView, catchItem: catchAnnotation.catchItem, isSelected: false)
+                    MapMarkerStyler.configureCatch(markerView, catchItem: catchAnnotation.catchItem, isSelected: false)
                 }
                 if parent.selection == .catchPin(catchAnnotation.catchItem.id) {
                     parent.selection = nil
                 }
             } else if let accessAnnotation = annotation as? PublicAccessAnnotation {
-                configureAccessView(view, site: accessAnnotation.site, isSelected: false)
+                if let markerView = view as? MKMarkerAnnotationView {
+                    MapMarkerStyler.configureAccess(markerView, site: accessAnnotation.site, isSelected: false)
+                }
                 if parent.selection == .accessSite(accessAnnotation.site.id) {
                     parent.selection = nil
                 }
@@ -355,86 +395,51 @@ extension CatchMKMapView {
             on mapView: MKMapView,
             isSelected: Bool
         ) {
-            guard let view = mapView.view(for: annotation) else { return }
+            guard let markerView = mapView.view(for: annotation) as? MKMarkerAnnotationView else { return }
             if let catchAnnotation = annotation as? CatchPinAnnotation {
-                if let markerView = view as? MKMarkerAnnotationView {
-                    configureCatchView(markerView, catchItem: catchAnnotation.catchItem, isSelected: isSelected)
-                }
+                MapMarkerStyler.configureCatch(markerView, catchItem: catchAnnotation.catchItem, isSelected: isSelected)
             } else if let accessAnnotation = annotation as? PublicAccessAnnotation {
-                configureAccessView(view, site: accessAnnotation.site, isSelected: isSelected)
+                MapMarkerStyler.configureAccess(markerView, site: accessAnnotation.site, isSelected: isSelected)
             }
-        }
-
-        private func configureCatchView(
-            _ view: MKMarkerAnnotationView,
-            catchItem: CatchItem,
-            isSelected: Bool
-        ) {
-            view.canShowCallout = false
-            view.displayPriority = .required
-            view.zPriority = .max
-            view.titleVisibility = .adaptive
-            view.markerTintColor = UIColor(isSelected ? ReelTheme.accentHighlight : ReelTheme.accent)
-            view.glyphImage = UIImage(systemName: isSelected ? "fish.circle.fill" : "fish.fill")
-            view.isAccessibilityElement = true
-            view.accessibilityLabel = catchItem.species
-            view.accessibilityIdentifier = "map.catch-pin.\(catchItem.id.uuidString)"
-        }
-
-        private func configureAccessView(
-            _ view: MKAnnotationView,
-            site: PublicAccessSite,
-            isSelected: Bool
-        ) {
-            view.canShowCallout = false
-            view.displayPriority = .required
-            view.zPriority = isSelected ? .defaultSelected : .defaultUnselected
-            view.image = AccessPinRenderer.image(isBoatLaunch: site.isBoatLaunch, isSelected: isSelected)
-            view.centerOffset = .zero
-            view.isAccessibilityElement = true
-            view.accessibilityTraits = .button
-            view.accessibilityLabel = "\(site.name) public access"
-            view.accessibilityIdentifier = "map.access-site.\(site.id)"
         }
     }
 }
 
-private enum AccessPinRenderer {
-    static func image(isBoatLaunch: Bool, isSelected: Bool) -> UIImage {
-        let diameter: CGFloat = isSelected ? 30 : 24
-        let size = CGSize(width: diameter + 4, height: diameter + 4)
-        let renderer = UIGraphicsImageRenderer(size: size)
-        return renderer.image { _ in
-            let circleRect = CGRect(x: 2, y: 2, width: diameter, height: diameter)
-            let fillColor = isSelected
-                ? UIColor(ReelTheme.accessPin)
-                : UIColor(ReelTheme.surface).withAlphaComponent(0.92)
-            let strokeColor = UIColor(ReelTheme.accessPin)
-            let path = UIBezierPath(ovalIn: circleRect)
-            fillColor.setFill()
-            path.fill()
-            strokeColor.setStroke()
-            path.lineWidth = isSelected ? 2 : 1.5
-            path.stroke()
+private enum MapMarkerStyler {
+    @MainActor
+    static func configureCatch(
+        _ view: MKMarkerAnnotationView,
+        catchItem: CatchItem,
+        isSelected: Bool
+    ) {
+        view.canShowCallout = false
+        view.displayPriority = .required
+        view.zPriority = .max
+        view.titleVisibility = .adaptive
+        view.markerTintColor = UIColor(isSelected ? ReelTheme.accentHighlight : ReelTheme.accent)
+        view.glyphImage = UIImage(systemName: isSelected ? "fish.circle.fill" : "fish.fill")
+        view.isAccessibilityElement = true
+        view.accessibilityLabel = catchItem.species
+        view.accessibilityIdentifier = "map.catch-pin.\(catchItem.id.uuidString)"
+    }
 
-            let symbolName = isBoatLaunch ? "sailboat.fill" : "figure.fishing"
-            let symbolConfig = UIImage.SymbolConfiguration(
-                pointSize: isSelected ? 13 : 11,
-                weight: .semibold
-            )
-            let tint = isSelected ? UIColor(ReelTheme.page) : UIColor(ReelTheme.primaryText)
-            let symbol = UIImage(systemName: symbolName, withConfiguration: symbolConfig)?
-                .withTintColor(tint, renderingMode: .alwaysOriginal)
-            if let symbol {
-                let symbolRect = CGRect(
-                    x: (size.width - symbol.size.width) / 2,
-                    y: (size.height - symbol.size.height) / 2,
-                    width: symbol.size.width,
-                    height: symbol.size.height
-                )
-                symbol.draw(in: symbolRect)
-            }
-        }
+    @MainActor
+    static func configureAccess(
+        _ view: MKMarkerAnnotationView,
+        site: PublicAccessSite,
+        isSelected: Bool
+    ) {
+        view.canShowCallout = false
+        view.displayPriority = .required
+        view.zPriority = isSelected ? .defaultSelected : .defaultUnselected
+        view.titleVisibility = .adaptive
+        view.markerTintColor = UIColor(isSelected ? ReelTheme.accessPin : ReelTheme.raisedSurface)
+        view.glyphTintColor = UIColor(isSelected ? ReelTheme.page : ReelTheme.accessPin)
+        view.glyphImage = UIImage(systemName: site.isBoatLaunch ? "sailboat.fill" : "figure.fishing")
+        view.isAccessibilityElement = true
+        view.accessibilityTraits = .button
+        view.accessibilityLabel = "\(site.name) public access"
+        view.accessibilityIdentifier = "map.access-site.\(site.id)"
     }
 }
 

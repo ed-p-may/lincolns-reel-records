@@ -116,43 +116,85 @@ final class BathymetryTileOverlayTests: XCTestCase {
         XCTAssertEqual(MassGISBathymetryTileOverlay.overlayAlpha(for: .satellite), 0.68, accuracy: 0.001)
     }
 
+    func testCachedTileIsServedFromCacheWhenOffline() {
+        let payload = Data([0x89, 0x50, 0x4E, 0x47, 0x11, 0x22, 0x33])
+        StubTileURLProtocol.setResponse(.cacheable200(payload))
+        let session = makeCachingStubSession()
+        let overlay = MassGISBathymetryTileOverlay(session: session)
+        let lakeBuelPath = MKTileOverlayPath(x: 4856, y: 6071, z: 14, contentScaleFactor: 1)
+
+        let firstLoad = expectation(description: "Initial online tile load populates cache")
+        overlay.loadTile(at: lakeBuelPath) { data, error in
+            XCTAssertNil(error)
+            XCTAssertEqual(data, payload)
+            firstLoad.fulfill()
+        }
+        wait(for: [firstLoad], timeout: 2.0)
+        XCTAssertEqual(StubTileURLProtocol.requestCount, 1)
+
+        StubTileURLProtocol.setResponse(.error(URLError(.notConnectedToInternet)))
+        let offlineLoad = expectation(description: "Cached tile served while offline")
+        overlay.loadTile(at: lakeBuelPath) { data, error in
+            XCTAssertNil(error)
+            XCTAssertEqual(data, payload)
+            offlineLoad.fulfill()
+        }
+        wait(for: [offlineLoad], timeout: 2.0)
+        XCTAssertEqual(StubTileURLProtocol.requestCount, 0)
+        XCTAssertFalse(overlay.consumeTransientFailure())
+    }
+
     @MainActor
     func testBridgeAttachesAndRemovesBathymetryOverlayWithoutResettingCameraOrSelection() {
         let catchItem = makeTestCatch()
         var selection: CatchMapSelection? = .catchPin(catchItem.id)
-        let bridge = CatchMKMapView(
+        let selectionBinding = Binding(get: { selection }, set: { selection = $0 })
+        let initialRegion = MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 42.175, longitude: -73.279),
+            span: MKCoordinateSpan(latitudeDelta: 0.04, longitudeDelta: 0.04)
+        )
+        let initialBridge = CatchMKMapView(
             catches: [catchItem],
             accessSites: [],
             showPublicAccess: false,
             showLakeDepths: false,
             mapStyle: .standard,
-            targetRegion: nil,
-            cameraRevision: 0,
-            selection: Binding(get: { selection }, set: { selection = $0 })
+            targetRegion: initialRegion,
+            cameraRevision: 1,
+            selection: selectionBinding
         )
-        let coordinator = bridge.makeCoordinator()
+        let coordinator = initialBridge.makeCoordinator()
         let mapView = MKMapView(frame: CGRect(x: 0, y: 0, width: 390, height: 700))
         CatchMKMapView.configureMapView(mapView, coordinator: coordinator, style: .standard)
+        initialBridge.applyUpdate(to: mapView, coordinator: coordinator)
 
         let pannedRegion = MKCoordinateRegion(
-            center: CLLocationCoordinate2D(latitude: 42.175, longitude: -73.279),
-            span: MKCoordinateSpan(latitudeDelta: 0.04, longitudeDelta: 0.04)
+            center: CLLocationCoordinate2D(latitude: 42.20, longitude: -73.30),
+            span: MKCoordinateSpan(latitudeDelta: 0.05, longitudeDelta: 0.05)
         )
         mapView.setRegion(pannedRegion, animated: false)
-        coordinator.syncCatchAnnotations(on: mapView, catches: [catchItem])
-        coordinator.syncSelection(on: mapView, selection: selection)
-
         let centerBefore = mapView.region.center
-        coordinator.syncBathymetryOverlay(on: mapView, isVisible: true)
+
+        let depthsOnBridge = CatchMKMapView(
+            catches: [catchItem],
+            accessSites: [],
+            showPublicAccess: false,
+            showLakeDepths: true,
+            mapStyle: .standard,
+            targetRegion: initialRegion,
+            cameraRevision: 1,
+            selection: selectionBinding
+        )
+        depthsOnBridge.applyUpdate(to: mapView, coordinator: coordinator)
         XCTAssertTrue(mapView.overlays.contains { $0 is MassGISBathymetryTileOverlay })
         XCTAssertEqual(mapView.region.center.latitude, centerBefore.latitude, accuracy: 0.001)
         XCTAssertEqual(mapView.region.center.longitude, centerBefore.longitude, accuracy: 0.001)
-        XCTAssertEqual(selection, .catchPin(catchItem.id))
+        XCTAssertEqual(mapView.selectedAnnotations.count, 1)
 
-        coordinator.syncBathymetryOverlay(on: mapView, isVisible: false)
+        initialBridge.applyUpdate(to: mapView, coordinator: coordinator)
         XCTAssertFalse(mapView.overlays.contains { $0 is MassGISBathymetryTileOverlay })
         XCTAssertEqual(mapView.region.center.latitude, centerBefore.latitude, accuracy: 0.001)
-        XCTAssertEqual(selection, .catchPin(catchItem.id))
+        XCTAssertEqual(mapView.selectedAnnotations.count, 1)
     }
 
     private func makeTestCatch() -> CatchItem {
@@ -185,11 +227,20 @@ final class BathymetryTileOverlayTests: XCTestCase {
         config.protocolClasses = [StubTileURLProtocol.self]
         return URLSession(configuration: config)
     }
+
+    private func makeCachingStubSession() -> URLSession {
+        let config = URLSessionConfiguration.default
+        config.urlCache = URLCache(memoryCapacity: 4 * 1024 * 1024, diskCapacity: 0)
+        config.requestCachePolicy = .returnCacheDataElseLoad
+        config.protocolClasses = [StubTileURLProtocol.self]
+        return URLSession(configuration: config)
+    }
 }
 
 private final class StubTileURLProtocol: URLProtocol, @unchecked Sendable {
     enum StubResponse: Sendable {
         case status(Int, Data)
+        case cacheable200(Data)
         case error(URLError)
     }
 
@@ -244,6 +295,16 @@ private final class StubTileURLProtocol: URLProtocol, @unchecked Sendable {
                 headerFields: nil
             )!
             client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
+            client?.urlProtocolDidFinishLoading(self)
+        case let .cacheable200(data):
+            let response = HTTPURLResponse(
+                url: url,
+                statusCode: 200,
+                httpVersion: "HTTP/1.1",
+                headerFields: ["Cache-Control": "public, max-age=3600"]
+            )!
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .allowed)
             client?.urlProtocol(self, didLoad: data)
             client?.urlProtocolDidFinishLoading(self)
         case let .error(error):

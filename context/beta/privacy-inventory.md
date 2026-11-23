@@ -50,6 +50,7 @@ the app remains usable with manual/no-photo alternatives. Location capture is ex
   MassGIS / ArcGIS bathymetry tile requests in the public policy. When a Catch has coordinates and
   empty eligible weather fields, the editor automatically sends its coordinates and Catch time to
   Open-Meteo to suggest conditions. When the user enables the opt-in MA Lake Depths map layer,
-  MapKit sends Massachusetts map tile coordinates (`{z}/{y}/{x}`) for the visible viewport (including
-  when centered on a saved catch) to MassGIS / ArcGIS tile servers on cache misses.
+  MapKit sends map tile coordinates (`{z}/{y}/{x}`) for tiles intersecting the Massachusetts
+  bounding box (`41.2°–42.9°N`, `73.55°–69.9°W`) — including when centered on a saved catch or
+  near-border areas — to MassGIS / ArcGIS tile servers on cache misses.
 - Verify the hosted account-deletion path removes Auth, database rows, and all three private buckets.
