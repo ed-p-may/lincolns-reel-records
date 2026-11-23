@@ -210,4 +210,41 @@ final class CatchMapUITests: XCTestCase {
         accessToggle.switches.firstMatch.tap()
         app.buttons["map.layers.done"].tap()
     }
+
+    func testLakeDepthsLayerTogglesAndPersistsWithoutErrorAlerts() {
+        let app = XCUIApplication()
+        app.launchArguments = ["--ui-testing", "--ui-testing-logbook"]
+        app.launch()
+
+        let mapTab = app.tabBars.buttons["Map"]
+        XCTAssertTrue(mapTab.waitForExistence(timeout: 5))
+        mapTab.tap()
+
+        let layersButton = app.buttons["map.style.button"]
+        XCTAssertTrue(layersButton.waitForExistence(timeout: 5))
+        layersButton.tap()
+
+        let depthToggle = app.switches["map.layer.lake-depths"]
+        XCTAssertTrue(depthToggle.waitForExistence(timeout: 3))
+        XCTAssertEqual(depthToggle.value as? String, "0")
+        depthToggle.switches.firstMatch.tap()
+        app.buttons["map.layers.done"].tap()
+
+        XCTAssertTrue(app.maps.firstMatch.waitForExistence(timeout: 5))
+        XCTAssertEqual(app.alerts.count, 0)
+
+        app.terminate()
+        app.launch()
+        XCTAssertTrue(app.tabBars.buttons["Map"].waitForExistence(timeout: 5))
+        app.tabBars.buttons["Map"].tap()
+
+        let persistedLayersButton = app.buttons["map.style.button"]
+        XCTAssertTrue(persistedLayersButton.waitForExistence(timeout: 5))
+        persistedLayersButton.tap()
+        let persistedDepthToggle = app.switches["map.layer.lake-depths"]
+        XCTAssertTrue(persistedDepthToggle.waitForExistence(timeout: 3))
+        XCTAssertEqual(persistedDepthToggle.value as? String, "1")
+        persistedDepthToggle.switches.firstMatch.tap()
+        app.buttons["map.layers.done"].tap()
+    }
 }

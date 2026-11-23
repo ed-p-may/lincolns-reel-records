@@ -9,6 +9,23 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-11-22 — MKMapView bridge and MassGIS bathymetry tile overlay (Issue #12, Phase 03)
+- **Context:** Issue #12 requests inland lake depth maps for Massachusetts ponds. SwiftUI's native
+  `Map` view on iOS 18 does not support `MKTileOverlay`, and MassGIS / MassWildlife publishes a
+  public, unauthenticated raster tile service (`Inland_Bathymetry`) with depth shading and foot
+  contour labels.
+- **Decision:**
+  - Host `MKMapView` inside `CatchMKMapView` (`UIViewRepresentable`) for `CatchMapView` only,
+    preserving full parity for map styles, species filtering, catch pins, MA public access pins,
+    mutually exclusive selection, and catch-only camera framing while keeping `ManualLocationPicker`
+    and `CatchDetailView` on lightweight SwiftUI `Map`.
+  - Stream MassGIS `Inland_Bathymetry` tiles via `MassGISBathymetryTileOverlay` (`{z}/{y}/{x}`,
+    zoom 11–18, gated to Massachusetts bounds so out-of-state pans make zero network calls, backed
+    by a 25 MB `URLCache`, and treating 404/offline responses silently as empty transparent PNGs).
+  - Persist the toggle under `@AppStorage("reelrecords.map.showLakeDepths")` (default `false`).
+- **Consequences:** Zero paid bathymetry SDKs, zero backend changes, and readable depth contours over
+  Standard, Hybrid, and Satellite basemaps.
+
 ## 2026-11-22 — Bundled MassGIS OFBA public access catalog and live empty map (Issue #12, Phase 02)
 - **Context:** Issue #12 requests Massachusetts public boat ramps and shore fishing access sites on
   the Catch Map without runtime API fragility or paid services.

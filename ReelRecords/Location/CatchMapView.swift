@@ -11,13 +11,15 @@ struct CatchMapView: View {
     @Environment(SyncCoordinator.self) private var syncCoordinator
     @AppStorage(CatchMapStyle.storageKey) private var mapStyle: CatchMapStyle = .standard
     @AppStorage(CatchMapLayerSettings.showPublicAccessKey) private var showPublicAccess = false
+    @AppStorage(CatchMapLayerSettings.showLakeDepthsKey) private var showLakeDepths = false
     @State private var catches: [CatchItem] = []
     @State private var selectedSpecies: String?
     @State private var selection: CatchMapSelection?
     @State private var handledFocusRevision: Int?
     @State private var hasLoadedCatches = false
     @State private var usingEmptyFallbackCamera = false
-    @State private var cameraPosition: MapCameraPosition = .automatic
+    @State private var targetRegion: MKCoordinateRegion?
+    @State private var cameraRevision = 0
     @State private var showingLayersSheet = false
     @State private var loadError: String?
 
@@ -50,6 +52,7 @@ struct CatchMapView: View {
                 CatchMapLayersSheet(
                     mapStyle: $mapStyle,
                     showPublicAccess: $showPublicAccess,
+                    showLakeDepths: $showLakeDepths,
                     publicAccessSiteCount: accessCatalog.sites.count
                 )
             }
@@ -68,36 +71,17 @@ struct CatchMapView: View {
     }
 
     private var mapContent: some View {
-        Map(position: $cameraPosition, selection: $selection) {
-            ForEach(filteredCatches) { catchItem in
-                if let coordinate = catchItem.coordinate {
-                    let isSelected = selection == .catchPin(catchItem.id)
-                    Marker(
-                        catchItem.species,
-                        systemImage: isSelected ? "fish.circle.fill" : "fish.fill",
-                        coordinate: coordinate.mapCoordinate
-                    )
-                    .tint(isSelected ? ReelTheme.accentHighlight : ReelTheme.accent)
-                    .tag(CatchMapSelection.catchPin(catchItem.id))
-                }
-            }
-
-            if showPublicAccess {
-                ForEach(accessCatalog.sites) { site in
-                    Annotation(site.name, coordinate: site.mapCoordinate, anchor: .center) {
-                        PublicAccessPinView(site: site, isSelected: selection == .accessSite(site.id)) {
-                            selection = .accessSite(site.id)
-                        }
-                    }
-                    .tag(CatchMapSelection.accessSite(site.id))
-                }
-            }
-        }
-        .mapStyle(mapStyle.mapStyle)
-        .mapControls {
-            MapCompass()
-            MapScaleView()
-        }
+        CatchMKMapView(
+            catches: filteredCatches,
+            accessSites: accessCatalog.sites,
+            showPublicAccess: showPublicAccess,
+            showLakeDepths: showLakeDepths,
+            mapStyle: mapStyle,
+            targetRegion: targetRegion,
+            cameraRevision: cameraRevision,
+            selection: $selection
+        )
+        .ignoresSafeArea(edges: .bottom)
         .safeAreaInset(edge: .top) { mapHeader }
         .safeAreaInset(edge: .bottom) { bottomDetailCard }
     }
@@ -216,6 +200,11 @@ struct CatchMapView: View {
         )
     }
 
+    private func setCamera(to region: MKCoordinateRegion) {
+        targetRegion = region
+        cameraRevision += 1
+    }
+
     private func selectSpecies(_ species: String?) {
         selectedSpecies = species
         if let nextID = CatchMapFilter.reconciledSelection(selection?.catchID, in: filteredCatches) {
@@ -225,9 +214,7 @@ struct CatchMapView: View {
         }
         usingEmptyFallbackCamera = false
         if let region = CatchMapFilter.fittingRegion(for: filteredCatches) {
-            cameraPosition = .region(region)
-        } else {
-            cameraPosition = .automatic
+            setCamera(to: region)
         }
     }
 
@@ -249,13 +236,13 @@ struct CatchMapView: View {
             }
             if pinnedCatches.isEmpty {
                 if wasFirstLoad || !usingEmptyFallbackCamera {
-                    cameraPosition = .region(Self.defaultMassachusettsRegion)
+                    setCamera(to: Self.defaultMassachusettsRegion)
                     usingEmptyFallbackCamera = true
                 }
             } else if wasFirstLoad || usingEmptyFallbackCamera {
                 usingEmptyFallbackCamera = false
                 if let region = CatchMapFilter.fittingRegion(for: filteredCatches) {
-                    cameraPosition = .region(region)
+                    setCamera(to: region)
                 }
             }
             applyPendingFocusIfNeeded()
@@ -287,10 +274,10 @@ struct CatchMapView: View {
                 selection = nil
                 if let region = CatchMapFilter.fittingRegion(for: filteredCatches) {
                     usingEmptyFallbackCamera = false
-                    cameraPosition = .region(region)
+                    setCamera(to: region)
                 } else {
                     usingEmptyFallbackCamera = true
-                    cameraPosition = .region(Self.defaultMassachusettsRegion)
+                    setCamera(to: Self.defaultMassachusettsRegion)
                 }
             }
             return
@@ -302,7 +289,7 @@ struct CatchMapView: View {
             in: pinnedCatches
         )
         selection = .catchPin(catchItem.id)
-        cameraPosition = .region(MKCoordinateRegion(
+        setCamera(to: MKCoordinateRegion(
             center: coordinate.mapCoordinate,
             span: MKCoordinateSpan(latitudeDelta: 0.035, longitudeDelta: 0.035)
         ))
