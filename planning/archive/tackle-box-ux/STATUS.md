@@ -1,14 +1,14 @@
 ---
 DATE: 2026-11-23
-STATUS: In progress
+STATUS: Complete
 AUTHOR: Antigravity
 ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/11
 ---
 
 # Tackle Box UX — Status
 
-**Status:** In progress
-**Next step:** Review and merge Phase 02 PR (`feat/tackle-box-ux-phase-02`), then archive the packet and close Issue #11.
+**Status:** Complete
+**Next step:** None — archived to `planning/archive/tackle-box-ux/`.
 **Blockers:** None. All 4 product decisions resolved on 2026-11-23 (see [PRD.md](PRD.md#resolved-decisions-2026-11-23)).
 
 ## Phase inventory
@@ -16,7 +16,11 @@ ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/11
 | Phase | Plan | Scope | Status | Evidence |
 |---|---|---|---|---|
 | Phase 01 | [plans/phase-01-recent-strip-and-gallery-picker.md](plans/phase-01-recent-strip-and-gallery-picker.md) | Derived recently-used list (top 5), compact `CatchTackleSection` strip, shared `name`/`brand`/`color` search, and full-screen sectioned `TacklePickerView` | Merged to main | PR #29 (`f376534`); `make ci` pass: 0 lint violations (113 files), 146 unit tests, 31 UI tests, 99 DB tests |
-| Phase 02 | [plans/phase-02-catalog-type-sections.md](plans/phase-02-catalog-type-sections.md) | Type-grouped sections in `TackleBoxView` when viewing "All" types | Implemented on branch | `make ci` pass on `feat/tackle-box-ux-phase-02` |
+| Phase 02 | [plans/phase-02-catalog-type-sections.md](plans/phase-02-catalog-type-sections.md) | Type-grouped sections in `TackleBoxView` when viewing "All" types | Merged to main | PR #30 (`85ffe0e`); `make ci` pass: 0 lint violations (113 files), 146 unit tests, 31 UI tests, 99 DB tests |
+
+## Residual follow-ups
+
+- Physical-device verification with a staged catch photo across the nested full-screen gallery and inline tackle editor presentations remains part of TestFlight QA.
 
 ## Codebase notes verified during scoping (2026-11-23)
 

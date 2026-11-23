@@ -208,9 +208,7 @@ struct AddCatchView: View {
             }
         )) {
             Button("OK", role: .cancel) { errorMessage = nil }
-        } message: {
-            Text(errorMessage ?? "")
-        }
+        } message: { Text(errorMessage ?? "") }
     }
 
     private var conditionsSection: some View {
@@ -287,6 +285,9 @@ private extension AddCatchView {
     }
 
     private func formValues() throws -> CatchValues {
+        try tackleRepository.validateSelectableSelection(
+            itemID: selectedTackleItemID, unchangedFrom: initialValues?.tackleItemID, ownerID: ownerID
+        )
         let numbers = try CatchNumberInputs(
             weight: weight, length: length, airTemperature: airTemperature, waterTemperature: waterTemperature
         ).parsed(unchangedFrom: initialValues)
@@ -342,6 +343,9 @@ private extension AddCatchView {
             dismiss()
             Task { await syncCoordinator.sync(ownerID: ownerID) }
         } catch {
+            if error as? TackleRepositoryError == .retiredSelection {
+                loadTackleItems()
+            }
             errorMessage = error.localizedDescription
         }
     }
