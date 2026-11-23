@@ -1,8 +1,15 @@
 @testable import LincolnReelRecords
 import MapKit
+import os
+import SwiftUI
 import XCTest
 
 final class BathymetryTileOverlayTests: XCTestCase {
+    override func tearDown() {
+        StubTileURLProtocol.reset()
+        super.tearDown()
+    }
+
     func testTileURLUsesArcGISZYXOrder() {
         let overlay = MassGISBathymetryTileOverlay()
         let path = MKTileOverlayPath(x: 4856, y: 6071, z: 14, contentScaleFactor: 2)
@@ -29,8 +36,9 @@ final class BathymetryTileOverlayTests: XCTestCase {
         XCTAssertFalse(MassGISBathymetryTileOverlay.shouldFetchTile(column: 6000, row: 6071, zoom: 14))
     }
 
-    func testOutOfBoundsTileShortCircuitsToEmptyPNGWithoutNetwork() {
-        let overlay = MassGISBathymetryTileOverlay()
+    func testOutOfBoundsTileShortCircuitsWithoutSendingNetworkRequest() {
+        StubTileURLProtocol.setResponse(.status(200, Data([1, 2, 3])))
+        let overlay = MassGISBathymetryTileOverlay(session: makeStubSession())
         let nycPath = MKTileOverlayPath(x: 4824, y: 6160, z: 14, contentScaleFactor: 1)
         let expectation = expectation(description: "Out-of-bounds tile short-circuits")
 
@@ -41,6 +49,61 @@ final class BathymetryTileOverlayTests: XCTestCase {
         }
 
         wait(for: [expectation], timeout: 1.0)
+        XCTAssertEqual(StubTileURLProtocol.requestCount, 0)
+        XCTAssertFalse(overlay.consumeTransientFailure())
+    }
+
+    func testInBoundsTileReturnsPayloadOnHTTP200() {
+        let payload = Data([0x89, 0x50, 0x4E, 0x47, 0xAA, 0xBB])
+        StubTileURLProtocol.setResponse(.status(200, payload))
+        let overlay = MassGISBathymetryTileOverlay(session: makeStubSession())
+        let lakeBuelPath = MKTileOverlayPath(x: 4856, y: 6071, z: 14, contentScaleFactor: 1)
+        let expectation = expectation(description: "In-bounds HTTP 200 tile loads")
+
+        overlay.loadTile(at: lakeBuelPath) { data, error in
+            XCTAssertNil(error)
+            XCTAssertEqual(data, payload)
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 2.0)
+        XCTAssertEqual(StubTileURLProtocol.requestCount, 1)
+        XCTAssertFalse(overlay.consumeTransientFailure())
+    }
+
+    func testInBoundsTileReturnsEmptyPNGOnHTTP404WithoutTransientFailure() {
+        StubTileURLProtocol.setResponse(.status(404, Data()))
+        let overlay = MassGISBathymetryTileOverlay(session: makeStubSession())
+        let lakeBuelPath = MKTileOverlayPath(x: 4856, y: 6071, z: 14, contentScaleFactor: 1)
+        let expectation = expectation(description: "In-bounds HTTP 404 degrades silently")
+
+        overlay.loadTile(at: lakeBuelPath) { data, error in
+            XCTAssertNil(error)
+            XCTAssertEqual(data, MassGISBathymetryTileOverlay.emptyTilePNG)
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 2.0)
+        XCTAssertEqual(StubTileURLProtocol.requestCount, 1)
+        XCTAssertFalse(overlay.consumeTransientFailure())
+    }
+
+    func testInBoundsOfflineFailureReturnsEmptyPNGAndFlagsTransientRetry() {
+        StubTileURLProtocol.setResponse(.error(URLError(.notConnectedToInternet)))
+        let overlay = MassGISBathymetryTileOverlay(session: makeStubSession())
+        let lakeBuelPath = MKTileOverlayPath(x: 4856, y: 6071, z: 14, contentScaleFactor: 1)
+        let expectation = expectation(description: "Offline error degrades silently")
+
+        overlay.loadTile(at: lakeBuelPath) { data, error in
+            XCTAssertNil(error)
+            XCTAssertEqual(data, MassGISBathymetryTileOverlay.emptyTilePNG)
+            expectation.fulfill()
+        }
+
+        wait(for: [expectation], timeout: 2.0)
+        XCTAssertEqual(StubTileURLProtocol.requestCount, 1)
+        XCTAssertTrue(overlay.consumeTransientFailure())
+        XCTAssertFalse(overlay.consumeTransientFailure())
     }
 
     func testOverlayAlphaAndConfigurationDefaults() {
@@ -52,4 +115,141 @@ final class BathymetryTileOverlayTests: XCTestCase {
         XCTAssertEqual(MassGISBathymetryTileOverlay.overlayAlpha(for: .hybrid), 0.68, accuracy: 0.001)
         XCTAssertEqual(MassGISBathymetryTileOverlay.overlayAlpha(for: .satellite), 0.68, accuracy: 0.001)
     }
+
+    @MainActor
+    func testBridgeAttachesAndRemovesBathymetryOverlayWithoutResettingCameraOrSelection() {
+        let catchItem = makeTestCatch()
+        var selection: CatchMapSelection? = .catchPin(catchItem.id)
+        let bridge = CatchMKMapView(
+            catches: [catchItem],
+            accessSites: [],
+            showPublicAccess: false,
+            showLakeDepths: false,
+            mapStyle: .standard,
+            targetRegion: nil,
+            cameraRevision: 0,
+            selection: Binding(get: { selection }, set: { selection = $0 })
+        )
+        let coordinator = bridge.makeCoordinator()
+        let mapView = MKMapView(frame: CGRect(x: 0, y: 0, width: 390, height: 700))
+        CatchMKMapView.configureMapView(mapView, coordinator: coordinator, style: .standard)
+
+        let pannedRegion = MKCoordinateRegion(
+            center: CLLocationCoordinate2D(latitude: 42.175, longitude: -73.279),
+            span: MKCoordinateSpan(latitudeDelta: 0.04, longitudeDelta: 0.04)
+        )
+        mapView.setRegion(pannedRegion, animated: false)
+        coordinator.syncCatchAnnotations(on: mapView, catches: [catchItem])
+        coordinator.syncSelection(on: mapView, selection: selection)
+
+        let centerBefore = mapView.region.center
+        coordinator.syncBathymetryOverlay(on: mapView, isVisible: true)
+        XCTAssertTrue(mapView.overlays.contains { $0 is MassGISBathymetryTileOverlay })
+        XCTAssertEqual(mapView.region.center.latitude, centerBefore.latitude, accuracy: 0.001)
+        XCTAssertEqual(mapView.region.center.longitude, centerBefore.longitude, accuracy: 0.001)
+        XCTAssertEqual(selection, .catchPin(catchItem.id))
+
+        coordinator.syncBathymetryOverlay(on: mapView, isVisible: false)
+        XCTAssertFalse(mapView.overlays.contains { $0 is MassGISBathymetryTileOverlay })
+        XCTAssertEqual(mapView.region.center.latitude, centerBefore.latitude, accuracy: 0.001)
+        XCTAssertEqual(selection, .catchPin(catchItem.id))
+    }
+
+    private func makeTestCatch() -> CatchItem {
+        CatchItem(
+            id: UUID(),
+            ownerID: UUID(),
+            values: CatchValues(
+                species: "Rainbow Trout",
+                weight: nil,
+                length: nil,
+                caughtAt: Date(timeIntervalSince1970: 1_752_000_000),
+                location: "Lake Buel",
+                coordinate: CatchCoordinate(latitude: 42.175, longitude: -73.279),
+                lureText: nil,
+                rodReel: nil,
+                notes: nil,
+                released: true
+            ),
+            createdAt: Date(timeIntervalSince1970: 1_752_000_000),
+            updatedAt: Date(timeIntervalSince1970: 1_752_000_000),
+            deletedAt: nil,
+            remoteVersion: 1,
+            syncState: .synced,
+            syncError: nil
+        )
+    }
+
+    private func makeStubSession() -> URLSession {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [StubTileURLProtocol.self]
+        return URLSession(configuration: config)
+    }
+}
+
+private final class StubTileURLProtocol: URLProtocol, @unchecked Sendable {
+    enum StubResponse: Sendable {
+        case status(Int, Data)
+        case error(URLError)
+    }
+
+    private struct State: Sendable {
+        var response: StubResponse = .status(404, Data())
+        var requestCount = 0
+    }
+
+    private static let stateLock = OSAllocatedUnfairLock(initialState: State())
+
+    static var requestCount: Int {
+        stateLock.withLock(\.requestCount)
+    }
+
+    static func setResponse(_ response: StubResponse) {
+        stateLock.withLock {
+            $0.response = response
+            $0.requestCount = 0
+        }
+    }
+
+    static func reset() {
+        stateLock.withLock {
+            $0.response = .status(404, Data())
+            $0.requestCount = 0
+        }
+    }
+
+    override static func canInit(with _: URLRequest) -> Bool {
+        true
+    }
+
+    override static func canonicalRequest(for request: URLRequest) -> URLRequest {
+        request
+    }
+
+    override func startLoading() {
+        let stub = Self.stateLock.withLock { state -> StubResponse in
+            state.requestCount += 1
+            return state.response
+        }
+        guard let url = request.url else {
+            client?.urlProtocol(self, didFailWithError: URLError(.badURL))
+            return
+        }
+        switch stub {
+        case let .status(code, data):
+            let response = HTTPURLResponse(
+                url: url,
+                statusCode: code,
+                httpVersion: "HTTP/1.1",
+                headerFields: nil
+            )!
+            client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
+            client?.urlProtocol(self, didLoad: data)
+            client?.urlProtocolDidFinishLoading(self)
+        case let .error(error):
+            client?.urlProtocol(self, didFailWithError: error)
+        }
+    }
+
+    override func stopLoading() {}
 }

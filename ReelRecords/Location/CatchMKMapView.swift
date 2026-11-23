@@ -1,4 +1,5 @@
 import MapKit
+import Network
 import SwiftUI
 import UIKit
 
@@ -18,7 +19,16 @@ struct CatchMKMapView: UIViewRepresentable {
 
     func makeUIView(context: Context) -> MKMapView {
         let mapView = MKMapView(frame: .zero)
-        mapView.delegate = context.coordinator
+        Self.configureMapView(mapView, coordinator: context.coordinator, style: mapStyle)
+        return mapView
+    }
+
+    static func configureMapView(
+        _ mapView: MKMapView,
+        coordinator: Coordinator,
+        style: CatchMapStyle
+    ) {
+        mapView.delegate = coordinator
         mapView.overrideUserInterfaceStyle = .dark
         mapView.showsCompass = true
         mapView.showsScale = true
@@ -31,8 +41,7 @@ struct CatchMKMapView: UIViewRepresentable {
             MKAnnotationView.self,
             forAnnotationViewWithReuseIdentifier: Coordinator.accessReuseID
         )
-        applyConfiguration(to: mapView, style: mapStyle)
-        return mapView
+        applyConfiguration(to: mapView, style: style)
     }
 
     func updateUIView(_ mapView: MKMapView, context: Context) {
@@ -41,7 +50,7 @@ struct CatchMKMapView: UIViewRepresentable {
 
         if coordinator.lastAppliedStyle != mapStyle {
             coordinator.lastAppliedStyle = mapStyle
-            applyConfiguration(to: mapView, style: mapStyle)
+            Self.applyConfiguration(to: mapView, style: mapStyle)
             coordinator.updateBathymetryAlpha(on: mapView, style: mapStyle)
         }
 
@@ -51,16 +60,17 @@ struct CatchMKMapView: UIViewRepresentable {
             on: mapView,
             sites: showPublicAccess ? accessSites : []
         )
-        coordinator.syncSelection(on: mapView, selection: selection)
 
         if cameraRevision != coordinator.lastAppliedCameraRevision, let targetRegion {
             let animated = coordinator.lastAppliedCameraRevision != nil
             coordinator.lastAppliedCameraRevision = cameraRevision
             mapView.setRegion(targetRegion, animated: animated)
         }
+
+        coordinator.syncSelection(on: mapView, selection: selection)
     }
 
-    private func applyConfiguration(to mapView: MKMapView, style: CatchMapStyle) {
+    private static func applyConfiguration(to mapView: MKMapView, style: CatchMapStyle) {
         switch style {
         case .standard:
             let config = MKStandardMapConfiguration(elevationStyle: .flat, emphasisStyle: .muted)
@@ -88,22 +98,62 @@ extension CatchMKMapView {
 
         private let bathymetryOverlay = MassGISBathymetryTileOverlay()
         private var bathymetryAttached = false
+        private var pathMonitor: NWPathMonitor?
+        private weak var monitoredMapView: MKMapView?
         private var catchAnnotationsByID: [UUID: CatchPinAnnotation] = [:]
         private var accessAnnotationsByID: [String: PublicAccessAnnotation] = [:]
+        private var pendingSelection: CatchMapSelection?
         private var isSyncingSelection = false
 
         init(parent: CatchMKMapView) {
             self.parent = parent
         }
 
+        deinit {
+            pathMonitor?.cancel()
+        }
+
         func syncBathymetryOverlay(on mapView: MKMapView, isVisible: Bool) {
             if isVisible, !bathymetryAttached {
                 bathymetryAttached = true
                 mapView.addOverlay(bathymetryOverlay, level: .aboveRoads)
+                startPathMonitoring(for: mapView)
             } else if !isVisible, bathymetryAttached {
                 bathymetryAttached = false
+                stopPathMonitoring()
                 mapView.removeOverlay(bathymetryOverlay)
             }
+        }
+
+        private func startPathMonitoring(for mapView: MKMapView) {
+            guard pathMonitor == nil else { return }
+            monitoredMapView = mapView
+            let monitor = NWPathMonitor()
+            monitor.pathUpdateHandler = { [weak self] path in
+                guard path.status == .satisfied else { return }
+                Task { @MainActor [weak self] in
+                    self?.reloadBathymetryIfNeeded()
+                }
+            }
+            monitor.start(queue: DispatchQueue.global(qos: .utility))
+            pathMonitor = monitor
+        }
+
+        private func stopPathMonitoring() {
+            pathMonitor?.cancel()
+            pathMonitor = nil
+            monitoredMapView = nil
+        }
+
+        private func reloadBathymetryIfNeeded() {
+            guard bathymetryAttached,
+                  bathymetryOverlay.consumeTransientFailure(),
+                  let mapView = monitoredMapView,
+                  let renderer = mapView.renderer(for: bathymetryOverlay) as? MKTileOverlayRenderer
+            else {
+                return
+            }
+            renderer.reloadData()
         }
 
         func updateBathymetryAlpha(on mapView: MKMapView, style: CatchMapStyle) {
@@ -196,6 +246,7 @@ extension CatchMKMapView {
 
             let currentSelected = mapView.selectedAnnotations.first
             if let targetAnnotation, currentSelected === targetAnnotation {
+                pendingSelection = nil
                 refreshAppearance(for: targetAnnotation, on: mapView, isSelected: true)
                 return
             }
@@ -210,7 +261,27 @@ extension CatchMKMapView {
             if let targetAnnotation {
                 mapView.selectAnnotation(targetAnnotation, animated: false)
                 refreshAppearance(for: targetAnnotation, on: mapView, isSelected: true)
+                let didSelect = mapView.selectedAnnotations.contains { $0 === targetAnnotation }
+                pendingSelection = didSelect ? nil : selection
+            } else {
+                pendingSelection = nil
             }
+        }
+
+        func mapView(_ mapView: MKMapView, didAdd _: [MKAnnotationView]) {
+            retryPendingSelectionIfNeeded(on: mapView)
+        }
+
+        func mapView(_ mapView: MKMapView, regionDidChangeAnimated _: Bool) {
+            retryPendingSelectionIfNeeded(on: mapView)
+        }
+
+        private func retryPendingSelectionIfNeeded(on mapView: MKMapView) {
+            guard let pending = pendingSelection, pending == parent.selection else {
+                pendingSelection = nil
+                return
+            }
+            syncSelection(on: mapView, selection: pending)
         }
 
         func mapView(_: MKMapView, rendererFor overlay: any MKOverlay) -> MKOverlayRenderer {
@@ -301,6 +372,7 @@ extension CatchMKMapView {
         ) {
             view.canShowCallout = false
             view.displayPriority = .required
+            view.zPriority = .max
             view.titleVisibility = .adaptive
             view.markerTintColor = UIColor(isSelected ? ReelTheme.accentHighlight : ReelTheme.accent)
             view.glyphImage = UIImage(systemName: isSelected ? "fish.circle.fill" : "fish.fill")
@@ -315,49 +387,52 @@ extension CatchMKMapView {
             isSelected: Bool
         ) {
             view.canShowCallout = false
-            view.displayPriority = .defaultLow
-            view.image = Self.makeAccessPinImage(isBoatLaunch: site.isBoatLaunch, isSelected: isSelected)
+            view.displayPriority = .required
+            view.zPriority = isSelected ? .defaultSelected : .defaultUnselected
+            view.image = AccessPinRenderer.image(isBoatLaunch: site.isBoatLaunch, isSelected: isSelected)
             view.centerOffset = .zero
             view.isAccessibilityElement = true
             view.accessibilityTraits = .button
             view.accessibilityLabel = "\(site.name) public access"
             view.accessibilityIdentifier = "map.access-site.\(site.id)"
         }
+    }
+}
 
-        private static func makeAccessPinImage(isBoatLaunch: Bool, isSelected: Bool) -> UIImage {
-            let diameter: CGFloat = isSelected ? 30 : 24
-            let size = CGSize(width: diameter + 4, height: diameter + 4)
-            let renderer = UIGraphicsImageRenderer(size: size)
-            return renderer.image { _ in
-                let circleRect = CGRect(x: 2, y: 2, width: diameter, height: diameter)
-                let fillColor = isSelected
-                    ? UIColor(ReelTheme.accessPin)
-                    : UIColor(ReelTheme.surface).withAlphaComponent(0.92)
-                let strokeColor = UIColor(ReelTheme.accessPin)
-                let path = UIBezierPath(ovalIn: circleRect)
-                fillColor.setFill()
-                path.fill()
-                strokeColor.setStroke()
-                path.lineWidth = isSelected ? 2 : 1.5
-                path.stroke()
+private enum AccessPinRenderer {
+    static func image(isBoatLaunch: Bool, isSelected: Bool) -> UIImage {
+        let diameter: CGFloat = isSelected ? 30 : 24
+        let size = CGSize(width: diameter + 4, height: diameter + 4)
+        let renderer = UIGraphicsImageRenderer(size: size)
+        return renderer.image { _ in
+            let circleRect = CGRect(x: 2, y: 2, width: diameter, height: diameter)
+            let fillColor = isSelected
+                ? UIColor(ReelTheme.accessPin)
+                : UIColor(ReelTheme.surface).withAlphaComponent(0.92)
+            let strokeColor = UIColor(ReelTheme.accessPin)
+            let path = UIBezierPath(ovalIn: circleRect)
+            fillColor.setFill()
+            path.fill()
+            strokeColor.setStroke()
+            path.lineWidth = isSelected ? 2 : 1.5
+            path.stroke()
 
-                let symbolName = isBoatLaunch ? "sailboat.fill" : "figure.fishing"
-                let symbolConfig = UIImage.SymbolConfiguration(
-                    pointSize: isSelected ? 13 : 11,
-                    weight: .semibold
+            let symbolName = isBoatLaunch ? "sailboat.fill" : "figure.fishing"
+            let symbolConfig = UIImage.SymbolConfiguration(
+                pointSize: isSelected ? 13 : 11,
+                weight: .semibold
+            )
+            let tint = isSelected ? UIColor(ReelTheme.page) : UIColor(ReelTheme.primaryText)
+            let symbol = UIImage(systemName: symbolName, withConfiguration: symbolConfig)?
+                .withTintColor(tint, renderingMode: .alwaysOriginal)
+            if let symbol {
+                let symbolRect = CGRect(
+                    x: (size.width - symbol.size.width) / 2,
+                    y: (size.height - symbol.size.height) / 2,
+                    width: symbol.size.width,
+                    height: symbol.size.height
                 )
-                let tint = isSelected ? UIColor(ReelTheme.page) : UIColor(ReelTheme.primaryText)
-                let symbol = UIImage(systemName: symbolName, withConfiguration: symbolConfig)?
-                    .withTintColor(tint, renderingMode: .alwaysOriginal)
-                if let symbol {
-                    let symbolRect = CGRect(
-                        x: (size.width - symbol.size.width) / 2,
-                        y: (size.height - symbol.size.height) / 2,
-                        width: symbol.size.width,
-                        height: symbol.size.height
-                    )
-                    symbol.draw(in: symbolRect)
-                }
+                symbol.draw(in: symbolRect)
             }
         }
     }

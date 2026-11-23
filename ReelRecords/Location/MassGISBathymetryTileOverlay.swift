@@ -1,5 +1,6 @@
 import Foundation
 import MapKit
+import os
 
 final class MassGISBathymetryTileOverlay: MKTileOverlay, @unchecked Sendable {
     static let tileURLTemplate =
@@ -29,6 +30,7 @@ final class MassGISBathymetryTileOverlay: MKTileOverlay, @unchecked Sendable {
     ])
 
     private let session: URLSession
+    private let transientFailureLock = OSAllocatedUnfairLock(initialState: false)
 
     init(session: URLSession? = nil) {
         self.session = session ?? Self.makeCachingSession()
@@ -37,6 +39,14 @@ final class MassGISBathymetryTileOverlay: MKTileOverlay, @unchecked Sendable {
         minimumZ = Self.minZoom
         maximumZ = Self.maxZoom
         tileSize = CGSize(width: 256, height: 256)
+    }
+
+    func consumeTransientFailure() -> Bool {
+        transientFailureLock.withLock { hadFailure in
+            let current = hadFailure
+            hadFailure = false
+            return current
+        }
     }
 
     static func overlayAlpha(for style: CatchMapStyle) -> CGFloat {
@@ -87,9 +97,13 @@ final class MassGISBathymetryTileOverlay: MKTileOverlay, @unchecked Sendable {
         request.cachePolicy = .returnCacheDataElseLoad
         request.timeoutInterval = 10
 
-        session.dataTask(with: request) { data, response, error in
-            guard error == nil,
-                  let httpResponse = response as? HTTPURLResponse,
+        session.dataTask(with: request) { [weak self] data, response, error in
+            if error != nil {
+                self?.transientFailureLock.withLock { $0 = true }
+                resultBox.handler(Self.emptyTilePNG, nil)
+                return
+            }
+            guard let httpResponse = response as? HTTPURLResponse,
                   httpResponse.statusCode == 200,
                   let data,
                   !data.isEmpty
