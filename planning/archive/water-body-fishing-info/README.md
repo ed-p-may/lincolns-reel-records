@@ -1,6 +1,6 @@
 ---
-DATE: 2026-11-22
-STATUS: Scoped
+DATE: 2026-11-23
+STATUS: Complete
 AUTHOR: Antigravity
 ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/14
 ---
@@ -8,7 +8,7 @@ ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/14
 # Water-Body Fishing Info
 
 **Source:** [GitHub Issue #14](https://github.com/ed-p-may/lincolns-reel-records/issues/14)
-**Status:** Scoped (decisions resolved; ready for Phase 01)
+**Status:** Complete (Phase 01 merged to `main` via [PR #27](https://github.com/ed-p-may/lincolns-reel-records/pull/27); Phases 02–03 deferred)
 **Canonical context affected:** `context/PRD.md` (§6.4 Map), `context/user-stories.md` (Epic D), `context/decisions.md`
 
 ## Scope

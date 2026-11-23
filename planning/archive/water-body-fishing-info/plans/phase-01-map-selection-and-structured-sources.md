@@ -1,13 +1,13 @@
 ---
 DATE: 2026-11-23
-STATUS: Implemented on branch
+STATUS: Merged to main
 AUTHOR: Antigravity
 ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/14
 ---
 
 # Phase 01 — Map selection, sheet UX, and free structured sources
 
-**Status:** Implemented on branch (`feat/water-body-fishing-info`)
+**Status:** Merged to main ([PR #27](https://github.com/ed-p-may/lincolns-reel-records/pull/27), `a43cda3`)
 **Depends on:** Resolved 2026-11-22 decisions in `context/decisions.md`
 
 ## Goal
