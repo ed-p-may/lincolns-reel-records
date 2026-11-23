@@ -1,4 +1,5 @@
 @testable import LincolnReelRecords
+import SwiftData
 import XCTest
 
 final class TackleDiscoveryTests: XCTestCase {
@@ -111,9 +112,9 @@ final class TackleDiscoveryTests: XCTestCase {
 
     func testSectionsByTypeGroupsInCanonicalOrderSortsAlphabeticallyAndMatchesBrandAndColor() throws {
         let spoon = makeItem(name: "Silver Minnow", type: .spoon, color: "Silver", brand: "Johnson")
-        let crankZ = makeItem(name: "Z-Crank", type: .crankbait, color: "Chartreuse", brand: "Rapala")
+        let crankZ = makeItem(name: "Z-Crank", type: .crankbait, color: "Crème Chartreuse", brand: "Rapala")
         let crankA = makeItem(name: "Apple Shad", type: .crankbait, color: "Red Craw", brand: "Strike King")
-        let soft = makeItem(name: "Senko", type: .softPlastic, color: "Green Pumpkin", brand: "Yamamoto")
+        let soft = makeItem(name: "Senko", type: .softPlastic, color: "Green Pumpkin", brand: "Yamamoto Café")
         let items = [spoon, crankZ, crankA, soft]
 
         let allSections = TackleDiscovery.sectionsByType(in: items)
@@ -122,17 +123,65 @@ final class TackleDiscoveryTests: XCTestCase {
         XCTAssertEqual(crankSection.items.map(\.name), ["Apple Shad", "Z-Crank"])
         XCTAssertEqual(TackleDiscovery.availableTypes(in: items), [.softPlastic, .crankbait, .spoon])
 
-        let byBrand = TackleDiscovery.sectionsByType(in: items, query: "yamamoto")
+        let byBrand = TackleDiscovery.sectionsByType(in: items, query: "ｃａｆｅ")
         XCTAssertEqual(byBrand.map(\.type), [.softPlastic])
         XCTAssertEqual(try XCTUnwrap(byBrand.first).items.map(\.id), [soft.id])
 
-        let byColor = TackleDiscovery.sectionsByType(in: items, query: "chartreuse")
+        let byColor = TackleDiscovery.sectionsByType(in: items, query: "ｃｒｅｍｅ")
         XCTAssertEqual(byColor.map(\.type), [.crankbait])
         XCTAssertEqual(try XCTUnwrap(byColor.first).items.map(\.id), [crankZ.id])
 
         let byType = TackleDiscovery.sectionsByType(in: items, type: .crankbait)
         XCTAssertEqual(byType.map(\.type), [.crankbait])
         XCTAssertEqual(try XCTUnwrap(byType.first).items.map(\.id), [crankA.id, crankZ.id])
+    }
+
+    @MainActor
+    func testMetadataOnlyRemoteTackleArchiveAdvancesSyncCoordinatorRevision() async throws {
+        let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
+        let container = try ModelContainer(
+            for: CatchRecord.self,
+            OutboxOperation.self,
+            CatchPhotoRecord.self,
+            PhotoOutboxOperation.self,
+            TackleItemRecord.self,
+            TackleOutboxOperation.self,
+            configurations: configuration
+        )
+        let root = FileManager.default.temporaryDirectory
+            .appending(path: "reel-records-tackle-rev-\(UUID().uuidString)", directoryHint: .isDirectory)
+        let fileStore = try PhotoFileStore(rootURL: root)
+        let catchRepo = SwiftDataCatchRepository(modelContext: container.mainContext)
+        let tackleRepo = SwiftDataTackleRepository(modelContext: container.mainContext, fileStore: fileStore)
+        let tackleRemote = InMemoryTackleRemoteStore()
+        let coordinator = SyncCoordinator(
+            repository: catchRepo,
+            remoteStore: InMemoryCatchRemoteStore(),
+            tackleSync: TackleSyncDependencies(repository: tackleRepo, remoteStore: tackleRemote)
+        )
+        let ownerID = UUID()
+        let item = try tackleRepo.create(NewTackleItem(
+            ownerID: ownerID,
+            values: TackleValues(name: "Senko", type: .softPlastic, size: nil, color: nil, brand: nil, archived: false)
+        ))
+        await coordinator.sync(ownerID: ownerID)
+        let revisionAfterInitialSync = coordinator.revision
+
+        let archivedRemote = RemoteTackleItem(
+            id: item.id,
+            ownerID: ownerID,
+            values: TackleValues(name: "Senko", type: .softPlastic, size: nil, color: nil, brand: nil, archived: true),
+            photoStoragePath: nil,
+            createdAt: item.createdAt,
+            updatedAt: .now,
+            deletedAt: nil,
+            version: 2
+        )
+        await tackleRemote.seed(archivedRemote)
+        await coordinator.sync(ownerID: ownerID)
+
+        XCTAssertGreaterThan(coordinator.revision, revisionAfterInitialSync)
+        XCTAssertEqual(try tackleRepo.item(id: item.id, ownerID: ownerID)?.isSelectable, false)
     }
 }
 

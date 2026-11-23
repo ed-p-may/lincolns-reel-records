@@ -109,7 +109,7 @@ struct AddCatchView: View {
                     CatchTackleSection(
                         items: tackleItems,
                         recentItems: recentTackleItems,
-                        selectedItemID: $selectedTackleItemID,
+                        selectedItemID: selectedTackleBinding,
                         lureText: $lureText,
                         onAdd: { isAddingTackle = true },
                         onBrowse: {
@@ -178,40 +178,21 @@ struct AddCatchView: View {
                 coordinate = selected
             }
         }
-        .sheet(isPresented: $isAddingTackle) {
-            TackleItemEditor(ownerID: ownerID) { item in
+        .modifier(AddCatchTacklePresentations(
+            ownerID: ownerID,
+            items: tackleItems,
+            recentItems: recentTackleItems,
+            selectedItemID: selectedTackleItemID,
+            isAdding: $isAddingTackle,
+            isBrowsing: $isBrowsingTackle,
+            isManaging: $isManagingTackle,
+            onSelect: { acceptSelectableTackle($0.id) },
+            onCreated: {
                 loadTackleItems()
-                selectedTackleItemID = item.id
-            }
-        }
-        .fullScreenCover(isPresented: $isBrowsingTackle) {
-            TacklePickerView(
-                ownerID: ownerID,
-                items: tackleItems,
-                recentItems: recentTackleItems,
-                selectedItemID: selectedTackleItemID,
-                onSelect: { item in
-                    guard (try? tackleRepository.item(id: item.id, ownerID: ownerID))?.isSelectable == true else {
-                        loadTackleItems()
-                        return
-                    }
-                    selectedTackleItemID = item.id
-                    isBrowsingTackle = false
-                },
-                onCreated: { item in
-                    loadTackleItems()
-                    selectedTackleItemID = item.id
-                    isBrowsingTackle = false
-                },
-                onCancel: { isBrowsingTackle = false }
-            )
-        }
-        .fullScreenCover(isPresented: $isManagingTackle) {
-            ManageTackleCover(ownerID: ownerID) {
-                loadTackleItems()
-                isManagingTackle = false
-            }
-        }
+                selectedTackleItemID = $0.id
+            },
+            onReload: loadTackleItems
+        ))
         .onDisappear {
             locationService.reset()
             if !didCommitPhotos {
@@ -280,6 +261,29 @@ private extension AddCatchView {
 
     private var recentTackleItems: [TackleItem] {
         TackleDiscovery.recentlyUsed(from: tackleItems, catches: recentCatchHistory)
+    }
+
+    private var selectedTackleBinding: Binding<UUID?> {
+        Binding(
+            get: { selectedTackleItemID },
+            set: { newID in
+                if let newID {
+                    _ = acceptSelectableTackle(newID)
+                } else {
+                    selectedTackleItemID = nil
+                }
+            }
+        )
+    }
+
+    @discardableResult
+    private func acceptSelectableTackle(_ itemID: UUID) -> Bool {
+        guard (try? tackleRepository.item(id: itemID, ownerID: ownerID))?.isSelectable == true else {
+            loadTackleItems()
+            return false
+        }
+        selectedTackleItemID = itemID
+        return true
     }
 
     private func formValues() throws -> CatchValues {
@@ -417,16 +421,10 @@ private extension AddCatchView {
 
     private func loadTackleItems() {
         do {
-            var loaded = try tackleRepository.items(ownerID: ownerID)
-            if let selectedTackleItemID {
-                let isLoaded = loaded.contains { $0.id == selectedTackleItemID }
-                if !isLoaded {
-                    if let historical = try tackleRepository.item(id: selectedTackleItemID, ownerID: ownerID) {
-                        loaded.append(historical)
-                    }
-                }
-            }
-            tackleItems = loaded
+            tackleItems = try tackleRepository.itemsIncludingSelected(
+                ownerID: ownerID,
+                selectedID: selectedTackleItemID
+            )
         } catch {
             errorMessage = error.localizedDescription
         }

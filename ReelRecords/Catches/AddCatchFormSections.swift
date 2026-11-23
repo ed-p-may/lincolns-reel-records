@@ -122,19 +122,54 @@ struct CatchDispositionEditor: View {
     }
 }
 
-struct ManageTackleCover: View {
+struct AddCatchTacklePresentations: ViewModifier {
     let ownerID: UUID
-    let onDone: () -> Void
+    let items: [TackleItem]
+    let recentItems: [TackleItem]
+    let selectedItemID: UUID?
+    @Binding var isAdding: Bool
+    @Binding var isBrowsing: Bool
+    @Binding var isManaging: Bool
+    let onSelect: (TackleItem) -> Bool
+    let onCreated: (TackleItem) -> Void
+    let onReload: () -> Void
 
-    var body: some View {
-        NavigationStack {
-            TackleBoxView(ownerID: ownerID)
-                .toolbar {
-                    ToolbarItem(placement: .cancellationAction) {
-                        Button("Done", action: onDone)
-                    }
+    func body(content: Content) -> some View {
+        content
+            .sheet(isPresented: $isAdding) {
+                TackleItemEditor(ownerID: ownerID, onSaved: onCreated)
+            }
+            .fullScreenCover(isPresented: $isBrowsing) {
+                TacklePickerView(
+                    ownerID: ownerID,
+                    items: items,
+                    recentItems: recentItems,
+                    selectedItemID: selectedItemID,
+                    onSelect: {
+                        if onSelect($0) {
+                            isBrowsing = false
+                        }
+                    },
+                    onCreated: {
+                        onCreated($0)
+                        isBrowsing = false
+                    },
+                    onCancel: { isBrowsing = false }
+                )
+            }
+            .fullScreenCover(isPresented: $isManaging) {
+                NavigationStack {
+                    TackleBoxView(ownerID: ownerID)
+                        .toolbar {
+                            ToolbarItem(placement: .cancellationAction) {
+                                Button("Done") {
+                                    onReload()
+                                    isManaging = false
+                                }
+                            }
+                        }
                 }
-        }
+            }
     }
 }
 

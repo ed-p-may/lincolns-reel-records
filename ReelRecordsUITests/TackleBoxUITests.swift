@@ -134,15 +134,16 @@ final class TackleBoxUITests: XCTestCase {
         XCTAssertTrue(stripLabel.waitForExistence(timeout: 3))
         XCTAssertEqual(stripLabel.label, "RECENTLY USED")
 
-        let first = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'add.tackle.' AND label CONTAINS 'Lure Six'")
-        ).firstMatch
-        let second = app.buttons.matching(
-            NSPredicate(format: "identifier BEGINSWITH 'add.tackle.' AND label CONTAINS 'Lure Five'")
-        ).firstMatch
-        XCTAssertTrue(first.waitForExistence(timeout: 3))
-        XCTAssertTrue(second.exists)
-        XCTAssertLessThan(first.frame.minX, second.frame.minX)
+        let expected = ["Lure Six", "Lure Five", "Lure Four", "Lure Three", "Lure Two"]
+        var previousMinX: CGFloat = -.greatestFiniteMagnitude
+        for name in expected {
+            let button = app.buttons.matching(
+                NSPredicate(format: "identifier BEGINSWITH 'add.tackle.' AND label CONTAINS %@", name)
+            ).firstMatch
+            XCTAssertTrue(button.waitForExistence(timeout: 3), "Expected \(name) in recent strip")
+            XCTAssertGreaterThan(button.frame.minX, previousMinX)
+            previousMinX = button.frame.minX
+        }
 
         for excluded in ["Lure One", "Lure Seven"] {
             let button = app.buttons.matching(

@@ -76,6 +76,7 @@ struct CatchTackleSection: View {
                     }
                 }
             }
+            .accessibilityIdentifier("add.tackle.strip")
             if selectableItems.isEmpty {
                 Text("Add your first lure or bait to reuse it here.")
                     .font(ReelFont.body(.caption))
