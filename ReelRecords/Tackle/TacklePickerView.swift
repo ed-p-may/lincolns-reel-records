@@ -23,7 +23,7 @@ struct TacklePickerView: View {
 
         NavigationStack {
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 16) {
                     if selectable.isEmpty {
                         emptyCatalogState
                     } else {

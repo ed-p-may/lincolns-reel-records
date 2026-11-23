@@ -256,8 +256,10 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval
 
 ### 6.8 Tackle Box
 - A per-user catalog of lures & bait (see §5.1). Mockup: `mockups/tacklebox.html`.
-- **Catalog:** header + count, **search**, **type filter** chips, 2-col grid of item cards (photo, type
-  badge, color swatch, name, size · brand). Tap a card → edit. Per-item **catch count** is post-v1 F4.
+- **Catalog:** header + count, **search** (across name, brand, and color), **type filter** chips,
+  2-col grid of item cards (photo, type badge, color swatch, name, size · brand) grouped into
+  `TackleItemType` sections when viewing **All** types (both Active and Archived). Tap a card → edit.
+  Per-item **catch count** is post-v1 F4.
 - **Add / Edit item** (bottom sheet): photo, name, type chips, size, color (+ swatch), optional brand →
   Save.
 - **Entry points:** from Profile ("My Tackle Box") and inline from the Add-Catch lure picker.

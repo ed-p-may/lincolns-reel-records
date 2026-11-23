@@ -15,6 +15,8 @@ final class TackleBoxUITests: XCTestCase {
         tackleLink.tap()
 
         XCTAssertTrue(app.navigationBars["Tackle Box"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["tackle.section.soft_plastic"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["tackle.section.spinnerbait"].exists)
         let spinner = app.staticTexts["Chartreuse Spinner"]
         XCTAssertTrue(spinner.waitForExistence(timeout: 3))
         let catalogScreenshot = XCTAttachment(screenshot: app.screenshot())
@@ -25,6 +27,8 @@ final class TackleBoxUITests: XCTestCase {
         app.textFields["tackle.search"].typeText("spinner")
         app.buttons["tackle.type.spinnerbait"].tap()
         XCTAssertTrue(spinner.waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts["tackle.section.soft_plastic"].exists)
+        XCTAssertFalse(app.staticTexts["tackle.section.spinnerbait"].exists)
         XCTAssertFalse(app.staticTexts["Green Pumpkin Senko"].exists)
 
         spinner.tap()

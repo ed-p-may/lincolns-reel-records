@@ -1,6 +1,6 @@
 ---
 DATE: 2026-11-23
-STATUS: Scoped
+STATUS: Implemented on branch
 AUTHOR: Antigravity
 ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/11
 ---
@@ -8,7 +8,7 @@ ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/11
 # Phase 02 — Type-grouped sections in Tackle Box catalog
 
 **Date:** 2026-11-23
-**Status:** Scoped
+**Status:** Implemented on branch
 **Depends on:** Phase 01 (`TackleDiscovery.sectionsByType`)
 **Source:** [GitHub Issue #11](https://github.com/ed-p-may/lincolns-reel-records/issues/11)
 
