@@ -22,8 +22,9 @@ made; keep the "Open" list current. Newest entries at the top.
     via `TackleDiscovery.results`.
   - Refresh the catalog on Browse open and on `syncCoordinator.revision` changes, and recheck item
     selectability before accepting a selection so sync-retired items cannot be linked to a catch.
-- **Consequences:** Zero SwiftData schema, Supabase migration, or sync protocol changes; Phase 02
-  reuses `TackleDiscovery.sectionsByType` and `TackleSectionHeader` for `TackleBoxView`.
+- **Consequences:** Zero SwiftData schema, Supabase migration, or sync protocol changes; `TackleBoxView`
+  reuses `TackleDiscovery.sectionsByType` and `TackleSectionHeader` to group both Active and Archived
+  catalogs by `TackleItemType` when viewing `All` types (Phase 02).
 
 ## 2026-11-22 — MKMapView bridge and MassGIS bathymetry tile overlay (Issue #12, Phase 03)
 - **Context:** Issue #12 requests inland lake depth maps for Massachusetts ponds. SwiftUI's native

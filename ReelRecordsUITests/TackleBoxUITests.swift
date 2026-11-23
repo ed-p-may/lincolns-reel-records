@@ -15,6 +15,8 @@ final class TackleBoxUITests: XCTestCase {
         tackleLink.tap()
 
         XCTAssertTrue(app.navigationBars["Tackle Box"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["tackle.section.soft_plastic"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["tackle.section.spinnerbait"].exists)
         let spinner = app.staticTexts["Chartreuse Spinner"]
         XCTAssertTrue(spinner.waitForExistence(timeout: 3))
         let catalogScreenshot = XCTAttachment(screenshot: app.screenshot())
@@ -23,26 +25,40 @@ final class TackleBoxUITests: XCTestCase {
         add(catalogScreenshot)
         app.textFields["tackle.search"].tap()
         app.textFields["tackle.search"].typeText("spinner")
-        app.buttons["tackle.type.spinnerbait"].tap()
-        XCTAssertTrue(spinner.waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["tackle.section.spinnerbait"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts["tackle.section.soft_plastic"].exists)
         XCTAssertFalse(app.staticTexts["Green Pumpkin Senko"].exists)
 
-        spinner.tap()
+        app.buttons["tackle.search.clear"].tap()
+        XCTAssertTrue(app.staticTexts["tackle.section.soft_plastic"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Green Pumpkin Senko"].exists)
+        app.buttons["tackle.type.spinnerbait"].tap()
+        XCTAssertTrue(spinner.waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts["tackle.section.soft_plastic"].exists)
+        XCTAssertFalse(app.staticTexts["tackle.section.spinnerbait"].exists)
+        XCTAssertFalse(app.staticTexts["Green Pumpkin Senko"].exists)
+
+        toggleArchiveAndSave(item: spinner, in: app)
+
+        XCTAssertFalse(spinner.waitForExistence(timeout: 2))
+        app.segmentedControls["tackle.archive-filter"].buttons["Archived"].tap()
+        app.buttons["tackle.type.all"].tap()
+        XCTAssertTrue(app.staticTexts["tackle.section.spinnerbait"].waitForExistence(timeout: 3))
+        XCTAssertTrue(spinner.waitForExistence(timeout: 3))
+
+        toggleArchiveAndSave(item: spinner, in: app)
+        XCTAssertTrue(app.staticTexts["No archived tackle"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts["tackle.section.spinnerbait"].exists)
+        app.segmentedControls["tackle.archive-filter"].buttons["Active"].tap()
+        XCTAssertTrue(spinner.waitForExistence(timeout: 3))
+    }
+
+    private func toggleArchiveAndSave(item: XCUIElement, in app: XCUIApplication) {
+        item.tap()
         let archivedToggle = app.switches["tackle.editor.archived"]
         XCTAssertTrue(archivedToggle.waitForExistence(timeout: 3))
         archivedToggle.tap()
         app.buttons["tackle.editor.save"].tap()
-
-        XCTAssertFalse(spinner.waitForExistence(timeout: 2))
-        app.segmentedControls["tackle.archive-filter"].buttons["Archived"].tap()
-        XCTAssertTrue(spinner.waitForExistence(timeout: 3))
-
-        spinner.tap()
-        XCTAssertTrue(archivedToggle.waitForExistence(timeout: 3))
-        archivedToggle.tap()
-        app.buttons["tackle.editor.save"].tap()
-        app.segmentedControls["tackle.archive-filter"].buttons["Active"].tap()
-        XCTAssertTrue(spinner.waitForExistence(timeout: 3))
     }
 
     func testInlineTackleCreationLinksNewCatchAndOpensFromDetail() {

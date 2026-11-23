@@ -32,9 +32,9 @@ struct TackleBoxView: View {
     var initialItemID: UUID?
 
     var body: some View {
-        let results = TackleDiscovery.results(in: items, query: query, type: selectedType)
+        let sections = TackleDiscovery.sectionsByType(in: items, query: query, type: selectedType)
         ScrollView {
-            LazyVStack(alignment: .leading, spacing: 16) {
+            VStack(alignment: .leading, spacing: 16) {
                 header
                 Picker("Catalog", selection: $showsArchived) {
                     Text("Active").tag(false)
@@ -45,18 +45,10 @@ struct TackleBoxView: View {
 
                 searchField
                 typeFilters
-                if results.isEmpty {
+                if sections.isEmpty {
                     emptyState
                 } else {
-                    LazyVGrid(columns: columns, spacing: 13) {
-                        ForEach(results) { item in
-                            Button { editor = .edit(item) } label: {
-                                TackleItemCard(item: item)
-                            }
-                            .buttonStyle(.plain)
-                            .accessibilityIdentifier("tackle.item.\(item.id.uuidString)")
-                        }
-                    }
+                    catalogGrid(sections: sections)
                 }
             }
             .padding(.horizontal, 20)
@@ -131,12 +123,23 @@ struct TackleBoxView: View {
             TextField("Search your tackle", text: $query)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
+                .accessibilityIdentifier("tackle.search")
+            if !query.isEmpty {
+                Button { query = "" } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(ReelTheme.tertiaryText)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Clear search")
+                .accessibilityIdentifier("tackle.search.clear")
+            }
         }
         .padding(.horizontal, 14)
         .frame(minHeight: 50)
         .background(ReelTheme.raisedSurface, in: RoundedRectangle(cornerRadius: 15))
         .overlay { RoundedRectangle(cornerRadius: 15).stroke(ReelTheme.border) }
-        .accessibilityIdentifier("tackle.search")
     }
 
     private var typeFilters: some View {
@@ -154,6 +157,42 @@ struct TackleBoxView: View {
                 }
             }
         }
+    }
+
+    @ViewBuilder
+    private func catalogGrid(sections: [TackleTypeSection]) -> some View {
+        if selectedType == nil {
+            LazyVGrid(columns: columns, spacing: 13) {
+                ForEach(sections) { section in
+                    Section {
+                        ForEach(section.items) { item in
+                            itemButton(item)
+                        }
+                    } header: {
+                        TackleSectionHeader(
+                            title: section.type.label,
+                            systemImage: section.type.systemImage,
+                            count: section.items.count,
+                            identifier: "tackle.section.\(section.type.rawValue)"
+                        )
+                    }
+                }
+            }
+        } else {
+            LazyVGrid(columns: columns, spacing: 13) {
+                ForEach(sections.flatMap(\.items)) { item in
+                    itemButton(item)
+                }
+            }
+        }
+    }
+
+    private func itemButton(_ item: TackleItem) -> some View {
+        Button { editor = .edit(item) } label: {
+            TackleItemCard(item: item)
+        }
+        .buttonStyle(.plain)
+        .accessibilityIdentifier("tackle.item.\(item.id.uuidString)")
     }
 
     private var emptyState: some View {

@@ -1,6 +1,6 @@
 ---
 DATE: 2026-11-23
-STATUS: Implemented on branch
+STATUS: Merged to main
 AUTHOR: Antigravity
 ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/11
 ---
@@ -8,7 +8,7 @@ ISSUE: https://github.com/ed-p-may/lincolns-reel-records/issues/11
 # Phase 01 — Recently-used strip and full-screen gallery picker
 
 **Date:** 2026-11-23
-**Status:** Implemented on branch
+**Status:** Merged to main (PR #29, `f376534`)
 **Depends on:** Completed Phase 08 (Tackle Box) and Last-used Catch Defaults
 **Source:** [GitHub Issue #11](https://github.com/ed-p-may/lincolns-reel-records/issues/11)
 

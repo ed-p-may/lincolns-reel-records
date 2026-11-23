@@ -23,7 +23,7 @@ struct TacklePickerView: View {
 
         NavigationStack {
             ScrollView {
-                LazyVStack(alignment: .leading, spacing: 16) {
+                VStack(alignment: .leading, spacing: 16) {
                     if selectable.isEmpty {
                         emptyCatalogState
                     } else {
@@ -80,6 +80,8 @@ struct TacklePickerView: View {
                 Button { query = "" } label: {
                     Image(systemName: "xmark.circle.fill")
                         .foregroundStyle(ReelTheme.tertiaryText)
+                        .frame(width: 44, height: 44)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Clear search")
