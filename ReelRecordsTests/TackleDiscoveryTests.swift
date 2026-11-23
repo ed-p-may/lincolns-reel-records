@@ -109,7 +109,7 @@ final class TackleDiscoveryTests: XCTestCase {
         XCTAssertEqual(warm.items.map(\.name), ["Zebra Popper", "Bravo Senko"])
     }
 
-    func testSectionsByTypeGroupsInCanonicalOrderSortsAlphabeticallyAndMatchesBrandAndColor() {
+    func testSectionsByTypeGroupsInCanonicalOrderSortsAlphabeticallyAndMatchesBrandAndColor() throws {
         let spoon = makeItem(name: "Silver Minnow", type: .spoon, color: "Silver", brand: "Johnson")
         let crankZ = makeItem(name: "Z-Crank", type: .crankbait, color: "Chartreuse", brand: "Rapala")
         let crankA = makeItem(name: "Apple Shad", type: .crankbait, color: "Red Craw", brand: "Strike King")
@@ -118,20 +118,21 @@ final class TackleDiscoveryTests: XCTestCase {
 
         let allSections = TackleDiscovery.sectionsByType(in: items)
         XCTAssertEqual(allSections.map(\.type), [.softPlastic, .crankbait, .spoon])
-        XCTAssertEqual(allSections[1].items.map(\.name), ["Apple Shad", "Z-Crank"])
+        let crankSection = try XCTUnwrap(allSections.first { $0.type == .crankbait })
+        XCTAssertEqual(crankSection.items.map(\.name), ["Apple Shad", "Z-Crank"])
         XCTAssertEqual(TackleDiscovery.availableTypes(in: items), [.softPlastic, .crankbait, .spoon])
 
         let byBrand = TackleDiscovery.sectionsByType(in: items, query: "yamamoto")
         XCTAssertEqual(byBrand.map(\.type), [.softPlastic])
-        XCTAssertEqual(byBrand[0].items.map(\.id), [soft.id])
+        XCTAssertEqual(try XCTUnwrap(byBrand.first).items.map(\.id), [soft.id])
 
         let byColor = TackleDiscovery.sectionsByType(in: items, query: "chartreuse")
         XCTAssertEqual(byColor.map(\.type), [.crankbait])
-        XCTAssertEqual(byColor[0].items.map(\.id), [crankZ.id])
+        XCTAssertEqual(try XCTUnwrap(byColor.first).items.map(\.id), [crankZ.id])
 
         let byType = TackleDiscovery.sectionsByType(in: items, type: .crankbait)
         XCTAssertEqual(byType.map(\.type), [.crankbait])
-        XCTAssertEqual(byType[0].items.map(\.id), [crankA.id, crankZ.id])
+        XCTAssertEqual(try XCTUnwrap(byType.first).items.map(\.id), [crankA.id, crankZ.id])
     }
 }
 

@@ -9,6 +9,22 @@ made; keep the "Open" list current. Newest entries at the top.
 
 ## Decisions made
 
+## 2026-11-23 — Derived Tackle Box recency strip, full-screen gallery picker, and expanded search (Issue #11, Phase 01)
+- **Context:** Issue #11 asks to speed up lure selection on Log a Catch once an angler's Tackle Box
+  grows past a handful of items, without adding schema migrations or sync changes.
+- **Decision:**
+  - Derive **Recently Used** (up to 5 distinct selectable `TackleItem`s) purely from the owner's
+    visible local catches (`CatchDiscovery.recentPrecedes`), with a cold-start fallback to the first
+    5 alphabetical selectable items labeled `TACKLE BOX`.
+  - Keep **Browse Tackle Box** (`TacklePickerView`) as a full-screen 2-column tile gallery showing
+    **Recently Used** first followed by canonical `TackleItemType` sections (retaining recent items
+    in their canonical type sections below), with search across `name`, `brand`, and `color` shared
+    via `TackleDiscovery.results`.
+  - Refresh the catalog on Browse open and on `syncCoordinator.revision` changes, and recheck item
+    selectability before accepting a selection so sync-retired items cannot be linked to a catch.
+- **Consequences:** Zero SwiftData schema, Supabase migration, or sync protocol changes; Phase 02
+  reuses `TackleDiscovery.sectionsByType` and `TackleSectionHeader` for `TackleBoxView`.
+
 ## 2026-11-22 — MKMapView bridge and MassGIS bathymetry tile overlay (Issue #12, Phase 03)
 - **Context:** Issue #12 requests inland lake depth maps for Massachusetts ponds. SwiftUI's native
   `Map` view on iOS 18 does not support `MKTileOverlay`, and MassGIS / MassWildlife publishes a

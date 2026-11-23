@@ -58,8 +58,9 @@ _As an angler, I want to fix or remove a catch so my logbook stays accurate._
 
 **A7 · Pick the lure from my Tackle Box (P1)**
 _As an angler, I want to choose the lure/bait from my saved gear so my logs are consistent and analyzable._
-- In Add Catch, the lure field is a **Tackle Box picker** (see Epic F): select a saved item, or add a
-  new one **inline** without leaving the form.
+- In Add Catch, the lure field is a **Tackle Box picker** (see Epic F): pick from an inline strip of
+  up to 5 recently used items, open the full-screen type-sectioned gallery picker (**Browse Tackle
+  Box**) to search/filter and tap-to-select, or add a new item **inline** without leaving the form.
 - A one-off can still be entered as **free text** (`lureText`) when it's not worth cataloging.
 - The selected item shows on the catch card and Catch Detail; tapping it opens its Tackle Box entry.
 
@@ -209,7 +210,7 @@ _As an angler, I want to catalog my lures & bait so I can reuse them and keep cl
 **F2 · Browse & find tackle (P1)**
 _As an angler, I want to search and filter my Tackle Box so I can grab the right lure fast._
 - Catalog grid shows photo, type, color swatch, name, size · brand.
-- **Search** by name; **filter** by type.
+- **Search** across name, brand, and color; **filter** by type.
 
 **F3 · Edit / retire an item (P1)**
 _As an angler, I want to fix or retire tackle without losing history._

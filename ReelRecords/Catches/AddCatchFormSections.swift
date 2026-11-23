@@ -47,6 +47,17 @@ struct CatchDateEditor: View {
 }
 
 struct CatchSpeciesEditor: View {
+    static let suggestedSpecies = [
+        "Largemouth Bass",
+        "Smallmouth Bass",
+        "Northern Pike",
+        "Walleye",
+        "Crappie",
+        "Bluegill",
+        "Channel Catfish",
+        "Rainbow Trout"
+    ]
+
     let options: [String]
     @Binding var selectedSpecies: String
     @Binding var customSpecies: String
@@ -107,6 +118,22 @@ struct CatchDispositionEditor: View {
             }
             .pickerStyle(.segmented)
             .accessibilityIdentifier("add.released")
+        }
+    }
+}
+
+struct ManageTackleCover: View {
+    let ownerID: UUID
+    let onDone: () -> Void
+
+    var body: some View {
+        NavigationStack {
+            TackleBoxView(ownerID: ownerID)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Done", action: onDone)
+                    }
+                }
         }
     }
 }
