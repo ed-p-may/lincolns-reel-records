@@ -56,6 +56,7 @@
 		7B7602E11B5F4F0AC0FED883 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D23BC765920DD9DFBAB42A9 /* DashboardView.swift */; };
 		7C019F8114554C2AD13C1995 /* PublicAccessSiteCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76ABF7FE61BB4B1CBF79DE83 /* PublicAccessSiteCard.swift */; };
 		7DFB8CE29178AE46D91B274F /* AuthBackend.swift in Sources */ = {isa = PBXBuildFile; fileRef = B8DDAE86ED1D2AE8E06A0B91 /* AuthBackend.swift */; };
+		7FD0146C5F1152783FD83866 /* CatchEditPhotoConcurrencyTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2C87E97FFABC911EB1EFA7D1 /* CatchEditPhotoConcurrencyTests.swift */; };
 		879092C5467F9A7E4D17F1AD /* CatchDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 798FBE5458AC3FD926D9B6DD /* CatchDetailView.swift */; };
 		8795914B69778DDD95645C75 /* PhotoGalleryUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = D507FA6DACD56BEAA1A5FCA3 /* PhotoGalleryUITests.swift */; };
 		87EA90297E973C0C9206F77A /* ConditionModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = C4B93E885658057151862F91 /* ConditionModels.swift */; };
@@ -165,6 +166,7 @@
 		2A593DE96B1E32305113E299 /* CatchPhotoPager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchPhotoPager.swift; sourceTree = "<group>"; };
 		2A8F36648AEB8363C6CDB985 /* PhotoMetadataDefaultsUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PhotoMetadataDefaultsUITests.swift; sourceTree = "<group>"; };
 		2C5EF924B1F4BDEFAD8CAD8F /* BathymetryTileOverlayTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BathymetryTileOverlayTests.swift; sourceTree = "<group>"; };
+		2C87E97FFABC911EB1EFA7D1 /* CatchEditPhotoConcurrencyTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchEditPhotoConcurrencyTests.swift; sourceTree = "<group>"; };
 		32F3AE12ADFCAAAE2AF35E22 /* AppDependencies.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDependencies.swift; sourceTree = "<group>"; };
 		357D8827DB6786E542225859 /* CatchShareTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CatchShareTests.swift; sourceTree = "<group>"; };
 		39A826C3942C30F4548BED31 /* LincolnReelRecords.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = LincolnReelRecords.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -504,6 +506,7 @@
 				2C5EF924B1F4BDEFAD8CAD8F /* BathymetryTileOverlayTests.swift */,
 				A2F96EABC8DC1C4D991C710E /* CatchDiscoveryTests.swift */,
 				DEEA5E3354E5E52A098087C7 /* CatchEditConcurrencyTests.swift */,
+				2C87E97FFABC911EB1EFA7D1 /* CatchEditPhotoConcurrencyTests.swift */,
 				E9C4F22B577BAE332104BB6F /* CatchEditRoundTripTests.swift */,
 				41A16E6184062EA3D35F25E9 /* CatchMapTests.swift */,
 				242F61F59B3F0AE44A674867 /* CatchPhotoGalleryTests.swift */,
@@ -685,6 +688,7 @@
 				D5F0368E4AA7A64D6E129DC4 /* BathymetryTileOverlayTests.swift in Sources */,
 				3181317F76C7F0FA64F0586F /* CatchDiscoveryTests.swift in Sources */,
 				15B671313FA9E04F60B16305 /* CatchEditConcurrencyTests.swift in Sources */,
+				7FD0146C5F1152783FD83866 /* CatchEditPhotoConcurrencyTests.swift in Sources */,
 				A15FFF391E546FD654C8AE3B /* CatchEditRoundTripTests.swift in Sources */,
 				8D06F47F682725614A611EA4 /* CatchMapTests.swift in Sources */,
 				DB6B3E07E99FADB830F134BF /* CatchPhotoGalleryTests.swift in Sources */,

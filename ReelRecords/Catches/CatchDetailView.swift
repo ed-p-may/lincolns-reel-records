@@ -284,8 +284,11 @@ private extension CatchDetailView {
                 .accessibilityIdentifier("detail.done")
         }
         ToolbarItem(placement: .primaryAction) {
-            Button("Edit") { isEditing = true }
-                .accessibilityIdentifier("detail.edit")
+            Button("Edit") {
+                reload()
+                isEditing = true
+            }
+            .accessibilityIdentifier("detail.edit")
         }
     }
 

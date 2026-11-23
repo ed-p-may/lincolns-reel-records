@@ -63,10 +63,10 @@ enum CatchEditSave {
                 orderedIDs: request.orderedPhotoIDs,
                 drafts: request.draftPhotos
             )
-            try request.photoRepository.discardDrafts(sessionID: request.photoSessionID)
         } catch {
             throw CatchEditSaveError.photosFailed(savedCatch: catchItem, underlying: error)
         }
+        try? request.photoRepository.discardDrafts(sessionID: request.photoSessionID)
         return CatchEditSaveResult(updatedCatch: catchItem, didMutate: true)
     }
 
@@ -155,13 +155,11 @@ enum CatchEditSave {
                     drafts: request.draftPhotos,
                     expectedSnapshot: plan.snapshot.photos
                 )
-                try request.photoRepository.discardDrafts(sessionID: request.photoSessionID)
             } catch {
                 throw CatchEditSaveError.photosFailed(savedCatch: savedCatch, underlying: error)
             }
-        } else {
-            try? request.photoRepository.discardDrafts(sessionID: request.photoSessionID)
         }
+        try? request.photoRepository.discardDrafts(sessionID: request.photoSessionID)
 
         return CatchEditSaveResult(updatedCatch: savedCatch, didMutate: true)
     }

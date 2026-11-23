@@ -6,12 +6,12 @@ import XCTest
 @MainActor
 final class CatchEditConcurrencyTests: XCTestCase {
     func testUntouchedSaveDoesNotOverwriteConcurrentlySyncedCatch() async throws {
-        let env = try makeEnvironment()
+        let env = try ConcurrencyTestEnvironment.make()
         defer { env.cleanup() }
 
         let created = try env.catchRepository.create(NewCatch(
             ownerID: env.ownerID,
-            values: makeValues(notes: "v1", airTemperatureF: nil)
+            values: ConcurrencyTestEnvironment.makeValues(notes: "v1", airTemperatureF: nil)
         ))
         await env.coordinator.sync(ownerID: env.ownerID)
         let openingCatch = try XCTUnwrap(env.catchRepository.item(id: created.id, ownerID: env.ownerID))
@@ -19,7 +19,11 @@ final class CatchEditConcurrencyTests: XCTestCase {
 
         try await env.seedRemoteCatchUpdate(
             from: openingCatch,
-            values: makeValues(notes: "v2 from other device", airTemperatureF: 72, bookmarked: true)
+            values: ConcurrencyTestEnvironment.makeValues(
+                notes: "v2 from other device",
+                airTemperatureF: 72,
+                bookmarked: true
+            )
         )
         await env.coordinator.sync(ownerID: env.ownerID)
 
@@ -40,54 +44,13 @@ final class CatchEditConcurrencyTests: XCTestCase {
         XCTAssertEqual(remote.values.notes, "v2 from other device")
     }
 
-    func testUntouchedSaveDoesNotDeleteConcurrentlySyncedPhoto() async throws {
-        let env = try makeEnvironment()
-        defer { env.cleanup() }
-
-        let created = try env.catchRepository.create(NewCatch(
-            ownerID: env.ownerID,
-            values: makeValues(notes: "with photo")
-        ))
-        let photoA = try env.photoRepository.stage(data: jpeg(width: 40, height: 40), sessionID: UUID())
-        try env.photoRepository.saveOrder(
-            catchID: created.id,
-            ownerID: env.ownerID,
-            orderedIDs: [photoA.id],
-            drafts: [photoA]
-        )
-        await env.coordinator.sync(ownerID: env.ownerID)
-        let openingCatch = try XCTUnwrap(env.catchRepository.item(id: created.id, ownerID: env.ownerID))
-        let openingPhotos = try env.photoRepository.photos(catchID: created.id, ownerID: env.ownerID)
-        let snapshot = CatchEditSnapshot(
-            catchItem: openingCatch,
-            photos: openingPhotos.map(CatchPhotoSnapshot.init)
-        )
-
-        let photoBID = try await env.seedRemotePhoto(catchID: created.id, position: 1)
-        await env.coordinator.sync(ownerID: env.ownerID)
-
-        let result = try env.persist(
-            snapshot: snapshot,
-            submittedValues: openingCatch.values,
-            orderedPhotoIDs: openingPhotos.map(\.id)
-        )
-        XCTAssertFalse(result.didMutate)
-        await env.coordinator.sync(ownerID: env.ownerID)
-
-        let afterSave = try env.photoRepository.photos(catchID: created.id, ownerID: env.ownerID)
-        XCTAssertEqual(afterSave.map(\.id), [photoA.id, photoBID])
-        XCTAssertEqual(try env.photoRepository.pendingCount(ownerID: env.ownerID), 0)
-        let remoteActive = try await env.photoRemote.fetch(ownerID: env.ownerID).filter { $0.deletedAt == nil }
-        XCTAssertEqual(Set(remoteActive.map(\.id)), Set([photoA.id, photoBID]))
-    }
-
     func testEditedCatchRejectsOverwriteWhenConcurrentlySynced() async throws {
-        let env = try makeEnvironment()
+        let env = try ConcurrencyTestEnvironment.make()
         defer { env.cleanup() }
 
         let created = try env.catchRepository.create(NewCatch(
             ownerID: env.ownerID,
-            values: makeValues(notes: "v1")
+            values: ConcurrencyTestEnvironment.makeValues(notes: "v1")
         ))
         await env.coordinator.sync(ownerID: env.ownerID)
         let openingCatch = try XCTUnwrap(env.catchRepository.item(id: created.id, ownerID: env.ownerID))
@@ -95,13 +58,13 @@ final class CatchEditConcurrencyTests: XCTestCase {
 
         try await env.seedRemoteCatchUpdate(
             from: openingCatch,
-            values: makeValues(notes: "v2 from other device", airTemperatureF: 72)
+            values: ConcurrencyTestEnvironment.makeValues(notes: "v2 from other device", airTemperatureF: 72)
         )
         await env.coordinator.sync(ownerID: env.ownerID)
 
         XCTAssertThrowsError(try env.persist(
             snapshot: snapshot,
-            submittedValues: makeValues(notes: "local edit")
+            submittedValues: ConcurrencyTestEnvironment.makeValues(notes: "local edit")
         )) { error in
             XCTAssertEqual(error as? CatchRepositoryError, .concurrentChange(created.id))
         }
@@ -113,58 +76,13 @@ final class CatchEditConcurrencyTests: XCTestCase {
         XCTAssertEqual(try env.catchRepository.pendingCount(ownerID: env.ownerID), 0)
     }
 
-    func testEditedPhotosRejectOverwriteWhenConcurrentlySynced() async throws {
-        let env = try makeEnvironment()
-        defer { env.cleanup() }
-
-        let created = try env.catchRepository.create(NewCatch(
-            ownerID: env.ownerID,
-            values: makeValues(notes: "with photo")
-        ))
-        let photoA = try env.photoRepository.stage(data: jpeg(width: 40, height: 40), sessionID: UUID())
-        try env.photoRepository.saveOrder(
-            catchID: created.id,
-            ownerID: env.ownerID,
-            orderedIDs: [photoA.id],
-            drafts: [photoA]
-        )
-        await env.coordinator.sync(ownerID: env.ownerID)
-        let openingCatch = try XCTUnwrap(env.catchRepository.item(id: created.id, ownerID: env.ownerID))
-        let openingPhotos = try env.photoRepository.photos(catchID: created.id, ownerID: env.ownerID)
-        let snapshot = CatchEditSnapshot(
-            catchItem: openingCatch,
-            photos: openingPhotos.map(CatchPhotoSnapshot.init)
-        )
-
-        let photoBID = try await env.seedRemotePhoto(catchID: created.id, position: 1)
-        await env.coordinator.sync(ownerID: env.ownerID)
-
-        let sessionID = UUID()
-        let draftC = try env.photoRepository.stage(data: jpeg(width: 40, height: 40), sessionID: sessionID)
-
-        XCTAssertThrowsError(try env.persist(
-            snapshot: snapshot,
-            submittedValues: openingCatch.values,
-            orderedPhotoIDs: [photoA.id, draftC.id],
-            draftPhotos: [draftC],
-            photoSessionID: sessionID
-        )) { error in
-            XCTAssertEqual(error as? CatchPhotoRepositoryError, .concurrentChange(created.id))
-        }
-
-        let livePhotos = try env.photoRepository.photos(catchID: created.id, ownerID: env.ownerID)
-        XCTAssertEqual(livePhotos.map(\.id), [photoA.id, photoBID])
-        XCTAssertEqual(try env.photoRepository.pendingCount(ownerID: env.ownerID), 0)
-        XCTAssertNotNil(env.photoRepository.fileURL(for: draftC))
-    }
-
     func testEditingBothCatchAndPhotosDoesNotPartiallySaveOnPhotoConflict() async throws {
-        let env = try makeEnvironment()
+        let env = try ConcurrencyTestEnvironment.make()
         defer { env.cleanup() }
 
         let created = try env.catchRepository.create(NewCatch(
             ownerID: env.ownerID,
-            values: makeValues(notes: "v1")
+            values: ConcurrencyTestEnvironment.makeValues(notes: "v1")
         ))
         await env.coordinator.sync(ownerID: env.ownerID)
         let openingCatch = try XCTUnwrap(env.catchRepository.item(id: created.id, ownerID: env.ownerID))
@@ -174,11 +92,11 @@ final class CatchEditConcurrencyTests: XCTestCase {
         await env.coordinator.sync(ownerID: env.ownerID)
 
         let sessionID = UUID()
-        let draft = try env.photoRepository.stage(data: jpeg(width: 40, height: 40), sessionID: sessionID)
+        let draft = try env.photoRepository.stage(data: ConcurrencyTestEnvironment.jpeg(), sessionID: sessionID)
 
         XCTAssertThrowsError(try env.persist(
             snapshot: snapshot,
-            submittedValues: makeValues(notes: "local edit"),
+            submittedValues: ConcurrencyTestEnvironment.makeValues(notes: "local edit"),
             orderedPhotoIDs: [draft.id],
             draftPhotos: [draft],
             photoSessionID: sessionID
@@ -197,12 +115,12 @@ final class CatchEditConcurrencyTests: XCTestCase {
     }
 
     func testEditingCatchOnlyPreservesConcurrentlySyncedPhoto() async throws {
-        let env = try makeEnvironment()
+        let env = try ConcurrencyTestEnvironment.make()
         defer { env.cleanup() }
 
         let created = try env.catchRepository.create(NewCatch(
             ownerID: env.ownerID,
-            values: makeValues(notes: "v1")
+            values: ConcurrencyTestEnvironment.makeValues(notes: "v1")
         ))
         await env.coordinator.sync(ownerID: env.ownerID)
         let openingCatch = try XCTUnwrap(env.catchRepository.item(id: created.id, ownerID: env.ownerID))
@@ -211,7 +129,10 @@ final class CatchEditConcurrencyTests: XCTestCase {
         let syncedPhotoID = try await env.seedRemotePhoto(catchID: created.id, position: 0)
         await env.coordinator.sync(ownerID: env.ownerID)
 
-        let result = try env.persist(snapshot: snapshot, submittedValues: makeValues(notes: "updated notes"))
+        let result = try env.persist(
+            snapshot: snapshot,
+            submittedValues: ConcurrencyTestEnvironment.makeValues(notes: "updated notes")
+        )
         XCTAssertTrue(result.didMutate)
 
         let liveCatch = try XCTUnwrap(env.catchRepository.item(id: created.id, ownerID: env.ownerID))
@@ -224,12 +145,12 @@ final class CatchEditConcurrencyTests: XCTestCase {
     }
 
     func testEditingPhotosOnlyPreservesConcurrentlySyncedCatch() async throws {
-        let env = try makeEnvironment()
+        let env = try ConcurrencyTestEnvironment.make()
         defer { env.cleanup() }
 
         let created = try env.catchRepository.create(NewCatch(
             ownerID: env.ownerID,
-            values: makeValues(notes: "v1")
+            values: ConcurrencyTestEnvironment.makeValues(notes: "v1")
         ))
         await env.coordinator.sync(ownerID: env.ownerID)
         let openingCatch = try XCTUnwrap(env.catchRepository.item(id: created.id, ownerID: env.ownerID))
@@ -237,12 +158,12 @@ final class CatchEditConcurrencyTests: XCTestCase {
 
         try await env.seedRemoteCatchUpdate(
             from: openingCatch,
-            values: makeValues(notes: "v2 from other device", airTemperatureF: 72)
+            values: ConcurrencyTestEnvironment.makeValues(notes: "v2 from other device", airTemperatureF: 72)
         )
         await env.coordinator.sync(ownerID: env.ownerID)
 
         let sessionID = UUID()
-        let draft = try env.photoRepository.stage(data: jpeg(width: 40, height: 40), sessionID: sessionID)
+        let draft = try env.photoRepository.stage(data: ConcurrencyTestEnvironment.jpeg(), sessionID: sessionID)
         let result = try env.persist(
             snapshot: snapshot,
             submittedValues: openingCatch.values,
@@ -262,30 +183,58 @@ final class CatchEditConcurrencyTests: XCTestCase {
         )
     }
 
-    func testOwnOfflineCreateCompletingSyncDoesNotBlockSubsequentEdit() async throws {
-        let env = try makeEnvironment()
+    func testOwnOfflineCreateWithTimestampPrecisionShiftDoesNotBlockSubsequentEdit() throws {
+        let env = try ConcurrencyTestEnvironment.make()
         defer { env.cleanup() }
 
+        let localCaughtAt = Date(timeIntervalSince1970: 1_700_000_000.123456)
+        let serverCaughtAt = localCaughtAt.addingTimeInterval(0.005)
         let created = try env.catchRepository.create(NewCatch(
             ownerID: env.ownerID,
-            values: makeValues(notes: "offline draft")
+            values: ConcurrencyTestEnvironment.makeValues(caughtAt: localCaughtAt, notes: "offline draft")
         ))
         let snapshot = CatchEditSnapshot(catchItem: created, photos: [])
 
-        await env.coordinator.sync(ownerID: env.ownerID)
-        XCTAssertEqual(try env.catchRepository.item(id: created.id, ownerID: env.ownerID)?.remoteVersion, 1)
-
-        let result = try env.persist(snapshot: snapshot, submittedValues: makeValues(notes: "edited after upload"))
-        XCTAssertTrue(result.didMutate)
-        XCTAssertEqual(
-            try env.catchRepository.item(id: created.id, ownerID: env.ownerID)?.notes,
-            "edited after upload"
+        // Simulate server ack returning a 5 ms precision-shifted caughtAt timestamp.
+        let mutation = try XCTUnwrap(env.catchRepository.pendingMutations(ownerID: env.ownerID).first)
+        let acked = RemoteCatch(
+            id: created.id,
+            ownerID: env.ownerID,
+            values: ConcurrencyTestEnvironment.makeValues(caughtAt: serverCaughtAt, notes: "offline draft"),
+            createdAt: mutation.catchItem.createdAt,
+            updatedAt: mutation.catchItem.updatedAt,
+            deletedAt: nil,
+            version: 1
         )
+        try env.catchRepository.markApplied(mutation, remote: acked)
+
+        let result = try env.persist(
+            snapshot: snapshot,
+            submittedValues: ConcurrencyTestEnvironment.makeValues(
+                caughtAt: localCaughtAt,
+                notes: "edited after upload"
+            )
+        )
+        XCTAssertTrue(result.didMutate)
+        let live = try XCTUnwrap(env.catchRepository.item(id: created.id, ownerID: env.ownerID))
+        XCTAssertEqual(live.notes, "edited after upload")
+        XCTAssertEqual(live.caughtAt, serverCaughtAt)
     }
 }
 
-private extension CatchEditConcurrencyTests {
-    func makeEnvironment() throws -> ConcurrencyTestEnvironment {
+@MainActor
+struct ConcurrencyTestEnvironment {
+    let root: URL
+    let container: ModelContainer
+    let ownerID: UUID
+    let catchRepository: SwiftDataCatchRepository
+    let photoRepository: SwiftDataCatchPhotoRepository
+    let tackleRepository: SwiftDataTackleRepository
+    let catchRemote: InMemoryCatchRemoteStore
+    let photoRemote: InMemoryCatchPhotoRemoteStore
+    let coordinator: SyncCoordinator
+
+    static func make() throws -> ConcurrencyTestEnvironment {
         let root = FileManager.default.temporaryDirectory
             .appending(path: "reel-records-edit-concurrency-\(UUID().uuidString)", directoryHint: .isDirectory)
         try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
@@ -327,8 +276,9 @@ private extension CatchEditConcurrencyTests {
         )
     }
 
-    func makeValues(
+    static func makeValues(
         species: String = "Bass",
+        caughtAt: Date = Date(timeIntervalSince1970: 1_700_000_000),
         notes: String? = nil,
         airTemperatureF: Double? = nil,
         tackleItemID: UUID? = nil,
@@ -338,7 +288,7 @@ private extension CatchEditConcurrencyTests {
             species: species,
             weight: 3.5,
             length: 17,
-            caughtAt: Date(timeIntervalSince1970: 1_700_000_000),
+            caughtAt: caughtAt,
             location: "Lake Mansfield",
             coordinate: nil,
             conditions: CatchConditions(
@@ -356,7 +306,7 @@ private extension CatchEditConcurrencyTests {
         )
     }
 
-    func jpeg(width: Int, height: Int) -> Data {
+    static func jpeg(width: Int = 40, height: Int = 40) -> Data {
         let renderer = UIGraphicsImageRenderer(size: CGSize(width: width, height: height))
         let image = renderer.image { context in
             UIColor.systemGreen.setFill()
@@ -364,19 +314,26 @@ private extension CatchEditConcurrencyTests {
         }
         return image.jpegData(compressionQuality: 0.8) ?? Data()
     }
-}
 
-@MainActor
-private struct ConcurrencyTestEnvironment {
-    let root: URL
-    let container: ModelContainer
-    let ownerID: UUID
-    let catchRepository: SwiftDataCatchRepository
-    let photoRepository: SwiftDataCatchPhotoRepository
-    let tackleRepository: SwiftDataTackleRepository
-    let catchRemote: InMemoryCatchRemoteStore
-    let photoRemote: InMemoryCatchPhotoRemoteStore
-    let coordinator: SyncCoordinator
+    func createSyncedCatchWithPhotos(count: Int) async throws -> (CatchItem, [CatchPhotoItem]) {
+        let created = try catchRepository.create(NewCatch(
+            ownerID: ownerID,
+            values: Self.makeValues(notes: "with photos")
+        ))
+        let drafts = try (0 ..< count).map { _ in
+            try photoRepository.stage(data: Self.jpeg(), sessionID: UUID())
+        }
+        try photoRepository.saveOrder(
+            catchID: created.id,
+            ownerID: ownerID,
+            orderedIDs: drafts.map(\.id),
+            drafts: drafts
+        )
+        await coordinator.sync(ownerID: ownerID)
+        let catchItem = try XCTUnwrap(catchRepository.item(id: created.id, ownerID: ownerID))
+        let photos = try photoRepository.photos(catchID: created.id, ownerID: ownerID)
+        return (catchItem, photos)
+    }
 
     func persist(
         snapshot: CatchEditSnapshot?,
@@ -417,12 +374,7 @@ private struct ConcurrencyTestEnvironment {
             catchID: catchID,
             photoID: photoID
         )
-        let renderer = UIGraphicsImageRenderer(size: CGSize(width: 30, height: 30))
-        let data = renderer.image { context in
-            UIColor.systemBlue.setFill()
-            context.fill(CGRect(x: 0, y: 0, width: 30, height: 30))
-        }.jpegData(compressionQuality: 0.8) ?? Data()
-        try await photoRemote.upload(data: data, path: path)
+        try await photoRemote.upload(data: Self.jpeg(width: 30, height: 30), path: path)
         let now = Date.now
         let remote = RemoteCatchPhoto(
             id: photoID,
@@ -435,16 +387,59 @@ private struct ConcurrencyTestEnvironment {
             deletedAt: nil,
             version: 1
         )
-        let mutation = PendingPhotoMutation(
+        _ = try await photoRemote.apply(PendingPhotoMutation(
             operationID: UUID(),
             kind: .create,
             stage: .upsertMetadata,
             expectedVersion: 0,
             photo: remote,
             localRelativePath: nil
-        )
-        _ = try await photoRemote.apply(mutation)
+        ))
         return photoID
+    }
+
+    func reorderRemotePhoto(_ photo: CatchPhotoItem, to position: Int) async throws {
+        let updated = RemoteCatchPhoto(
+            id: photo.id,
+            ownerID: ownerID,
+            catchID: photo.catchID,
+            storagePath: photo.storagePath,
+            position: position,
+            createdAt: photo.createdAt,
+            updatedAt: photo.updatedAt.addingTimeInterval(30),
+            deletedAt: nil,
+            version: photo.remoteVersion + 1
+        )
+        _ = try await photoRemote.apply(PendingPhotoMutation(
+            operationID: UUID(),
+            kind: .update,
+            stage: .upsertMetadata,
+            expectedVersion: photo.remoteVersion,
+            photo: updated,
+            localRelativePath: nil
+        ))
+    }
+
+    func deleteRemotePhoto(_ photo: CatchPhotoItem) async throws {
+        let deleted = RemoteCatchPhoto(
+            id: photo.id,
+            ownerID: ownerID,
+            catchID: photo.catchID,
+            storagePath: photo.storagePath,
+            position: photo.position,
+            createdAt: photo.createdAt,
+            updatedAt: photo.updatedAt.addingTimeInterval(30),
+            deletedAt: Date.now,
+            version: photo.remoteVersion + 1
+        )
+        _ = try await photoRemote.apply(PendingPhotoMutation(
+            operationID: UUID(),
+            kind: .delete,
+            stage: .deleteMetadata,
+            expectedVersion: photo.remoteVersion,
+            photo: deleted,
+            localRelativePath: nil
+        ))
     }
 
     func cleanup() {

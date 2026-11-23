@@ -22,12 +22,16 @@ made; keep the "Open" list current. Newest entries at the top.
     when normalized submitted values equal the opening snapshot, and skip
     `SwiftDataCatchPhotoRepository.saveOrder` when no drafts were added and the ordered photo IDs
     match the opening snapshot.
-  - When the angler did edit catch fields or photos, verify both live records still match their
-    opening snapshots (`record.values == normalizedOpening` and
-    `currentSnapshot == openingPhotos`) before mutating either store, throwing `.concurrentChange`
-    rather than silently overwriting merged remote changes or partially saving. Comparing values
-    and `(id, position)` rather than `remoteVersion` allows this device's own offline create/upload
-    to complete in the background without blocking a subsequent edit.
+  - When the angler did edit catch fields or photos, verify preconditions before mutating either
+    store: catch-field edits verify the live catch matches its opening values using
+    `hasSameMutationPayload` (preserving the live server timestamp when `caughtAt` was not edited);
+    photo-only edits verify the parent catch is still active; and photo edits verify the live photo
+    snapshot matches its opening `(id, position)` list. When both stores are edited, both
+    preconditions must pass before either write runs, throwing `.concurrentChange` instead of
+    silently overwriting merged remote edits or partially saving. Comparing payload values and
+    `(id, position)` rather than `remoteVersion` allows this device's own offline create/upload
+    (including server timestamp precision normalization) to complete in the background without
+    blocking a subsequent edit.
 - **Consequences:** Zero schema, migration, or sync protocol changes. Untouched saves are strict
   no-ops; catch-only edits preserve concurrently synced photos and photo-only edits preserve
   concurrently synced catch fields; genuine concurrent edits fail safely with the form kept open.

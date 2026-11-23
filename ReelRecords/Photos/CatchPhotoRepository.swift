@@ -163,7 +163,7 @@ final class SwiftDataCatchPhotoRepository {
             throw error
         }
         for path in localFilesToRemove {
-            try fileStore.remove(relativePath: path)
+            try? fileStore.remove(relativePath: path)
         }
     }
 
@@ -177,7 +177,7 @@ final class SwiftDataCatchPhotoRepository {
         }
         try modelContext.save()
         for path in localFilesToRemove {
-            try fileStore.remove(relativePath: path)
+            try? fileStore.remove(relativePath: path)
         }
     }
 

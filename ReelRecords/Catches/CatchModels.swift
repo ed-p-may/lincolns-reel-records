@@ -186,6 +186,22 @@ struct CatchValues: Equatable, Sendable {
         self.released = released
         self.bookmarked = bookmarked
     }
+
+    func hasSameMutationPayload(as other: CatchValues) -> Bool {
+        species == other.species
+            && weight == other.weight
+            && length == other.length
+            && abs(caughtAt.timeIntervalSince(other.caughtAt)) < 0.01
+            && location == other.location
+            && coordinate == other.coordinate
+            && conditions == other.conditions
+            && tackleItemID == other.tackleItemID
+            && lureText == other.lureText
+            && rodReel == other.rodReel
+            && notes == other.notes
+            && released == other.released
+            && bookmarked == other.bookmarked
+    }
 }
 
 struct CatchItem: Identifiable, Equatable, Sendable {

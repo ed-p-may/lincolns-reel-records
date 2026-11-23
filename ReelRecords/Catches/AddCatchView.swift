@@ -42,6 +42,7 @@ struct AddCatchView: View {
     @State private var didLoadPhotos = false
     @State private var didCommitPhotos = false
     @State private var didNotifySaved = false
+    @State private var hasPendingSyncFromEarlierSave = false
     @State private var isChoosingLocation = false
     @State private var errorMessage: String?
     @State private var editSnapshot: CatchEditSnapshot?
@@ -328,7 +329,7 @@ private extension AddCatchView {
             didCommitPhotos = true
             notifySaved()
             dismiss()
-            if result.didMutate {
+            if result.didMutate || hasPendingSyncFromEarlierSave {
                 Task { await syncCoordinator.sync(ownerID: ownerID) }
             }
         } catch let saveError as CatchEditSaveError {
@@ -337,6 +338,7 @@ private extension AddCatchView {
                     catchItem: savedCatch,
                     photos: editSnapshot?.photos ?? []
                 )
+                hasPendingSyncFromEarlierSave = true
                 notifySaved()
             }
             errorMessage = saveError.localizedDescription
