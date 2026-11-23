@@ -30,6 +30,8 @@ final class TackleBoxUITests: XCTestCase {
         XCTAssertFalse(app.staticTexts["Green Pumpkin Senko"].exists)
 
         app.buttons["tackle.search.clear"].tap()
+        XCTAssertTrue(app.staticTexts["tackle.section.soft_plastic"].waitForExistence(timeout: 3))
+        XCTAssertTrue(app.staticTexts["Green Pumpkin Senko"].exists)
         app.buttons["tackle.type.spinnerbait"].tap()
         XCTAssertTrue(spinner.waitForExistence(timeout: 3))
         XCTAssertFalse(app.staticTexts["tackle.section.soft_plastic"].exists)
@@ -45,6 +47,8 @@ final class TackleBoxUITests: XCTestCase {
         XCTAssertTrue(spinner.waitForExistence(timeout: 3))
 
         toggleArchiveAndSave(item: spinner, in: app)
+        XCTAssertTrue(app.staticTexts["No archived tackle"].waitForExistence(timeout: 3))
+        XCTAssertFalse(app.staticTexts["tackle.section.spinnerbait"].exists)
         app.segmentedControls["tackle.archive-filter"].buttons["Active"].tap()
         XCTAssertTrue(spinner.waitForExistence(timeout: 3))
     }
