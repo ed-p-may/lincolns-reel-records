@@ -42,10 +42,9 @@ struct AddCatchView: View {
     @State private var didLoadPhotos = false
     @State private var didCommitPhotos = false
     @State private var didNotifySaved = false
-    @State private var persistedCatchID: UUID?
     @State private var isChoosingLocation = false
     @State private var errorMessage: String?
-    @State private var initialValues: CatchValues?
+    @State private var editSnapshot: CatchEditSnapshot?
 
     let ownerID: UUID
     let editItem: CatchItem?
@@ -57,7 +56,7 @@ struct AddCatchView: View {
         self.onSaved = onSaved
 
         let values = editItem?.values
-        _initialValues = State(initialValue: values)
+        _editSnapshot = State(initialValue: editItem.map { CatchEditSnapshot(catchItem: $0, photos: nil) })
         let species = CatchDiscovery.pickerSelection(
             for: values?.species ?? "",
             options: CatchSpeciesEditor.suggestedSpecies
@@ -285,11 +284,7 @@ private extension AddCatchView {
     }
 
     private func formValues() throws -> CatchValues {
-        let persistedTackleID = (editItem?.id ?? persistedCatchID)
-            .flatMap { try? repository.item(id: $0, ownerID: ownerID)?.tackleItemID }
-        try tackleRepository.validateSelectableSelection(
-            itemID: selectedTackleItemID, unchangedFrom: persistedTackleID, ownerID: ownerID
-        )
+        let initialValues = editSnapshot?.catchItem.values
         let numbers = try CatchNumberInputs(
             weight: weight, length: length, airTemperature: airTemperature, waterTemperature: waterTemperature
         ).parsed(unchangedFrom: initialValues)
@@ -311,7 +306,7 @@ private extension AddCatchView {
             rodReel: rodReel,
             notes: notes,
             released: released,
-            bookmarked: editItem?.bookmarked ?? false
+            bookmarked: initialValues?.bookmarked ?? false
         )
     }
 
@@ -319,31 +314,32 @@ private extension AddCatchView {
         locationService.reset()
         do {
             let values = try formValues()
-            let catchItem: CatchItem
-            if let catchID = editItem?.id ?? persistedCatchID {
-                catchItem = try repository.update(id: catchID, ownerID: ownerID, values: values)
-            } else {
-                catchItem = try repository.create(NewCatch(ownerID: ownerID, values: values))
-                persistedCatchID = catchItem.id
-            }
-            do {
-                try photoRepository.saveOrder(
-                    catchID: catchItem.id,
-                    ownerID: ownerID,
-                    orderedIDs: photos.map(\.id),
-                    drafts: photos.compactMap(\.draft)
-                )
-                try photoRepository.discardDrafts(sessionID: photoSessionID)
-                didCommitPhotos = true
-            } catch {
-                notifySaved()
-                errorMessage = "The catch is saved locally, but its photos were not attached: "
-                    + error.localizedDescription
-                return
-            }
+            let result = try CatchEditSave.persist(CatchEditSaveRequest(
+                ownerID: ownerID,
+                snapshot: editSnapshot,
+                submittedValues: values,
+                orderedPhotoIDs: photos.map(\.id),
+                draftPhotos: photos.compactMap(\.draft),
+                photoSessionID: photoSessionID,
+                catchRepository: repository,
+                photoRepository: photoRepository,
+                tackleRepository: tackleRepository
+            ))
+            didCommitPhotos = true
             notifySaved()
             dismiss()
-            Task { await syncCoordinator.sync(ownerID: ownerID) }
+            if result.didMutate {
+                Task { await syncCoordinator.sync(ownerID: ownerID) }
+            }
+        } catch let saveError as CatchEditSaveError {
+            if case let .photosFailed(savedCatch, _) = saveError, let savedCatch {
+                editSnapshot = CatchEditSnapshot(
+                    catchItem: savedCatch,
+                    photos: editSnapshot?.photos ?? []
+                )
+                notifySaved()
+            }
+            errorMessage = saveError.localizedDescription
         } catch {
             if error as? TackleRepositoryError == .retiredSelection {
                 loadTackleItems()
@@ -357,7 +353,9 @@ private extension AddCatchView {
         didLoadPhotos = true
         guard let editItem else { return }
         do {
-            photos = try photoRepository.photos(catchID: editItem.id, ownerID: ownerID).map { photo in
+            let loaded = try photoRepository.photos(catchID: editItem.id, ownerID: ownerID)
+            editSnapshot?.photos = loaded.map(CatchPhotoSnapshot.init)
+            photos = loaded.map { photo in
                 EditableCatchPhoto(
                     source: .existing(photo),
                     fileURL: photoRepository.fileURL(for: photo)
