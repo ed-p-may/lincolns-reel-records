@@ -34,6 +34,21 @@ struct CatchTackleSection: View {
                 .buttonStyle(.plain)
                 .accessibilityLabel("Selected \(selectedItem.name). Tap to clear.")
                 .accessibilityIdentifier("add.tackle.selected")
+            } else if selectedItemID != nil {
+                Button { selectedItemID = nil } label: {
+                    HStack {
+                        Label("Unavailable lure · Tap to clear", systemImage: "exclamationmark.triangle")
+                        Spacer()
+                        Image(systemName: "xmark.circle.fill")
+                    }
+                    .font(ReelFont.body(.subheadline, weight: .semibold))
+                    .foregroundStyle(ReelTheme.secondaryText)
+                    .padding(14)
+                    .background(ReelTheme.surface, in: RoundedRectangle(cornerRadius: 14))
+                    .overlay { RoundedRectangle(cornerRadius: 14).stroke(ReelTheme.border) }
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("add.tackle.selected")
             }
             itemPicker
             if !selectableItems.isEmpty {

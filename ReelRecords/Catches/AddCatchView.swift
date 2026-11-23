@@ -276,17 +276,19 @@ private extension AddCatchView {
 
     @discardableResult
     private func acceptSelectableTackle(_ itemID: UUID) -> Bool {
-        guard (try? tackleRepository.item(id: itemID, ownerID: ownerID))?.isSelectable == true else {
+        guard let validID = tackleRepository.selectableID(itemID, ownerID: ownerID) else {
             loadTackleItems()
             return false
         }
-        selectedTackleItemID = itemID
+        selectedTackleItemID = validID
         return true
     }
 
     private func formValues() throws -> CatchValues {
+        let persistedTackleID = (editItem?.id ?? persistedCatchID)
+            .flatMap { try? repository.item(id: $0, ownerID: ownerID)?.tackleItemID }
         try tackleRepository.validateSelectableSelection(
-            itemID: selectedTackleItemID, unchangedFrom: initialValues?.tackleItemID, ownerID: ownerID
+            itemID: selectedTackleItemID, unchangedFrom: persistedTackleID, ownerID: ownerID
         )
         let numbers = try CatchNumberInputs(
             weight: weight, length: length, airTemperature: airTemperature, waterTemperature: waterTemperature
@@ -399,7 +401,7 @@ private extension AddCatchView {
             let defaults = NewCatchDefaults(catchItem: latestCatch)
             location = defaults.location ?? ""
             coordinate = nil
-            selectedTackleItemID = defaults.tackleItemID
+            selectedTackleItemID = tackleRepository.selectableID(defaults.tackleItemID, ownerID: ownerID)
             lureText = defaults.lureText ?? ""
             skyCondition = defaults.skyCondition
             if defaults.skyCondition != nil {
@@ -425,10 +427,8 @@ private extension AddCatchView {
 
     private func loadTackleItems() {
         do {
-            tackleItems = try tackleRepository.itemsIncludingSelected(
-                ownerID: ownerID,
-                selectedID: selectedTackleItemID
-            )
+            let selected = selectedTackleItemID
+            tackleItems = try tackleRepository.itemsIncludingSelected(ownerID: ownerID, selectedID: selected)
         } catch {
             errorMessage = error.localizedDescription
         }

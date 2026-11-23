@@ -145,6 +145,44 @@ final class TackleBoxUITests: XCTestCase {
         XCTAssertTrue(selectedBanner.label.contains("Inline Crank"))
     }
 
+    func testArchivingSelectedLureBlocksSaveUntilCleared() {
+        let app = launchApp(arguments: ["--ui-testing-logbook"])
+        let logTab = app.tabBars.buttons["Log"]
+        XCTAssertTrue(logTab.waitForExistence(timeout: 5))
+        logTab.tap()
+        app.buttons["Log a catch"].tap()
+        app.buttons["add.species.Smallmouth Bass"].tap()
+
+        let form = app.scrollViews.firstMatch
+        for _ in 0 ..< 5 where !app.buttons["add.tackle.manage"].exists {
+            form.swipeUp()
+        }
+        let senkoChip = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'add.tackle.' AND label CONTAINS 'Green Pumpkin Senko'")
+        ).firstMatch
+        XCTAssertTrue(senkoChip.waitForExistence(timeout: 3))
+        senkoChip.tap()
+
+        app.buttons["add.tackle.manage"].tap()
+        let senkoCard = app.buttons.matching(
+            NSPredicate(format: "identifier BEGINSWITH 'tackle.item.' AND label CONTAINS 'Green Pumpkin Senko'")
+        ).firstMatch
+        XCTAssertTrue(senkoCard.waitForExistence(timeout: 3))
+        toggleArchiveAndSave(item: senkoCard, in: app)
+        app.buttons["Done"].tap()
+
+        app.buttons["add.save"].tap()
+        let alert = app.alerts["Unable to finish save"]
+        XCTAssertTrue(alert.waitForExistence(timeout: 5))
+        alert.buttons["OK"].tap()
+
+        let selectedBanner = app.buttons["add.tackle.selected"]
+        XCTAssertTrue(selectedBanner.waitForExistence(timeout: 3))
+        selectedBanner.tap()
+        app.buttons["add.save"].tap()
+        XCTAssertTrue(app.staticTexts["Smallmouth Bass"].waitForExistence(timeout: 5))
+    }
+
     private func assertRecentStripShowsTopFiveOnly(in app: XCUIApplication) {
         let stripLabel = app.staticTexts["add.tackle.strip-label"]
         XCTAssertTrue(stripLabel.waitForExistence(timeout: 3))

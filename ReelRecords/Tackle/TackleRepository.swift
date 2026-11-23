@@ -72,6 +72,11 @@ final class SwiftDataTackleRepository {
         }
     }
 
+    func selectableID(_ id: UUID?, ownerID: UUID) -> UUID? {
+        guard let id, (try? item(id: id, ownerID: ownerID))?.isSelectable == true else { return nil }
+        return id
+    }
+
     func itemNames(ownerID: UUID, referencedIDs: Set<UUID>) throws -> [UUID: String] {
         guard !referencedIDs.isEmpty else { return [:] }
         return try Dictionary(uniqueKeysWithValues: records(ownerID: ownerID)
