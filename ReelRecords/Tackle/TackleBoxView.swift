@@ -123,12 +123,21 @@ struct TackleBoxView: View {
             TextField("Search your tackle", text: $query)
                 .textInputAutocapitalization(.never)
                 .autocorrectionDisabled()
+                .accessibilityIdentifier("tackle.search")
+            if !query.isEmpty {
+                Button { query = "" } label: {
+                    Image(systemName: "xmark.circle.fill")
+                        .foregroundStyle(ReelTheme.tertiaryText)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Clear search")
+                .accessibilityIdentifier("tackle.search.clear")
+            }
         }
         .padding(.horizontal, 14)
         .frame(minHeight: 50)
         .background(ReelTheme.raisedSurface, in: RoundedRectangle(cornerRadius: 15))
         .overlay { RoundedRectangle(cornerRadius: 15).stroke(ReelTheme.border) }
-        .accessibilityIdentifier("tackle.search")
     }
 
     private var typeFilters: some View {
