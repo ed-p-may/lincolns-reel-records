@@ -192,6 +192,11 @@ Backed by Supabase Auth (credentials) + a `profiles` row (app data). No approval
   tapping a site opens a detail card with ramp/parking/restriction info and Apple Maps directions.
   The live map canvas renders even with 0 pinned catches (with a compact empty header) so anglers can
   browse access sites before logging pins.
+- **MA Lake Depths layer:** Toggleable online-backed raster tile overlay (off by default, persisted in
+  `@AppStorage`, cached locally via `URLCache`) streaming MassGIS / MassWildlife Inland Water
+  Bathymetry contours (`{z}/{y}/{x}`, zoom 11–18, gated to Massachusetts bounds, silent 404/offline
+  fallback) over Standard, Hybrid, or Satellite basemaps via an `MKMapView` `UIViewRepresentable`
+  bridge (`CatchMKMapView`).
 - **GPS** is captured at logging (location permission); **manual pin-drop / map-search fallback** when
   GPS is off/denied or a catch is logged later. Free-text named `location` is kept alongside coordinates.
 - Header: "N catches across M spots" (or "X of N catches across M spots" when filtered).

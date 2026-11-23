@@ -160,29 +160,3 @@ struct PublicAccessSiteCard: View {
         ])
     }
 }
-
-struct PublicAccessPinView: View {
-    let site: PublicAccessSite
-    let isSelected: Bool
-    let onSelect: () -> Void
-
-    var body: some View {
-        Button(action: onSelect) {
-            Image(systemName: site.isBoatLaunch ? "sailboat.fill" : "figure.fishing")
-                .font(.system(size: isSelected ? 13 : 11, weight: .semibold))
-                .foregroundStyle(isSelected ? ReelTheme.page : ReelTheme.primaryText)
-                .frame(width: isSelected ? 30 : 24, height: isSelected ? 30 : 24)
-                .background(
-                    isSelected ? ReelTheme.accessPin : ReelTheme.surface.opacity(0.92),
-                    in: Circle()
-                )
-                .overlay {
-                    Circle().stroke(ReelTheme.accessPin, lineWidth: isSelected ? 2 : 1.5)
-                }
-                .shadow(color: .black.opacity(0.45), radius: 3, y: 1)
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("\(site.name) public access")
-        .accessibilityIdentifier("map.access-site.\(site.id)")
-    }
-}

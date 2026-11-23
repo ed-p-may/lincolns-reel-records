@@ -180,6 +180,7 @@ enum CatchMapFilter {
 
 enum CatchMapLayerSettings {
     static let showPublicAccessKey = "reelrecords.map.showPublicAccess"
+    static let showLakeDepthsKey = "reelrecords.map.showLakeDepths"
 }
 
 enum CatchMapSelection: Hashable, Sendable {
@@ -205,6 +206,7 @@ struct CatchMapLayersSheet: View {
     @Environment(\.dismiss) private var dismiss
     @Binding var mapStyle: CatchMapStyle
     @Binding var showPublicAccess: Bool
+    @Binding var showLakeDepths: Bool
     let publicAccessSiteCount: Int
 
     var body: some View {
@@ -259,10 +261,29 @@ struct CatchMapLayersSheet: View {
                     }
                     .tint(ReelTheme.accessPin)
                     .accessibilityIdentifier("map.layer.public-access")
+
+                    Toggle(isOn: $showLakeDepths) {
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("MA Lake Depths")
+                                .font(ReelFont.body(.body, weight: .semibold))
+                                .foregroundStyle(ReelTheme.primaryText)
+                            Text(
+                                "MassWildlife inland pond contours (MA only, requires connection; "
+                                    + "zoom in on a pond to view)."
+                            )
+                            .font(ReelFont.body(.caption))
+                            .foregroundStyle(ReelTheme.secondaryText)
+                        }
+                    }
+                    .tint(ReelTheme.accessPin)
+                    .accessibilityIdentifier("map.layer.lake-depths")
                 } header: {
                     Text("Layers")
                 } footer: {
-                    Text("Public access data sourced from MassGIS / MA Office of Fishing and Boating Access.")
+                    Text(
+                        "Public access and bathymetry data sourced from MassGIS, "
+                            + "MA Office of Fishing and Boating Access, and MassWildlife."
+                    )
                 }
             }
             .scrollContentBackground(.hidden)

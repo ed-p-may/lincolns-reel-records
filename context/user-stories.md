@@ -149,6 +149,11 @@ _As an angler, I want to see official Massachusetts boat ramps, kayak launches, 
 - Tapping an access site opens a detail card with facility types, ramp surface, parking, notes, and Apple Maps directions.
 - The live map remains browsable even when 0 catches are pinned.
 
+**D5 · View MA inland lake depth contours (P1)**
+_As an angler, I want to toggle Massachusetts pond depth maps over standard or satellite imagery._
+- Toggleable layer in Map Layers (off by default, persisted) overlays MassGIS / MassWildlife bathymetry contours over surveyed MA ponds on Standard, Hybrid, and Satellite styles.
+- Out-of-state tiles and offline/404 responses degrade silently with zero error alerts.
+
 ## Epic E — Account, data & settings
 
 **E1 · Get into the app (P0)**
